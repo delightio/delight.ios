@@ -20,7 +20,6 @@
 }
 
 + (void)start;
-+ (void)startWithScaleFactor:(CGFloat)scaleFactor maximumFrameRate:(NSUInteger)maximumFrameRate;
 + (void)stop;
 + (void)pause;
 + (void)resume;
@@ -28,7 +27,9 @@
 + (void)unregisterPrivateView:(UIView *)view;
 + (void)setHidesKeyboard:(BOOL)hidesKeyboard;
 
+@property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) CGFloat frameRate;
+@property (nonatomic, assign) NSUInteger maximumFrameRate;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoController *videoController;

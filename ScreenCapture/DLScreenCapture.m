@@ -27,16 +27,20 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         method_exchangeImplementations(origMethod, newMethod);
 }
 
-@interface DLScreenCapture(Private)
-- (void)startRecordingWithScaleFactor:(CGFloat)scaleFactor maximumFrameRate:(NSUInteger)maximumFrameRate;
+@interface DLScreenCapture ()
+- (void)startRecording;
 - (void)stopRecording;
 - (void)pause;
 - (void)resume;
+- (void)screenshotTimerFired;
+- (void)takeScreenshot;
 @end
 
 @implementation DLScreenCapture
 
+@synthesize scaleFactor;
 @synthesize frameRate;
+@synthesize maximumFrameRate;
 @synthesize paused;
 @synthesize screenshotController;
 @synthesize videoController;
@@ -53,12 +57,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)start
 {
-    [[self sharedInstance] startRecordingWithScaleFactor:kDefaultScaleFactor maximumFrameRate:kDefaultMaxFrameRate];    
-}
-
-+ (void)startWithScaleFactor:(CGFloat)scaleFactor maximumFrameRate:(NSUInteger)maximumFrameRate
-{
-    [[self sharedInstance] startRecordingWithScaleFactor:scaleFactor maximumFrameRate:maximumFrameRate];
+    [[self sharedInstance] startRecording];
 }
 
 + (void)stop
@@ -98,7 +97,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     self = [super init];
     if (self) {
+        self.scaleFactor = kDefaultScaleFactor;
         self.frameRate = kStartingFrameRate;
+        self.maximumFrameRate = kDefaultMaxFrameRate;
         
         screenshotController = [[DLScreenshotController alloc] init];
 
@@ -127,10 +128,54 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [super dealloc];
 }
 
-- (void)takeScreenshot
+- (void)startRecording
+{
+    if (!videoController.recording) {
+        [videoController startNewRecording];
+        
+        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+    }
+}
+
+- (void)stopRecording 
+{
+    [videoController stopRecording];
+}
+
+- (void)pause
+{
+    if (!paused) {
+        paused = YES;
+        pauseStartedAt = [[NSDate date] timeIntervalSince1970];
+    }
+}
+
+- (void)resume
+{
+    if (paused) {
+        paused = NO;
+        NSTimeInterval thisPauseTime = [[NSDate date] timeIntervalSince1970] - pauseStartedAt;
+        [videoController addPauseTime:thisPauseTime];
+        
+        NSLog(@"Resume recording, was paused for %.1f seconds", thisPauseTime);
+    }
+}
+
+- (void)setScaleFactor:(CGFloat)aScaleFactor
+{
+    if (videoController.recording) {
+        [NSException raise:@"Screen capture exception" format:@"Cannot change scale factor while recording is in progress."];
+    }
+    
+    scaleFactor = aScaleFactor;
+    screenshotController.scaleFactor = scaleFactor;
+    videoController.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
+}
+
+- (void)screenshotTimerFired
 {
     if (!processing) {
-        [self performSelectorInBackground:@selector(takeScreenshotInCurrentThread) withObject:nil];
+        [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
         if (frameRate < maximumFrameRate) {
             frameRate++;
         }
@@ -145,10 +190,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         NSLog(@"Frame rate: %.0f fps", frameRate);
     }
     
-    [self performSelector:@selector(takeScreenshot) withObject:nil afterDelay:1.0/frameRate];
+    [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0/frameRate];
 }
 
-- (void)takeScreenshotInCurrentThread
+- (void)takeScreenshot
 {
     if (paused || !videoController.recording) return;
     
@@ -177,54 +222,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     processing = NO;
 }
 
-- (void)startRecordingWithScaleFactor:(CGFloat)aScaleFactor maximumFrameRate:(NSUInteger)aMaximumFrameRate
-{
-    scaleFactor = aScaleFactor;
-    screenshotController.scaleFactor = aScaleFactor;
-    maximumFrameRate = aMaximumFrameRate;
-
-    if (!videoController.recording) {
-        videoController.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
-        [videoController startNewRecording];
-        
-        [self performSelector:@selector(takeScreenshot) withObject:nil afterDelay:1.0/frameRate];
-    }
-}
-
-- (void)stopRecording 
-{
-    [videoController stopRecording];
-}
-
-- (void)pause
-{
-    if (!paused) {
-        paused = YES;
-        pauseStartedAt = [[NSDate date] timeIntervalSince1970];
-    }
-}
-
-- (void)resume
-{
-    if (paused) {
-        paused = NO;
-        NSTimeInterval thisPauseTime = [[NSDate date] timeIntervalSince1970] - pauseStartedAt;
-        [videoController addPauseTime:thisPauseTime];
-        
-        NSLog(@"Resume recording, was paused for %.1f seconds", thisPauseTime);
-    }
-}
-
 #pragma mark - Notifications
+
+- (void)handleDidBecomeActive:(NSNotification *)notification
+{
+    [self startRecording];
+}
 
 - (void)handleWillResignActive:(NSNotification *)notification
 {
     [self stopRecording];
-}
-
-- (void)handleDidBecomeActive:(NSNotification *)notification
-{
-    [self startRecordingWithScaleFactor:scaleFactor maximumFrameRate:maximumFrameRate];
 }
 
 @end
