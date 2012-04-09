@@ -28,12 +28,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 @interface DLScreenCapture ()
-- (void)startRecording;
-- (void)stopRecording;
-- (void)pause;
-- (void)resume;
 - (void)screenshotTimerFired;
-- (void)takeScreenshot;
+- (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 @end
 
 @implementation DLScreenCapture
@@ -75,6 +71,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)resume
 {
     [[self sharedInstance] resume];
+}
+
++ (void)takeScreenshot
+{
+    [[self sharedInstance] takeScreenshot];
+}
+
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
+{
+    [[self sharedInstance] takeOpenGLScreenshot:glView colorRenderBuffer:colorRenderBuffer];
 }
 
 + (void)registerPrivateView:(UIView *)view description:(NSString *)description
@@ -201,41 +207,28 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     videoController.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
 }
 
-- (void)screenshotTimerFired
+- (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
 {
-    if (!processing) {
-        [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
-        if (frameRate < maximumFrameRate) {
-            frameRate++;
-        }
-    } else {
-        // Frame rate too high to keep up
-        if (frameRate > 1.0) {
-            frameRate--;
-        }
-    }
+    autoCaptureEnabled = isAutoCaptureEnabled;
     
-    if (frameCount % 30 == 0) {
-        NSLog(@"Frame rate: %.0f fps", frameRate);
-    }
-    
-    if (autoCaptureEnabled) {
-        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0/frameRate];
+    if (autoCaptureEnabled && videoController.recording) {
+        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
     }
 }
 
-- (void)takeScreenshot
+- (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
-    if (paused || !videoController.recording) return;
-    
     processing = YES;
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     UIImage *screenshot = nil;
     
     @synchronized(self) {
-        // Take screenshot
         NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
-        screenshot = [screenshotController screenshot];
+        if (glView) {
+            screenshot = [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
+        } else {
+            screenshot = [screenshotController screenshot];
+        }
         NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
         
         frameCount++;
@@ -243,14 +236,47 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);
     }
     
-    if (videoController.recording) {
-        @synchronized(self) {
-            [videoController writeFrameImage:screenshot];
-        } 
-    }
+    @synchronized(self) {
+        [videoController writeFrameImage:screenshot];
+    } 
     
     [pool drain];
     processing = NO;
+}
+
+- (void)takeScreenshot
+{    
+    [self takeScreenshot:nil colorRenderBuffer:0];
+}
+
+- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
+{
+    [self takeScreenshot:glView colorRenderBuffer:colorRenderBuffer];
+}
+
+- (void)screenshotTimerFired
+{
+    if (!paused) {
+        if (!processing) {
+            [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
+            if (frameRate < maximumFrameRate) {
+                frameRate++;
+            }
+        } else {
+            // Frame rate too high to keep up
+            if (frameRate > 1.0) {
+                frameRate--;
+            }
+        }
+        
+        if (frameCount % 30 == 0) {
+            NSLog(@"Frame rate: %.0f fps", frameRate);
+        }
+    }
+    
+    if (autoCaptureEnabled) {
+        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+    }
 }
 
 #pragma mark - Notifications

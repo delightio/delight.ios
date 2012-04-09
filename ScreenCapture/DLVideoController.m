@@ -66,7 +66,7 @@
 
 - (void)writeFrameImage:(UIImage *)frameImage
 {
-    if (![videoWriterInput isReadyForMoreMediaData]) {
+    if (![videoWriterInput isReadyForMoreMediaData] || !recording) {
         NSLog(@"Not ready for video data");
     } else {
         float millisElapsed = ([[NSDate date] timeIntervalSinceDate:startedAt] - pauseTime) * 1000.0;

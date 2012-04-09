@@ -21,6 +21,8 @@
 + (void)stop;
 + (void)pause;
 + (void)resume;
++ (void)takeScreenshot;
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 + (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 + (void)unregisterPrivateView:(UIView *)view;
 + (BOOL)hidesKeyboard;
@@ -37,5 +39,12 @@
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoController *videoController;
+
+- (void)startRecording;
+- (void)stopRecording;
+- (void)pause;
+- (void)resume;
+- (void)takeScreenshot;
+- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 
 @end
