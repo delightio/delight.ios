@@ -13,24 +13,9 @@
 @interface DLScreenCapture : NSObject {
     NSTimeInterval pauseStartedAt;
     BOOL processing;
-    NSInteger frameCount;
+    NSUInteger frameCount;
     NSTimeInterval elapsedTime;
 }
-
-+ (void)start;
-+ (void)stop;
-+ (void)pause;
-+ (void)resume;
-+ (void)takeScreenshot;
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
-+ (void)registerPrivateView:(UIView *)view description:(NSString *)description;
-+ (void)unregisterPrivateView:(UIView *)view;
-+ (BOOL)hidesKeyboard;
-+ (void)setHidesKeyboard:(BOOL)hidesKeyboard;
-+ (CGFloat)scaleFactor;
-+ (void)setScaleFactor:(CGFloat)scaleFactor;
-+ (BOOL)autoCaptureEnabled;
-+ (void)setAutoCaptureEnabled:(BOOL)autoCaptureEnabled;
 
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, readonly) float frameRate;
@@ -39,6 +24,34 @@
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoController *videoController;
+
+// Recording control
++ (void)start;
++ (void)stop;
++ (void)pause;
++ (void)resume;
+
+// Manually trigger a screenshot call
++ (void)takeScreenshot;
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+
+// Set views that should be censored
++ (void)registerPrivateView:(UIView *)view description:(NSString *)description;
++ (void)unregisterPrivateView:(UIView *)view;
+
+// Set whether the keyboard window is rendered
++ (void)setHidesKeyboard:(BOOL)hidesKeyboard;
++ (BOOL)hidesKeyboard;
+
+// Set the scale factor for the recording (e.g. 0.5 = downscaled to 50%)
++ (void)setScaleFactor:(CGFloat)scaleFactor;
++ (CGFloat)scaleFactor;
+
+// Set whether screenshots should be taken automatically. For OpenGL ES apps, autocapture should be disabled
+// and takeOpenGLScreenshot:colorRenderBuffer: should be called just before presentRenderbuffer: in the
+// rendering loop.
++ (void)setAutoCaptureEnabled:(BOOL)autoCaptureEnabled;
++ (BOOL)autoCaptureEnabled;
 
 - (void)startRecording;
 - (void)stopRecording;
