@@ -1,5 +1,5 @@
 //
-//  NBScreenCapturingWindow.h
+//  UIWindow+InterceptEvents.h
 //  ipad
 //
 //  Created by Chris Haugli on 1/23/12.
@@ -10,19 +10,13 @@
 
 @protocol NBScreenCapturingWindowDelegate;
 
-@interface NBScreenCapturingWindow : UIWindow
-
-- (void)setDelegate:(id<NBScreenCapturingWindowDelegate>)delegate;
-
-@end
-
-@protocol NBScreenCapturingWindowDelegate <NSObject>
-- (void)screenCapturingWindow:(UIWindow *)window sendEvent:(UIEvent *)event;
-@end
-
 @interface UIWindow (InterceptEvents)
 
 - (void)NBsetDelegate:(id<NBScreenCapturingWindowDelegate>)delegate;
 - (void)NBsendEvent:(UIEvent *)event;
 
+@end
+
+@protocol NBScreenCapturingWindowDelegate <NSObject>
+- (void)screenCapturingWindow:(UIWindow *)window sendEvent:(UIEvent *)event;
 @end
