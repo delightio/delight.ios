@@ -16,9 +16,9 @@
    DLScreenshotController takes and stores screenshots of a UIView.
  */
 @interface DLScreenshotController : NSObject <NBScreenCapturingWindowDelegate> {
-    NSMutableArray *screenshotBuffer;
     NSMutableArray *pendingTouches;  
     NSMutableSet *privateViews;
+    UIImage *previousScreenshot;
     
     void *bitmapData;
     CGRect keyboardFrame;

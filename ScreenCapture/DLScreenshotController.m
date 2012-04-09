@@ -32,7 +32,6 @@
     self = [super init];
     if (self) {
         bitmapData = NULL;
-        screenshotBuffer = [[NSMutableArray alloc] init];
         pendingTouches = [[NSMutableArray alloc] init];
         privateViews = [[NSMutableSet alloc] init];
         
@@ -61,9 +60,9 @@
         bitmapData = NULL;
     }
     
-    [screenshotBuffer release];
     [pendingTouches release];
     [privateViews release];
+    [previousScreenshot release];
     
     [super dealloc];
 }

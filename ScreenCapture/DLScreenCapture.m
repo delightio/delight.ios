@@ -42,6 +42,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize frameRate;
 @synthesize maximumFrameRate;
 @synthesize paused;
+@synthesize autoCaptureEnabled;
 @synthesize screenshotController;
 @synthesize videoController;
 
@@ -86,9 +87,34 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[self sharedInstance].screenshotController unregisterPrivateView:view];
 }
 
++ (BOOL)hidesKeyboard
+{
+    return [self sharedInstance].screenshotController.hidesKeyboard;
+}
+
 + (void)setHidesKeyboard:(BOOL)hidesKeyboard
 {
-    [[self sharedInstance].screenshotController setHidesKeyboard:hidesKeyboard];
+    [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboard;
+}
+
++ (CGFloat)scaleFactor
+{
+    return [self sharedInstance].scaleFactor;
+}
+
++ (void)setScaleFactor:(CGFloat)scaleFactor
+{
+    [self sharedInstance].scaleFactor = scaleFactor;
+}
+
++ (BOOL)autoCaptureEnabled
+{
+    return [self sharedInstance].autoCaptureEnabled;
+}
+
++ (void)setAutoCaptureEnabled:(BOOL)autoCaptureEnabled
+{
+    [self sharedInstance].autoCaptureEnabled = autoCaptureEnabled;
 }
 
 #pragma mark -
@@ -98,8 +124,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     self = [super init];
     if (self) {
         self.scaleFactor = kDefaultScaleFactor;
-        self.frameRate = kStartingFrameRate;
         self.maximumFrameRate = kDefaultMaxFrameRate;
+        self.autoCaptureEnabled = YES;
+        frameRate = kStartingFrameRate;
         
         screenshotController = [[DLScreenshotController alloc] init];
 
@@ -133,7 +160,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (!videoController.recording) {
         [videoController startNewRecording];
         
-        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        if (autoCaptureEnabled) {
+            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        }
     }
 }
 
@@ -190,7 +219,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         NSLog(@"Frame rate: %.0f fps", frameRate);
     }
     
-    [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0/frameRate];
+    if (autoCaptureEnabled) {
+        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0/frameRate];
+    }
 }
 
 - (void)takeScreenshot
