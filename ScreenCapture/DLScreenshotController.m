@@ -320,6 +320,8 @@
         BOOL lineBegun = NO;
         for (NSMutableDictionary *touch in pendingTouches) {
             CGPoint location = [[touch objectForKey:@"location"] CGPointValue];
+            location.x *= scaleFactor;
+            location.y *= scaleFactor;
             NSInteger decayCount = [[touch objectForKey:@"decayCount"] integerValue];
             UITouchPhase phase = [[touch objectForKey:@"phase"] intValue];
             

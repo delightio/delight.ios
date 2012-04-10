@@ -235,12 +235,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     @synchronized(self) {
-        if (screenshotController.previousScreenshot) {
-            UIImage *previousScreenshot = [screenshotController drawPendingTouchMarksOnImage:screenshotController.previousScreenshot];
-            [videoController writeFrameImage:previousScreenshot];
-        }
-
         NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
+        UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
         if (glView) {
             [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
         } else {
@@ -251,6 +247,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         frameCount++;
         elapsedTime += (end - start);
         // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
+        
+        if (previousScreenshot) {
+            UIImage *touchedUpScreenshot = [screenshotController drawPendingTouchMarksOnImage:previousScreenshot];
+            [videoController writeFrameImage:touchedUpScreenshot];
+            [previousScreenshot release];
+        }
     } 
     
     [pool drain];
