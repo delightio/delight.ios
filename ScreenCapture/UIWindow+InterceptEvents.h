@@ -8,15 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol NBScreenCapturingWindowDelegate;
+@protocol DLWindowDelegate;
 
 @interface UIWindow (InterceptEvents)
 
-- (void)NBsetDelegate:(id<NBScreenCapturingWindowDelegate>)delegate;
-- (void)NBsendEvent:(UIEvent *)event;
+- (void)DLsetDelegate:(id<DLWindowDelegate>)delegate;
+- (void)DLsendEvent:(UIEvent *)event;
 
 @end
 
-@protocol NBScreenCapturingWindowDelegate <NSObject>
-- (void)screenCapturingWindow:(UIWindow *)window sendEvent:(UIEvent *)event;
+@protocol DLWindowDelegate <NSObject>
+- (void)window:(UIWindow *)window sendEvent:(UIEvent *)event;
 @end

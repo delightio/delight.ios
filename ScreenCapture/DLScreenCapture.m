@@ -149,9 +149,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         frameRate = kStartingFrameRate;
 
         // Method swizzling to intercept events
-        Swizzle([UIWindow class], @selector(sendEvent:), @selector(NBsendEvent:));
+        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
         for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-            [window NBsetDelegate:screenshotController];
+            [window DLsetDelegate:screenshotController];
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];

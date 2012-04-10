@@ -469,7 +469,7 @@
 
 - (void)writeImageToPNG:(UIImage *)image
 {
-    NSString *filename = [NSString stringWithFormat:@"Documents/frame_%d.png", pngCount++];
+    NSString *filename = [NSString stringWithFormat:@"Documents/frame_%i.png", pngCount++];
     NSString *pngPath = [NSHomeDirectory() stringByAppendingPathComponent:filename];
     [UIImagePNGRepresentation(image) writeToFile:pngPath atomically:YES];
 }
@@ -481,9 +481,9 @@
     keyboardFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 }
 
-#pragma mark - NBScreenCapturingWindowDelegate
+#pragma mark - DLWindowDelegate
 
-- (void)screenCapturingWindow:(UIWindow *)window sendEvent:(UIEvent *)event
+- (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
 {
     @synchronized(self) {
         for (UITouch *touch in [event allTouches]) {

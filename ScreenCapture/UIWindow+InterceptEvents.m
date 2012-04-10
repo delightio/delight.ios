@@ -13,18 +13,18 @@ MAKE_CATEGORIES_LOADABLE(UIWindow_InterceptEvents);
 
 @implementation UIWindow (InterceptEvents)
 
-- (void)NBsetDelegate:(id<NBScreenCapturingWindowDelegate>)delegate
+- (void)DLsetDelegate:(id<DLWindowDelegate>)delegate
 {
-    // Can't use ivar since we need this class to be have the same memory offsets as UIWindow
+    // Can't use ivar since we need this class to have the same memory offsets as UIWindow
     objc_setAssociatedObject(self, "delegate", delegate, OBJC_ASSOCIATION_ASSIGN);    
 }
 
-- (void)NBsendEvent:(UIEvent *)event
+- (void)DLsendEvent:(UIEvent *)event
 {
-    id<NBScreenCapturingWindowDelegate> delegate = objc_getAssociatedObject(self, "delegate");
-    [delegate screenCapturingWindow:self sendEvent:event]; 
+    id<DLWindowDelegate> delegate = objc_getAssociatedObject(self, "delegate");
+    [delegate window:self sendEvent:event]; 
     
-    [self NBsendEvent:event];
+    [self DLsendEvent:event];
 }
 
 @end

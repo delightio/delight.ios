@@ -9,6 +9,9 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
+/* 
+   DLVideoController encodes video to a file.
+ */
 @interface DLVideoController : NSObject {
     AVAssetWriter *videoWriter;
     AVAssetWriterInput *videoWriterInput;
@@ -25,6 +28,9 @@
 - (void)startNewRecording;
 - (void)stopRecording;
 - (void)writeFrameImage:(UIImage *)frameImage;
+
+// If the encoding should be temporarily paused, the pause duration should be passed to here.
+// Any frames added after this method call will have their timestamp reduced by the total pause time.
 - (void)addPauseTime:(NSTimeInterval)pauseTime;
 
 @end
