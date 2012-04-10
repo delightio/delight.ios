@@ -40,7 +40,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize paused;
 @synthesize autoCaptureEnabled;
 @synthesize screenshotController;
-@synthesize videoController;
+@synthesize videoEncoder;
 
 #pragma mark - Class methods
 
@@ -140,8 +140,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];
-        videoController = [[DLVideoController alloc] init];
-        videoController.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
+        videoEncoder = [[DLVideoEncoder alloc] init];
+        videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
         
         self.scaleFactor = kDefaultScaleFactor;
         self.maximumFrameRate = kDefaultMaxFrameRate;
@@ -165,15 +165,15 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [screenshotController release];
-    [videoController release];
+    [videoEncoder release];
     
     [super dealloc];
 }
 
 - (void)startRecording
 {
-    if (!videoController.recording) {
-        [videoController startNewRecording];
+    if (!videoEncoder.recording) {
+        [videoEncoder startNewRecording];
         
         if (autoCaptureEnabled) {
             if (frameRate > maximumFrameRate) {
@@ -187,7 +187,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)stopRecording 
 {
-    [videoController stopRecording];
+    [videoEncoder stopRecording];
 }
 
 - (void)pause
@@ -203,7 +203,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (paused) {
         paused = NO;
         NSTimeInterval thisPauseTime = [[NSDate date] timeIntervalSince1970] - pauseStartedAt;
-        [videoController addPauseTime:thisPauseTime];
+        [videoEncoder addPauseTime:thisPauseTime];
         
         NSLog(@"Resume recording, was paused for %.1f seconds", thisPauseTime);
     }
@@ -211,20 +211,20 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)setScaleFactor:(CGFloat)aScaleFactor
 {
-    if (videoController.recording) {
+    if (videoEncoder.recording) {
         [NSException raise:@"Screen capture exception" format:@"Cannot change scale factor while recording is in progress."];
     }
     
     scaleFactor = aScaleFactor;
     screenshotController.scaleFactor = scaleFactor;
-    videoController.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
+    videoEncoder.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
 }
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
 {
     autoCaptureEnabled = isAutoCaptureEnabled;
     
-    if (autoCaptureEnabled && videoController.recording) {
+    if (autoCaptureEnabled && videoEncoder.recording) {
         [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
     }
 }
@@ -251,7 +251,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         if (previousScreenshot) {
             UIImage *touchedUpScreenshot = [screenshotController drawPendingTouchMarksOnImage:previousScreenshot];
-            [videoController writeFrameImage:touchedUpScreenshot];
+            [videoEncoder writeFrameImage:touchedUpScreenshot];
             [previousScreenshot release];
         }
         

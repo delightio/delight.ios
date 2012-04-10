@@ -1,5 +1,5 @@
 //
-//  DLVideoController.h
+//  DLVideoEncoder.h
 //  ScreenCapture
 //
 //  Created by Chris Haugli on 4/9/12.
@@ -10,9 +10,9 @@
 #import <AVFoundation/AVFoundation.h>
 
 /* 
-   DLVideoController encodes video to a file.
+   DLVideoEncoder encodes video to a file.
  */
-@interface DLVideoController : NSObject {
+@interface DLVideoEncoder : NSObject {
     AVAssetWriter *videoWriter;
     AVAssetWriterInput *videoWriterInput;
     AVAssetWriterInputPixelBufferAdaptor *avAdaptor;

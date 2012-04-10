@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DLScreenshotController.h"
-#import "DLVideoController.h"
+#import "DLVideoEncoder.h"
 
 @interface DLScreenCapture : NSObject {
     NSTimeInterval pauseStartedAt;
@@ -23,7 +23,7 @@
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
-@property (nonatomic, readonly) DLVideoController *videoController;
+@property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
 
 // Recording control
 + (void)start;

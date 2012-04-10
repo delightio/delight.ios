@@ -1,22 +1,22 @@
 //
-//  DLVideoController.m
+//  DLVideoEncoder.m
 //  ScreenCapture
 //
 //  Created by Chris Haugli on 4/9/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "DLVideoController.h"
+#import "DLVideoEncoder.h"
 
 #define kDefaultBitRate 500.0*1024.0
 
-@interface DLVideoController ()
+@interface DLVideoEncoder ()
 - (BOOL)setupWriter;
 - (void)cleanupWriter;
 - (NSURL *)tempFileURL;
 @end
 
-@implementation DLVideoController
+@implementation DLVideoEncoder
 
 @synthesize recording;
 @synthesize outputPath;
