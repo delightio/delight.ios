@@ -40,14 +40,6 @@
                                                  selector:@selector(handleKeyboardFrameChanged:)
                                                      name:UIKeyboardWillShowNotification
                                                    object:nil];    
-        
-        // iOS 5+ only
-        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 5.0) {
-            [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(handleKeyboardFrameChanged:)
-                                                         name:UIKeyboardWillChangeFrameNotification
-                                                       object:nil];
-        }
     }
     return self;
 }
