@@ -352,7 +352,7 @@
                         CGContextFillPath(context);
                     } else {
                         CGContextSetRGBFillColor(context, 0, 0, 1, 0.7);                                 
-                        CGContextFillEllipseInRect(context, CGRectMake(location.x - 15, location.y - 15, 15, 15));    
+                        CGContextFillEllipseInRect(context, CGRectMake(location.x - 8, location.y - 8, 16, 16));    
                     }
                     break;
                 case UITouchPhaseMoved:
