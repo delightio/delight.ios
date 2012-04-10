@@ -1,12 +1,12 @@
 //
-//  DLScreenCapture.m
-//  ipad
+//  Delight.m
+//  Delight
 //
 //  Created by Chris Haugli on 1/18/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "DLScreenCapture.h"
+#import "Delight.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -16,7 +16,7 @@
 #define kDefaultMaxFrameRate 100.0f
 #define kStartingFrameRate 5.0f
 
-static DLScreenCapture *sharedInstance = nil;
+static Delight *sharedInstance = nil;
 
 static void Swizzle(Class c, SEL orig, SEL new) {
     Method origMethod = class_getInstanceMethod(c, orig);
@@ -27,12 +27,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         method_exchangeImplementations(origMethod, newMethod);
 }
 
-@interface DLScreenCapture ()
+@interface Delight ()
 - (void)screenshotTimerFired;
 - (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 @end
 
-@implementation DLScreenCapture
+@implementation Delight
 
 @synthesize scaleFactor;
 @synthesize frameRate;
@@ -44,10 +44,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 #pragma mark - Class methods
 
-+ (DLScreenCapture *)sharedInstance
++ (Delight *)sharedInstance
 {
     if (!sharedInstance) {
-        sharedInstance = [[DLScreenCapture alloc] init];
+        sharedInstance = [[Delight alloc] init];
     }
     return sharedInstance;
 }

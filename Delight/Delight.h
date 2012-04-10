@@ -1,6 +1,6 @@
 //
-//  DLScreenCapture.h
-//  ipad
+//  Delight.h
+//  Delight
 //
 //  Created by Chris Haugli on 1/18/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
@@ -10,7 +10,7 @@
 #import "DLScreenshotController.h"
 #import "DLVideoEncoder.h"
 
-@interface DLScreenCapture : NSObject {
+@interface Delight : NSObject {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;

@@ -13,8 +13,8 @@
 		83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2C15338CC500003862 /* DLVideoEncoder.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
-		83B8969914EAECD6006D93C2 /* DLScreenCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969314EAECD6006D93C2 /* DLScreenCapture.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		83B8969A14EAECD6006D93C2 /* DLScreenCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969414EAECD6006D93C2 /* DLScreenCapture.m */; };
+		83B8969914EAECD6006D93C2 /* Delight.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969314EAECD6006D93C2 /* Delight.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		83B8969A14EAECD6006D93C2 /* Delight.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969414EAECD6006D93C2 /* Delight.m */; };
 		83B8969B14EAECD6006D93C2 /* UIWindow+InterceptEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969514EAECD6006D93C2 /* UIWindow+InterceptEvents.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83B8969C14EAECD6006D93C2 /* UIWindow+InterceptEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969614EAECD6006D93C2 /* UIWindow+InterceptEvents.m */; };
 		83B896AF14EAEFBF006D93C2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */; };
@@ -31,13 +31,13 @@
 		83149B2715337E5C00003862 /* DLScreenshotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLScreenshotController.m; sourceTree = "<group>"; };
 		83149B2B15338CC500003862 /* DLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLVideoEncoder.h; sourceTree = "<group>"; };
 		83149B2C15338CC500003862 /* DLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLVideoEncoder.m; sourceTree = "<group>"; };
-		83B8968214EAEC68006D93C2 /* ScreenCapture.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = ScreenCapture.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Delight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B8968514EAEC68006D93C2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		83B8968914EAEC68006D93C2 /* ScreenCapture-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ScreenCapture-Info.plist"; sourceTree = "<group>"; };
+		83B8968914EAEC68006D93C2 /* Delight-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Delight-Info.plist"; sourceTree = "<group>"; };
 		83B8968B14EAEC68006D93C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		83B8968D14EAEC68006D93C2 /* ScreenCapture-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ScreenCapture-Prefix.pch"; sourceTree = "<group>"; };
-		83B8969314EAECD6006D93C2 /* DLScreenCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLScreenCapture.h; sourceTree = "<group>"; };
-		83B8969414EAECD6006D93C2 /* DLScreenCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLScreenCapture.m; sourceTree = "<group>"; };
+		83B8968D14EAEC68006D93C2 /* Delight-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Delight-Prefix.pch"; sourceTree = "<group>"; };
+		83B8969314EAECD6006D93C2 /* Delight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Delight.h; sourceTree = "<group>"; };
+		83B8969414EAECD6006D93C2 /* Delight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Delight.m; sourceTree = "<group>"; };
 		83B8969514EAECD6006D93C2 /* UIWindow+InterceptEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+InterceptEvents.h"; sourceTree = "<group>"; };
 		83B8969614EAECD6006D93C2 /* UIWindow+InterceptEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+InterceptEvents.m"; sourceTree = "<group>"; };
 		83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
@@ -71,7 +71,7 @@
 		83B8967314EAEC68006D93C2 = {
 			isa = PBXGroup;
 			children = (
-				83B8968714EAEC68006D93C2 /* ScreenCapture */,
+				83B8968714EAEC68006D93C2 /* Delight */,
 				83B8968414EAEC68006D93C2 /* Frameworks */,
 				83B8968314EAEC68006D93C2 /* Products */,
 			);
@@ -80,7 +80,7 @@
 		83B8968314EAEC68006D93C2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				83B8968214EAEC68006D93C2 /* ScreenCapture.framework */,
+				83B8968214EAEC68006D93C2 /* Delight.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -100,11 +100,11 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		83B8968714EAEC68006D93C2 /* ScreenCapture */ = {
+		83B8968714EAEC68006D93C2 /* Delight */ = {
 			isa = PBXGroup;
 			children = (
-				83B8969314EAECD6006D93C2 /* DLScreenCapture.h */,
-				83B8969414EAECD6006D93C2 /* DLScreenCapture.m */,
+				83B8969314EAECD6006D93C2 /* Delight.h */,
+				83B8969414EAECD6006D93C2 /* Delight.m */,
 				83149B2615337E5C00003862 /* DLScreenshotController.h */,
 				83149B2715337E5C00003862 /* DLScreenshotController.m */,
 				83149B2B15338CC500003862 /* DLVideoEncoder.h */,
@@ -113,15 +113,15 @@
 				83B8969614EAECD6006D93C2 /* UIWindow+InterceptEvents.m */,
 				83B8968814EAEC68006D93C2 /* Supporting Files */,
 			);
-			path = ScreenCapture;
+			path = Delight;
 			sourceTree = "<group>";
 		};
 		83B8968814EAEC68006D93C2 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				83B8968914EAEC68006D93C2 /* ScreenCapture-Info.plist */,
+				83B8968914EAEC68006D93C2 /* Delight-Info.plist */,
 				83B8968A14EAEC68006D93C2 /* InfoPlist.strings */,
-				83B8968D14EAEC68006D93C2 /* ScreenCapture-Prefix.pch */,
+				83B8968D14EAEC68006D93C2 /* Delight-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -133,7 +133,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83B8969914EAECD6006D93C2 /* DLScreenCapture.h in Headers */,
+				83B8969914EAECD6006D93C2 /* Delight.h in Headers */,
 				83B8969B14EAECD6006D93C2 /* UIWindow+InterceptEvents.h in Headers */,
 				83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */,
 				83149B2D15338CC500003862 /* DLVideoEncoder.h in Headers */,
@@ -143,9 +143,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		83B8968114EAEC68006D93C2 /* ScreenCapture */ = {
+		83B8968114EAEC68006D93C2 /* Delight */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "ScreenCapture" */;
+			buildConfigurationList = 83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "Delight" */;
 			buildPhases = (
 				83B8967A14EAEC68006D93C2 /* ShellScript */,
 				83B8967B14EAEC68006D93C2 /* Sources */,
@@ -159,9 +159,9 @@
 			);
 			dependencies = (
 			);
-			name = ScreenCapture;
+			name = Delight;
 			productName = ScreenCapture;
-			productReference = 83B8968214EAEC68006D93C2 /* ScreenCapture.framework */;
+			productReference = 83B8968214EAEC68006D93C2 /* Delight.framework */;
 			productType = "com.apple.product-type.framework.static";
 		};
 /* End PBXNativeTarget section */
@@ -171,10 +171,10 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = DL;
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 				ORGANIZATIONNAME = "Pipely Inc.";
 			};
-			buildConfigurationList = 83B8967814EAEC68006D93C2 /* Build configuration list for PBXProject "ScreenCapture" */;
+			buildConfigurationList = 83B8967814EAEC68006D93C2 /* Build configuration list for PBXProject "Delight" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -186,7 +186,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				83B8968114EAEC68006D93C2 /* ScreenCapture */,
+				83B8968114EAEC68006D93C2 /* Delight */,
 			);
 		};
 /* End PBXProject section */
@@ -249,7 +249,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83B8969A14EAECD6006D93C2 /* DLScreenCapture.m in Sources */,
+				83B8969A14EAECD6006D93C2 /* Delight.m in Sources */,
 				83B8969C14EAECD6006D93C2 /* UIWindow+InterceptEvents.m in Sources */,
 				83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */,
 				83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */,
@@ -321,9 +321,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ScreenCapture/ScreenCapture-Prefix.pch";
-				INFOPLIST_FILE = "ScreenCapture/ScreenCapture-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "Delight/Delight-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
+				INFOPLIST_FILE = "Delight/Delight-Info.plist";
+				PRODUCT_NAME = Delight;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -340,9 +341,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ScreenCapture/ScreenCapture-Prefix.pch";
-				INFOPLIST_FILE = "ScreenCapture/ScreenCapture-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "Delight/Delight-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
+				INFOPLIST_FILE = "Delight/Delight-Info.plist";
+				PRODUCT_NAME = Delight;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -351,7 +353,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		83B8967814EAEC68006D93C2 /* Build configuration list for PBXProject "ScreenCapture" */ = {
+		83B8967814EAEC68006D93C2 /* Build configuration list for PBXProject "Delight" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83B8968E14EAEC68006D93C2 /* Debug */,
@@ -360,7 +362,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "ScreenCapture" */ = {
+		83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "Delight" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83B8969114EAEC68006D93C2 /* Debug */,

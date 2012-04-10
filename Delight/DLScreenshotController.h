@@ -1,6 +1,6 @@
 //
 //  DLScreenshotController.h
-//  ScreenCapture
+//  Delight
 //
 //  Created by Chris Haugli on 4/9/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.

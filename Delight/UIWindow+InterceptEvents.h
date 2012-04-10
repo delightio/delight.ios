@@ -1,6 +1,6 @@
 //
 //  UIWindow+InterceptEvents.h
-//  ipad
+//  Delight
 //
 //  Created by Chris Haugli on 1/23/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
