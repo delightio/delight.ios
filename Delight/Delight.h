@@ -26,6 +26,8 @@
 
 // Recording control
 + (void)start;
++ (void)startWithScaleFactor:(CGFloat)scaleFactor;
++ (void)startWithScaleFactor:(CGFloat)scaleFactor bitRate:(double)bitRate;
 + (void)stop;
 + (void)pause;
 + (void)resume;
@@ -42,29 +44,14 @@
 + (void)setHidesKeyboard:(BOOL)hidesKeyboard;
 + (BOOL)hidesKeyboard;
 
-// Set the scale factor for the recording (e.g. 0.5 = downscaled to 50%)
-+ (void)setScaleFactor:(CGFloat)scaleFactor;
-+ (CGFloat)scaleFactor;
-
 // Set the maximum frame rate
 + (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate;
 + (NSUInteger)maximumFrameRate;
-
-// Sets the video encoding bitrate
-+ (void)setBitRate:(double)bitRate;
-+ (double)bitRate;
 
 // Set whether screenshots should be taken automatically. For OpenGL ES apps, autocapture should be disabled
 // and takeOpenGLScreenshot:colorRenderBuffer: should be called just before presentRenderbuffer: in the
 // rendering loop.
 + (void)setAutoCaptureEnabled:(BOOL)autoCaptureEnabled;
 + (BOOL)autoCaptureEnabled;
-
-- (void)startRecording;
-- (void)stopRecording;
-- (void)pause;
-- (void)resume;
-- (void)takeScreenshot;
-- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 
 @end

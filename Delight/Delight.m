@@ -28,8 +28,14 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 @interface Delight ()
-- (void)screenshotTimerFired;
+- (void)startRecording;
+- (void)stopRecording;
+- (void)pause;
+- (void)resume;
 - (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (void)takeScreenshot;
+- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (void)screenshotTimerFired;
 @end
 
 @implementation Delight
@@ -54,6 +60,19 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)start
 {
+    [[self sharedInstance] startRecording];
+}
+
++ (void)startWithScaleFactor:(CGFloat)scaleFactor
+{
+    [self sharedInstance].scaleFactor = scaleFactor;
+    [[self sharedInstance] startRecording];
+}
+
++ (void)startWithScaleFactor:(CGFloat)scaleFactor bitRate:(double)bitRate
+{
+    [self sharedInstance].scaleFactor = scaleFactor;
+    [self sharedInstance].videoEncoder.averageBitRate = bitRate;
     [[self sharedInstance] startRecording];
 }
 
@@ -103,16 +122,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboard;
 }
 
-+ (CGFloat)scaleFactor
-{
-    return [self sharedInstance].scaleFactor;
-}
-
-+ (void)setScaleFactor:(CGFloat)scaleFactor
-{
-    [self sharedInstance].scaleFactor = scaleFactor;
-}
-
 + (NSUInteger)maximumFrameRate
 {
     return [self sharedInstance].maximumFrameRate;
@@ -121,16 +130,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate
 {
     [self sharedInstance].maximumFrameRate = maximumFrameRate;
-}
-
-+ (double)bitRate
-{
-    return [self sharedInstance].videoEncoder.averageBitRate;
-}
-
-+ (void)setBitRate:(double)bitRate
-{
-    [self sharedInstance].videoEncoder.averageBitRate = bitRate;
 }
 
 + (BOOL)autoCaptureEnabled

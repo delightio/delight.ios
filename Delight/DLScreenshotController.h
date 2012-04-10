@@ -26,7 +26,7 @@
     NSUInteger pngCount;
 }
 
-@property (nonatomic, assign) CGFloat scaleFactor;      // Note: does not currently apply to OpenGL screenshots
+@property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL hidesKeyboard;
 @property (nonatomic, assign) BOOL writesToPNG;
 @property (nonatomic, retain) UIImage *previousScreenshot;
