@@ -50,6 +50,10 @@
 + (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate;
 + (NSUInteger)maximumFrameRate;
 
+// Sets the video encoding bitrate
++ (void)setBitRate:(double)bitRate;
++ (double)bitRate;
+
 // Set whether screenshots should be taken automatically. For OpenGL ES apps, autocapture should be disabled
 // and takeOpenGLScreenshot:colorRenderBuffer: should be called just before presentRenderbuffer: in the
 // rendering loop.

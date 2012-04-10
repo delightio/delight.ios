@@ -123,6 +123,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self sharedInstance].maximumFrameRate = maximumFrameRate;
 }
 
++ (double)bitRate
+{
+    return [self sharedInstance].videoEncoder.averageBitRate;
+}
+
++ (void)setBitRate:(double)bitRate
+{
+    [self sharedInstance].videoEncoder.averageBitRate = bitRate;
+}
+
 + (BOOL)autoCaptureEnabled
 {
     return [self sharedInstance].autoCaptureEnabled;
