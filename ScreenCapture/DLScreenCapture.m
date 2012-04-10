@@ -194,7 +194,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     if (!paused) {
         paused = YES;
-        pauseStartedAt = [[NSDate date] timeIntervalSince1970];
+        [videoEncoder pause];
     }
 }
 
@@ -202,10 +202,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     if (paused) {
         paused = NO;
-        NSTimeInterval thisPauseTime = [[NSDate date] timeIntervalSince1970] - pauseStartedAt;
-        [videoEncoder addPauseTime:thisPauseTime];
-        
-        NSLog(@"Resume recording, was paused for %.1f seconds", thisPauseTime);
+        [videoEncoder resume];
     }
 }
 

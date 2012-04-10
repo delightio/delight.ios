@@ -19,6 +19,7 @@
 @implementation DLVideoEncoder
 
 @synthesize recording;
+@synthesize paused;
 @synthesize outputPath;
 @synthesize videoSize;
 @synthesize averageBitRate;
@@ -31,7 +32,6 @@
         videoWriterInput = nil;
         avAdaptor = nil;
         
-        pauseTime = 0;
         averageBitRate = kDefaultBitRate;
     }
     return self;
@@ -66,10 +66,10 @@
 
 - (void)writeFrameImage:(UIImage *)frameImage
 {
-    if (![videoWriterInput isReadyForMoreMediaData] || !recording) {
+    if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
         NSLog(@"Not ready for video data");
     } else {
-        float millisElapsed = ([[NSDate date] timeIntervalSinceDate:startedAt] - pauseTime) * 1000.0;
+        float millisElapsed = ([[NSDate date] timeIntervalSince1970] - recordingStartTime - totalPauseDuration) * 1000.0;
         CMTime time = CMTimeMake((int)millisElapsed, 1000);
         
         @synchronized (self) {
@@ -103,9 +103,20 @@
     }
 }
 
-- (void)addPauseTime:(NSTimeInterval)aPauseTime
+- (void)pause
 {
-    pauseTime += aPauseTime;
+    if (!paused) {
+        paused = YES;
+        pauseStartTime = [[NSDate date] timeIntervalSince1970];
+    }
+}
+
+- (void)resume
+{
+    if (paused) {
+        paused = NO;
+        totalPauseDuration += [[NSDate date] timeIntervalSince1970] - pauseStartTime;
+    }
 }
 
 #pragma mark - Private methods
@@ -139,7 +150,8 @@
     [videoWriter startWriting];
     [videoWriter startSessionAtSourceTime:CMTimeMake(0, 1000)];
     
-    startedAt = [[NSDate date] retain];
+    recordingStartTime = [[NSDate date] timeIntervalSince1970];
+    totalPauseDuration = 0.0f;
 
     return YES;
 }
@@ -177,7 +189,6 @@
     [avAdaptor release]; avAdaptor = nil;
     [videoWriterInput release]; videoWriterInput = nil;
     [videoWriter release]; videoWriter = nil;
-    [startedAt release]; startedAt = nil;
 }
 
 - (NSURL *)tempFileURL 

@@ -11,7 +11,6 @@
 #import "DLVideoEncoder.h"
 
 @interface DLScreenCapture : NSObject {
-    NSTimeInterval pauseStartedAt;
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
