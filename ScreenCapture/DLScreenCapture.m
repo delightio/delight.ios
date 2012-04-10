@@ -232,9 +232,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
     processing = YES;
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     @synchronized(self) {
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
         NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
         UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
         if (glView) {
@@ -253,9 +254,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             [videoController writeFrameImage:touchedUpScreenshot];
             [previousScreenshot release];
         }
+        
+        [pool drain];
     } 
     
-    [pool drain];
     processing = NO;
 }
 

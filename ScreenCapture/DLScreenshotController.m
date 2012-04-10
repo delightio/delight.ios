@@ -16,6 +16,7 @@
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
 - (void)hidePrivateViewsForWindow:(UIWindow *)window inContext:(CGContextRef)context;
+- (BOOL)locationIsInPrivateView:(CGPoint)location;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
@@ -320,6 +321,7 @@
         BOOL lineBegun = NO;
         for (NSMutableDictionary *touch in pendingTouches) {
             CGPoint location = [[touch objectForKey:@"location"] CGPointValue];
+            BOOL locationIsInPrivateView = [self locationIsInPrivateView:location];
             location.x *= scaleFactor;
             location.y *= scaleFactor;
             NSInteger decayCount = [[touch objectForKey:@"decayCount"] integerValue];
@@ -329,48 +331,50 @@
             [touch setObject:[NSNumber numberWithInteger:decayCount+1] forKey:@"decayCount"];
             [objectsToRemove addObject:touch];
             
-            switch (phase) {
-                case UITouchPhaseBegan:
-                    startLocation = location;
-                    CGContextMoveToPoint(context, location.x, location.y);
-                    lineBegun = YES;
-                    break;
-                case UITouchPhaseEnded:
-                case UITouchPhaseCancelled:
-                    CGContextStrokePath(context);
-                    double distance = sqrt((location.y - startLocation.y)*(location.y - startLocation.y) + (location.x - startLocation.x)*(location.x-startLocation.x));
-                    
-                    if (distance > 10 && strokeCount > 0) {
-                        CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
-                        double angle = atan2(location.y - lastLocation.y, location.x - lastLocation.x);
-                        
-                        CGContextSetRGBFillColor(context, 0, 0, 1, 1.0); 
-                        CGContextMoveToPoint(context, location.x, location.y);
-                        CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI + M_PI/8), location.y + 50*sin(angle + M_PI + M_PI/8));
-                        CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI - M_PI/8), location.y + 50*sin(angle + M_PI - M_PI/8));
-                        CGContextAddLineToPoint(context, location.x, location.y);
-                        CGContextFillPath(context);
-                    } else {
-                        CGContextSetRGBFillColor(context, 0, 0, 1, 0.7);                                 
-                        CGContextFillEllipseInRect(context, CGRectMake(location.x - 8, location.y - 8, 16, 16));    
-                    }
-                    break;
-                case UITouchPhaseMoved:
-                case UITouchPhaseStationary:
-                    if (lineBegun) {
-                        CGContextAddLineToPoint(context, location.x, location.y);
-                    } else {
-                        CGContextMoveToPoint(context, location.x, location.y);
-                    }
-                    if (CGPointEqualToPoint(startLocation, CGPointZero)) {
+            if (!locationIsInPrivateView) {
+                switch (phase) {
+                    case UITouchPhaseBegan:
                         startLocation = location;
-                    }
-                    for (NSInteger i = 0; i <= 2; i++) {
-                        lastLocations[i] = lastLocations[i+1];
-                    }
-                    lastLocations[3] = location;
-                    strokeCount++;
-                    break;
+                        CGContextMoveToPoint(context, location.x, location.y);
+                        lineBegun = YES;
+                        break;
+                    case UITouchPhaseEnded:
+                    case UITouchPhaseCancelled:
+                        CGContextStrokePath(context);
+                        double distance = sqrt((location.y - startLocation.y)*(location.y - startLocation.y) + (location.x - startLocation.x)*(location.x-startLocation.x));
+                        
+                        if (distance > 10 && strokeCount > 0) {
+                            CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
+                            double angle = atan2(location.y - lastLocation.y, location.x - lastLocation.x);
+                            
+                            CGContextSetRGBFillColor(context, 0, 0, 1, 1.0); 
+                            CGContextMoveToPoint(context, location.x, location.y);
+                            CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI + M_PI/8), location.y + 50*sin(angle + M_PI + M_PI/8));
+                            CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI - M_PI/8), location.y + 50*sin(angle + M_PI - M_PI/8));
+                            CGContextAddLineToPoint(context, location.x, location.y);
+                            CGContextFillPath(context);
+                        } else {
+                            CGContextSetRGBFillColor(context, 0, 0, 1, 0.7);                                 
+                            CGContextFillEllipseInRect(context, CGRectMake(location.x - 8, location.y - 8, 16, 16));    
+                        }
+                        break;
+                    case UITouchPhaseMoved:
+                    case UITouchPhaseStationary:
+                        if (lineBegun) {
+                            CGContextAddLineToPoint(context, location.x, location.y);
+                        } else {
+                            CGContextMoveToPoint(context, location.x, location.y);
+                        }
+                        if (CGPointEqualToPoint(startLocation, CGPointZero)) {
+                            startLocation = location;
+                        }
+                        for (NSInteger i = 0; i <= 2; i++) {
+                            lastLocations[i] = lastLocations[i+1];
+                        }
+                        lastLocations[3] = location;
+                        strokeCount++;
+                        break;
+                }
             }
         }
         [pendingTouches removeObjectsInArray:objectsToRemove];
@@ -419,6 +423,20 @@
                             transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
         }
     }
+}
+
+- (BOOL)locationIsInPrivateView:(CGPoint)location
+{
+    for (NSDictionary *dictionary in privateViews) {
+        UIView *view = [dictionary objectForKey:@"view"];
+        CGRect frameInWindow = [view convertRect:view.frame toView:view.window];
+            
+        if (CGRectContainsPoint(frameInWindow, location)) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context
