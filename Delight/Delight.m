@@ -63,16 +63,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[self sharedInstance] startRecording];
 }
 
-+ (void)startWithScaleFactor:(CGFloat)scaleFactor
++ (void)startOpenGL
 {
-    [self sharedInstance].scaleFactor = scaleFactor;
-    [[self sharedInstance] startRecording];
-}
-
-+ (void)startWithScaleFactor:(CGFloat)scaleFactor bitRate:(double)bitRate
-{
-    [self sharedInstance].scaleFactor = scaleFactor;
-    [self sharedInstance].videoEncoder.averageBitRate = bitRate;
+    [self sharedInstance].autoCaptureEnabled = NO;
     [[self sharedInstance] startRecording];
 }
 
@@ -102,24 +95,15 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[self sharedInstance] takeOpenGLScreenshot:glView colorRenderBuffer:colorRenderBuffer];
 }
 
-+ (void)registerPrivateView:(UIView *)view description:(NSString *)description
++ (CGFloat)scaleFactor
 {
-    [[self sharedInstance].screenshotController registerPrivateView:view description:description];
+    return [self sharedInstance].scaleFactor;
 }
 
-+ (void)unregisterPrivateView:(UIView *)view
++ (void)setScaleFactor:(CGFloat)scaleFactor
 {
-    [[self sharedInstance].screenshotController unregisterPrivateView:view];
-}
 
-+ (BOOL)hidesKeyboard
-{
-    return [self sharedInstance].screenshotController.hidesKeyboard;
-}
-
-+ (void)setHidesKeyboard:(BOOL)hidesKeyboard
-{
-    [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboard;
+    [self sharedInstance].scaleFactor = scaleFactor;
 }
 
 + (NSUInteger)maximumFrameRate
@@ -132,14 +116,24 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self sharedInstance].maximumFrameRate = maximumFrameRate;
 }
 
-+ (BOOL)autoCaptureEnabled
++ (BOOL)hidesKeyboardInRecording
 {
-    return [self sharedInstance].autoCaptureEnabled;
+    return [self sharedInstance].screenshotController.hidesKeyboard;
 }
 
-+ (void)setAutoCaptureEnabled:(BOOL)autoCaptureEnabled
++ (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording
 {
-    [self sharedInstance].autoCaptureEnabled = autoCaptureEnabled;
+    [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboardInRecording;
+}
+
++ (void)registerPrivateView:(UIView *)view description:(NSString *)description
+{
+    [[self sharedInstance].screenshotController registerPrivateView:view description:description];
+}
+
++ (void)unregisterPrivateView:(UIView *)view
+{
+    [[self sharedInstance].screenshotController unregisterPrivateView:view];
 }
 
 #pragma mark -

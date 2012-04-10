@@ -24,34 +24,53 @@
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
 
-// Recording control
+/**************
+ * UIKit apps *
+ **************/
+
+// Start recording
 + (void)start;
-+ (void)startWithScaleFactor:(CGFloat)scaleFactor;
-+ (void)startWithScaleFactor:(CGFloat)scaleFactor bitRate:(double)bitRate;
+
+// Manually trigger a screen capture. Doesn't need to be called, but can be used if you want to ensure
+// that a screenshot is taken at a particular time.
++ (void)takeScreenshot;
+
+/******************
+ * OpenGL ES apps *
+ ******************/
+
+// Start recording
++ (void)startOpenGL;
+
+// This must be called in your render loop before presentRenderbuffer:
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+
+/*********************
+ * Recording control *
+ *********************/
+
 + (void)stop;
 + (void)pause;
 + (void)resume;
 
-// Manually trigger a screenshot call
-+ (void)takeScreenshot;
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+/*****************
+ * Configuration *
+ *****************/
 
-// Set views that should be censored
-+ (void)registerPrivateView:(UIView *)view description:(NSString *)description;
-+ (void)unregisterPrivateView:(UIView *)view;
-
-// Set whether the keyboard window is rendered
-+ (void)setHidesKeyboard:(BOOL)hidesKeyboard;
-+ (BOOL)hidesKeyboard;
+// Set the amount the recording should be scaled by, e.g. 0.5 = 50% scale
++ (void)setScaleFactor:(CGFloat)scaleFactor;
++ (CGFloat)scaleFactor;
 
 // Set the maximum frame rate
 + (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate;
 + (NSUInteger)maximumFrameRate;
 
-// Set whether screenshots should be taken automatically. For OpenGL ES apps, autocapture should be disabled
-// and takeOpenGLScreenshot:colorRenderBuffer: should be called just before presentRenderbuffer: in the
-// rendering loop.
-+ (void)setAutoCaptureEnabled:(BOOL)autoCaptureEnabled;
-+ (BOOL)autoCaptureEnabled;
+// Set whether the keyboard is covered up in the recording
++ (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;
++ (BOOL)hidesKeyboardInRecording;
+
+// Register/unregister views that should be censored
++ (void)registerPrivateView:(UIView *)view description:(NSString *)description;
++ (void)unregisterPrivateView:(UIView *)view;
 
 @end
