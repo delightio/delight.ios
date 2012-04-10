@@ -113,6 +113,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self sharedInstance].scaleFactor = scaleFactor;
 }
 
++ (NSUInteger)maximumFrameRate
+{
+    return [self sharedInstance].maximumFrameRate;
+}
+
++ (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate
+{
+    [self sharedInstance].maximumFrameRate = maximumFrameRate;
+}
+
 + (BOOL)autoCaptureEnabled
 {
     return [self sharedInstance].autoCaptureEnabled;
@@ -128,17 +138,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (id)init 
 {
     self = [super init];
-    if (self) {
+    if (self) {        
+        screenshotController = [[DLScreenshotController alloc] init];
+        videoController = [[DLVideoController alloc] init];
+        videoController.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
+        
         self.scaleFactor = kDefaultScaleFactor;
         self.maximumFrameRate = kDefaultMaxFrameRate;
         self.autoCaptureEnabled = YES;
         frameRate = kStartingFrameRate;
-        
-        screenshotController = [[DLScreenshotController alloc] init];
 
-        videoController = [[DLVideoController alloc] init];
-        videoController.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
-        
         // Method swizzling to intercept events
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(NBsendEvent:));
         for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
@@ -167,6 +176,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [videoController startNewRecording];
         
         if (autoCaptureEnabled) {
+            if (frameRate > maximumFrameRate) {
+                frameRate = maximumFrameRate;
+            }
+            
             [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
         }
     }
@@ -220,24 +233,24 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     processing = YES;
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    UIImage *screenshot = nil;
     
     @synchronized(self) {
+        if (screenshotController.previousScreenshot) {
+            UIImage *previousScreenshot = [screenshotController drawPendingTouchMarksOnImage:screenshotController.previousScreenshot];
+            [videoController writeFrameImage:previousScreenshot];
+        }
+
         NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
         if (glView) {
-            screenshot = [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
+            [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
         } else {
-            screenshot = [screenshotController screenshot];
+            [screenshotController screenshot];
         }
         NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
         
         frameCount++;
         elapsedTime += (end - start);
-        // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);
-    }
-    
-    @synchronized(self) {
-        [videoController writeFrameImage:screenshot];
+        // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
     } 
     
     [pool drain];
@@ -259,12 +272,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (!paused) {
         if (!processing) {
             [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
-            if (frameRate < maximumFrameRate) {
+            if (frameRate + 1 <= maximumFrameRate) {
                 frameRate++;
             }
         } else {
             // Frame rate too high to keep up
-            if (frameRate > 1.0) {
+            if (frameRate - 1 > 0) {
                 frameRate--;
             }
         }

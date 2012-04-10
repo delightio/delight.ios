@@ -17,7 +17,7 @@
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
 - (void)hidePrivateViewsForWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
-- (void)drawTouchMarksInContext:(CGContextRef)context;
+- (void)drawPendingTouchMarksInContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
 @end
 
@@ -26,6 +26,7 @@
 @synthesize scaleFactor;
 @synthesize hidesKeyboard;
 @synthesize writesToPNG;
+@synthesize previousScreenshot;
 
 - (id)init
 {
@@ -62,6 +63,7 @@
     
     [pendingTouches release];
     [privateViews release];
+    [openGLImage release];
     [previousScreenshot release];
     
     [super dealloc];
@@ -101,8 +103,14 @@
                 // Draw the view hierarchy onto our context
                 [[window layer] renderInContext:context];
             }
+                        
+            // Draw the OpenGL view, if there is one
+            if (openGLImage) {
+                CGContextDrawImage(context, openGLFrame, [openGLImage CGImage]);
+                [openGLImage release]; openGLImage = nil;
+            }
             
-            [self drawTouchMarksInContext:context];
+            // [self drawPendingTouchMarksInContext:context];            
             [self hidePrivateViewsForWindow:window inContext:context];
             
             CGContextRestoreGState(context);
@@ -122,6 +130,8 @@
     if (writesToPNG) {
         [self writeImageToPNG:image];
     }
+    
+    self.previousScreenshot = image;
     
     return image;
 }
@@ -186,7 +196,7 @@
     CGContextSetBlendMode(cgcontext, kCGBlendModeCopy);
     CGContextDrawImage(cgcontext, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
     // Retrieve the UIImage from the current context
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIImage *glImage = UIGraphicsGetImageFromCurrentImageContext();
     
     UIGraphicsEndImageContext();
     
@@ -196,11 +206,28 @@
     CFRelease(colorspace);
     CGImageRelease(iref);
     
-    if (writesToPNG) {
-        [self writeImageToPNG:image];
-    }
+    [openGLImage release];
+    openGLImage = [glImage retain];
+    openGLFrame = [view convertRect:view.frame toView:view.window];
     
-    return image;
+    return [self screenshot];
+}
+
+- (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image
+{
+    CGContextRef context = [self createBitmapContextOfSize:image.size];
+    CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextTranslateCTM(context, 0, -image.size.height);
+
+    [self drawPendingTouchMarksInContext:context];
+    
+    CGImageRef cgImage = CGBitmapContextCreateImage(context);
+    UIImage *touchMarkImage = [UIImage imageWithCGImage:cgImage];
+    CGImageRelease(cgImage);
+    CGContextRelease(context);
+    
+    return touchMarkImage;
 }
 
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description
@@ -286,7 +313,7 @@
     return context;
 }
 
-- (void)drawTouchMarksInContext:(CGContextRef)context
+- (void)drawPendingTouchMarksInContext:(CGContextRef)context
 {
     // Draw touch points
     NSMutableArray *objectsToRemove = [NSMutableArray array];

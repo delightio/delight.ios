@@ -47,6 +47,10 @@
 + (void)setScaleFactor:(CGFloat)scaleFactor;
 + (CGFloat)scaleFactor;
 
+// Set the maximum frame rate
++ (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate;
++ (NSUInteger)maximumFrameRate;
+
 // Set whether screenshots should be taken automatically. For OpenGL ES apps, autocapture should be disabled
 // and takeOpenGLScreenshot:colorRenderBuffer: should be called just before presentRenderbuffer: in the
 // rendering loop.

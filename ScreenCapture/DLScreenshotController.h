@@ -18,7 +18,8 @@
 @interface DLScreenshotController : NSObject <NBScreenCapturingWindowDelegate> {
     NSMutableArray *pendingTouches;  
     NSMutableSet *privateViews;
-    UIImage *previousScreenshot;
+    UIImage *openGLImage;
+    CGRect openGLFrame;
     
     void *bitmapData;
     CGRect keyboardFrame;
@@ -28,9 +29,11 @@
 @property (nonatomic, assign) CGFloat scaleFactor;      // Note: does not currently apply to OpenGL screenshots
 @property (nonatomic, assign) BOOL hidesKeyboard;
 @property (nonatomic, assign) BOOL writesToPNG;
+@property (nonatomic, retain) UIImage *previousScreenshot;
 
 - (UIImage *)screenshot;
 - (UIImage *)openGLScreenshotForView:(UIView *)view colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image;
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 - (void)unregisterPrivateView:(UIView *)view;
 
