@@ -14,6 +14,7 @@
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
+    NSTimeInterval lastScreenshotTime;
 }
 
 @property (nonatomic, assign) CGFloat scaleFactor;

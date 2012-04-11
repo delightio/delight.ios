@@ -247,6 +247,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         frameCount++;
         elapsedTime += (end - start);
+        lastScreenshotTime = end;
         // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
         
         if (previousScreenshot) {
@@ -262,13 +263,17 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 - (void)takeScreenshot
-{    
-    [self takeScreenshot:nil colorRenderBuffer:0];
+{   
+    if (!paused && !processing) {
+        [self takeScreenshot:nil colorRenderBuffer:0];
+    }
 }
 
 - (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
-    [self takeScreenshot:glView colorRenderBuffer:colorRenderBuffer];
+    if (!paused && !processing && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime >= 1.0f / maximumFrameRate) {
+        [self takeScreenshot:glView colorRenderBuffer:colorRenderBuffer];
+    }
 }
 
 - (void)screenshotTimerFired
