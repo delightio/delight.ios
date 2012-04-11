@@ -1,6 +1,6 @@
 //
 //  DLScreenshotController.h
-//  ScreenCapture
+//  Delight
 //
 //  Created by Chris Haugli on 4/9/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
@@ -15,7 +15,7 @@
 /*
    DLScreenshotController takes and stores screenshots of a UIView.
  */
-@interface DLScreenshotController : NSObject <NBScreenCapturingWindowDelegate> {
+@interface DLScreenshotController : NSObject <DLWindowDelegate> {
     NSMutableArray *pendingTouches;  
     NSMutableSet *privateViews;
     UIImage *openGLImage;
@@ -26,7 +26,7 @@
     NSUInteger pngCount;
 }
 
-@property (nonatomic, assign) CGFloat scaleFactor;      // Note: does not currently apply to OpenGL screenshots
+@property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL hidesKeyboard;
 @property (nonatomic, assign) BOOL writesToPNG;
 @property (nonatomic, retain) UIImage *previousScreenshot;

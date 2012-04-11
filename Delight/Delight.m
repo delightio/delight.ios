@@ -1,12 +1,12 @@
 //
-//  DLScreenCapture.m
-//  ipad
+//  Delight.m
+//  Delight
 //
 //  Created by Chris Haugli on 1/18/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "DLScreenCapture.h"
+#import "Delight.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -16,7 +16,7 @@
 #define kDefaultMaxFrameRate 100.0f
 #define kStartingFrameRate 5.0f
 
-static DLScreenCapture *sharedInstance = nil;
+static Delight *sharedInstance = nil;
 
 static void Swizzle(Class c, SEL orig, SEL new) {
     Method origMethod = class_getInstanceMethod(c, orig);
@@ -27,12 +27,18 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         method_exchangeImplementations(origMethod, newMethod);
 }
 
-@interface DLScreenCapture ()
-- (void)screenshotTimerFired;
+@interface Delight ()
+- (void)startRecording;
+- (void)stopRecording;
+- (void)pause;
+- (void)resume;
 - (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (void)takeScreenshot;
+- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (void)screenshotTimerFired;
 @end
 
-@implementation DLScreenCapture
+@implementation Delight
 
 @synthesize scaleFactor;
 @synthesize frameRate;
@@ -40,20 +46,26 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize paused;
 @synthesize autoCaptureEnabled;
 @synthesize screenshotController;
-@synthesize videoController;
+@synthesize videoEncoder;
 
 #pragma mark - Class methods
 
-+ (DLScreenCapture *)sharedInstance
++ (Delight *)sharedInstance
 {
     if (!sharedInstance) {
-        sharedInstance = [[DLScreenCapture alloc] init];
+        sharedInstance = [[Delight alloc] init];
     }
     return sharedInstance;
 }
 
 + (void)start
 {
+    [[self sharedInstance] startRecording];
+}
+
++ (void)startOpenGL
+{
+    [self sharedInstance].autoCaptureEnabled = NO;
     [[self sharedInstance] startRecording];
 }
 
@@ -83,26 +95,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[self sharedInstance] takeOpenGLScreenshot:glView colorRenderBuffer:colorRenderBuffer];
 }
 
-+ (void)registerPrivateView:(UIView *)view description:(NSString *)description
-{
-    [[self sharedInstance].screenshotController registerPrivateView:view description:description];
-}
-
-+ (void)unregisterPrivateView:(UIView *)view
-{
-    [[self sharedInstance].screenshotController unregisterPrivateView:view];
-}
-
-+ (BOOL)hidesKeyboard
-{
-    return [self sharedInstance].screenshotController.hidesKeyboard;
-}
-
-+ (void)setHidesKeyboard:(BOOL)hidesKeyboard
-{
-    [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboard;
-}
-
 + (CGFloat)scaleFactor
 {
     return [self sharedInstance].scaleFactor;
@@ -110,6 +102,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)setScaleFactor:(CGFloat)scaleFactor
 {
+
     [self sharedInstance].scaleFactor = scaleFactor;
 }
 
@@ -123,14 +116,24 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self sharedInstance].maximumFrameRate = maximumFrameRate;
 }
 
-+ (BOOL)autoCaptureEnabled
++ (BOOL)hidesKeyboardInRecording
 {
-    return [self sharedInstance].autoCaptureEnabled;
+    return [self sharedInstance].screenshotController.hidesKeyboard;
 }
 
-+ (void)setAutoCaptureEnabled:(BOOL)autoCaptureEnabled
++ (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording
 {
-    [self sharedInstance].autoCaptureEnabled = autoCaptureEnabled;
+    [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboardInRecording;
+}
+
++ (void)registerPrivateView:(UIView *)view description:(NSString *)description
+{
+    [[self sharedInstance].screenshotController registerPrivateView:view description:description];
+}
+
++ (void)unregisterPrivateView:(UIView *)view
+{
+    [[self sharedInstance].screenshotController unregisterPrivateView:view];
 }
 
 #pragma mark -
@@ -140,8 +143,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];
-        videoController = [[DLVideoController alloc] init];
-        videoController.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
+        videoEncoder = [[DLVideoEncoder alloc] init];
+        videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
         
         self.scaleFactor = kDefaultScaleFactor;
         self.maximumFrameRate = kDefaultMaxFrameRate;
@@ -149,9 +152,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         frameRate = kStartingFrameRate;
 
         // Method swizzling to intercept events
-        Swizzle([UIWindow class], @selector(sendEvent:), @selector(NBsendEvent:));
+        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
         for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-            [window NBsetDelegate:screenshotController];
+            [window DLsetDelegate:screenshotController];
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
@@ -165,15 +168,15 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [screenshotController release];
-    [videoController release];
+    [videoEncoder release];
     
     [super dealloc];
 }
 
 - (void)startRecording
 {
-    if (!videoController.recording) {
-        [videoController startNewRecording];
+    if (!videoEncoder.recording) {
+        [videoEncoder startNewRecording];
         
         if (autoCaptureEnabled) {
             if (frameRate > maximumFrameRate) {
@@ -187,14 +190,14 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)stopRecording 
 {
-    [videoController stopRecording];
+    [videoEncoder stopRecording];
 }
 
 - (void)pause
 {
     if (!paused) {
         paused = YES;
-        pauseStartedAt = [[NSDate date] timeIntervalSince1970];
+        [videoEncoder pause];
     }
 }
 
@@ -202,29 +205,26 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     if (paused) {
         paused = NO;
-        NSTimeInterval thisPauseTime = [[NSDate date] timeIntervalSince1970] - pauseStartedAt;
-        [videoController addPauseTime:thisPauseTime];
-        
-        NSLog(@"Resume recording, was paused for %.1f seconds", thisPauseTime);
+        [videoEncoder resume];
     }
 }
 
 - (void)setScaleFactor:(CGFloat)aScaleFactor
 {
-    if (videoController.recording) {
+    if (videoEncoder.recording) {
         [NSException raise:@"Screen capture exception" format:@"Cannot change scale factor while recording is in progress."];
     }
     
     scaleFactor = aScaleFactor;
     screenshotController.scaleFactor = scaleFactor;
-    videoController.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
+    videoEncoder.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
 }
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
 {
     autoCaptureEnabled = isAutoCaptureEnabled;
     
-    if (autoCaptureEnabled && videoController.recording) {
+    if (autoCaptureEnabled && videoEncoder.recording) {
         [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
     }
 }
@@ -247,11 +247,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         frameCount++;
         elapsedTime += (end - start);
+        lastScreenshotTime = end;
         // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
         
         if (previousScreenshot) {
             UIImage *touchedUpScreenshot = [screenshotController drawPendingTouchMarksOnImage:previousScreenshot];
-            [videoController writeFrameImage:touchedUpScreenshot];
+            [videoEncoder writeFrameImage:touchedUpScreenshot];
             [previousScreenshot release];
         }
         
@@ -262,13 +263,17 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 - (void)takeScreenshot
-{    
-    [self takeScreenshot:nil colorRenderBuffer:0];
+{   
+    if (!paused && !processing) {
+        [self takeScreenshot:nil colorRenderBuffer:0];
+    }
 }
 
 - (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
-    [self takeScreenshot:glView colorRenderBuffer:colorRenderBuffer];
+    if (!paused && !processing && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime >= 1.0f / maximumFrameRate) {
+        [self takeScreenshot:glView colorRenderBuffer:colorRenderBuffer];
+    }
 }
 
 - (void)screenshotTimerFired
