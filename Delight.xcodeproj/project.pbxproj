@@ -311,6 +311,15 @@
 		A934140B15355DA00044077B /* S3UploadPartResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = A93412EC15355DA00044077B /* S3UploadPartResponse.h */; };
 		A934140C15355DA00044077B /* S3VersionSummary.h in Headers */ = {isa = PBXBuildFile; fileRef = A93412ED15355DA00044077B /* S3VersionSummary.h */; };
 		A934140D15355DA00044077B /* S3VersionSummaryUnmarshaller.h in Headers */ = {isa = PBXBuildFile; fileRef = A93412EE15355DA00044077B /* S3VersionSummaryUnmarshaller.h */; };
+		A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */; };
+		A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */; };
+		A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A9A3D715371A3E00B6E4AB /* UIKit.framework */; };
+		A9A9A3DB15371AE500B6E4AB /* DLFileUploadStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3D915371AE500B6E4AB /* DLFileUploadStatus.h */; };
+		A9A9A3DC15371AE500B6E4AB /* DLFileUploadStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */; };
+		A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3DE15371E7E00B6E4AB /* DLTask.h */; };
+		A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DF15371E7E00B6E4AB /* DLTask.m */; };
+		A9A9A3E41537225F00B6E4AB /* DLGetSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E21537225F00B6E4AB /* DLGetSessionTask.h */; };
+		A9A9A3E51537225F00B6E4AB /* DLGetSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E31537225F00B6E4AB /* DLGetSessionTask.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -621,6 +630,15 @@
 		A93412EC15355DA00044077B /* S3UploadPartResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3UploadPartResponse.h; sourceTree = "<group>"; };
 		A93412ED15355DA00044077B /* S3VersionSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3VersionSummary.h; sourceTree = "<group>"; };
 		A93412EE15355DA00044077B /* S3VersionSummaryUnmarshaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3VersionSummaryUnmarshaller.h; sourceTree = "<group>"; };
+		A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTaskController.h; sourceTree = "<group>"; };
+		A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTaskController.m; sourceTree = "<group>"; };
+		A9A9A3D715371A3E00B6E4AB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		A9A9A3D915371AE500B6E4AB /* DLFileUploadStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLFileUploadStatus.h; sourceTree = "<group>"; };
+		A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLFileUploadStatus.m; sourceTree = "<group>"; };
+		A9A9A3DE15371E7E00B6E4AB /* DLTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTask.h; sourceTree = "<group>"; };
+		A9A9A3DF15371E7E00B6E4AB /* DLTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTask.m; sourceTree = "<group>"; };
+		A9A9A3E21537225F00B6E4AB /* DLGetSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGetSessionTask.h; sourceTree = "<group>"; };
+		A9A9A3E31537225F00B6E4AB /* DLGetSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGetSessionTask.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -628,6 +646,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */,
 				83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */,
 				83B896AF14EAEFBF006D93C2 /* AssetsLibrary.framework in Frameworks */,
 				83B896B014EAEFBF006D93C2 /* AVFoundation.framework in Frameworks */,
@@ -662,6 +681,7 @@
 		83B8968414EAEC68006D93C2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A9A9A3D715371A3E00B6E4AB /* UIKit.framework */,
 				83B896B614EAF090006D93C2 /* OpenGLES.framework */,
 				83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */,
 				83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */,
@@ -677,6 +697,7 @@
 		83B8968714EAEC68006D93C2 /* Delight */ = {
 			isa = PBXGroup;
 			children = (
+				A9A9A3CC1536EA3600B6E4AB /* Utility */,
 				A93411CB15355DA00044077B /* Amazon.S3 */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
@@ -1027,6 +1048,29 @@
 			path = S3;
 			sourceTree = "<group>";
 		};
+		A9A9A3CC1536EA3600B6E4AB /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				A9A9A3DD15371E6A00B6E4AB /* Tasks */,
+				A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */,
+				A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */,
+				A9A9A3D915371AE500B6E4AB /* DLFileUploadStatus.h */,
+				A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		A9A9A3DD15371E6A00B6E4AB /* Tasks */ = {
+			isa = PBXGroup;
+			children = (
+				A9A9A3DE15371E7E00B6E4AB /* DLTask.h */,
+				A9A9A3DF15371E7E00B6E4AB /* DLTask.m */,
+				A9A9A3E21537225F00B6E4AB /* DLGetSessionTask.h */,
+				A9A9A3E31537225F00B6E4AB /* DLGetSessionTask.m */,
+			);
+			path = Tasks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1196,6 +1240,10 @@
 				A934140B15355DA00044077B /* S3UploadPartResponse.h in Headers */,
 				A934140C15355DA00044077B /* S3VersionSummary.h in Headers */,
 				A934140D15355DA00044077B /* S3VersionSummaryUnmarshaller.h in Headers */,
+				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
+				A9A9A3DB15371AE500B6E4AB /* DLFileUploadStatus.h in Headers */,
+				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
+				A9A9A3E41537225F00B6E4AB /* DLGetSessionTask.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1441,6 +1489,10 @@
 				A934138915355DA00044077B /* S3UploadPartResponse.m in Sources */,
 				A934138A15355DA00044077B /* S3VersionSummary.m in Sources */,
 				A934138B15355DA00044077B /* S3VersionSummaryUnmarshaller.m in Sources */,
+				A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */,
+				A9A9A3DC15371AE500B6E4AB /* DLFileUploadStatus.m in Sources */,
+				A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */,
+				A9A9A3E51537225F00B6E4AB /* DLGetSessionTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
