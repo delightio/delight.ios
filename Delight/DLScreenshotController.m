@@ -28,6 +28,7 @@
 @synthesize hidesKeyboard;
 @synthesize writesToPNG;
 @synthesize previousScreenshot;
+@synthesize imageSize;
 
 - (id)init
 {
@@ -36,6 +37,7 @@
         bitmapData = NULL;
         pendingTouches = [[NSMutableArray alloc] init];
         privateViews = [[NSMutableSet alloc] init];
+        self.scaleFactor = 1.0f;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];    
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];    
@@ -64,10 +66,17 @@
 
 #pragma mark - Public methods
 
+- (void)setScaleFactor:(CGFloat)aScaleFactor
+{
+    scaleFactor = aScaleFactor;
+    
+    UIScreen *mainScreen = [UIScreen mainScreen];
+    imageSize = CGSizeMake(mainScreen.bounds.size.width * scaleFactor * mainScreen.scale, mainScreen.bounds.size.height * scaleFactor * mainScreen.scale);
+}
+
 - (UIImage *)screenshot
 {
     CGSize windowSize = [[UIScreen mainScreen] bounds].size;
-    CGSize imageSize = CGSizeMake(windowSize.width * scaleFactor, windowSize.height * scaleFactor);
     CGContextRef context = [self createBitmapContextOfSize:imageSize];
     
     // Flip the y-axis since Core Graphics starts with 0 at the bottom
@@ -85,7 +94,7 @@
             // Apply the window's transform about the anchor point
             CGContextTranslateCTM(context, (imageSize.width - windowSize.width) / 2, (imageSize.height - windowSize.height) / 2);
             CGContextConcatCTM(context, [window transform]);   
-            CGContextScaleCTM(context, scaleFactor, scaleFactor);
+            CGContextScaleCTM(context, scaleFactor * [UIScreen mainScreen].scale, scaleFactor * [UIScreen mainScreen].scale);
             
             // Offset by the portion of the bounds left of and above the anchor point
             CGContextTranslateCTM(context,
@@ -341,14 +350,15 @@
     CGPoint lastLocations[4];
     CGPoint startLocation = CGPointZero;
     NSInteger strokeCount = 0;
+    CGFloat scale = [UIScreen mainScreen].scale;
     
     @synchronized(self) {
         BOOL lineBegun = NO;
         for (NSMutableDictionary *touch in pendingTouches) {
             CGPoint location = [[touch objectForKey:@"location"] CGPointValue];
             BOOL locationIsInPrivateView = [self locationIsInPrivateView:location];
-            location.x *= scaleFactor;
-            location.y *= scaleFactor;
+            location.x *= scaleFactor * scale;
+            location.y *= scaleFactor * scale;
             NSInteger decayCount = [[touch objectForKey:@"decayCount"] integerValue];
             UITouchPhase phase = [[touch objectForKey:@"phase"] intValue];
             

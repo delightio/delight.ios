@@ -223,7 +223,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     scaleFactor = aScaleFactor;
     screenshotController.scaleFactor = scaleFactor;
-    videoEncoder.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
+    videoEncoder.videoSize = screenshotController.imageSize;
 }
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled

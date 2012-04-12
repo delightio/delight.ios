@@ -31,6 +31,7 @@
 @property (nonatomic, assign) BOOL hidesKeyboard;
 @property (nonatomic, assign) BOOL writesToPNG;
 @property (nonatomic, retain) UIImage *previousScreenshot;
+@property (nonatomic, readonly) CGSize imageSize;
 
 - (UIImage *)screenshot;
 - (UIImage *)openGLScreenshotForView:(UIView *)view colorRenderBuffer:(GLuint)colorRenderBuffer;
