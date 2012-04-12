@@ -14,10 +14,7 @@ Basic Setup
 
 2. In your build settings, add `-ObjC` to "Other Linker Flags".
 
-3. In your application delegate:
-
-    * `#import <Delight/Delight.h>`
-    * In `applicationDidFinishLaunching:withOptions:`, call `[Delight start]`
+3. In your application delegate, `#import <Delight/Delight.h>`. In `applicationDidFinishLaunching:withOptions:`, call `[Delight start]`
 
 Advanced Setup
 --------------
@@ -28,7 +25,7 @@ By default, it will record at a scale factor of 1 (full size) at as many frames 
 
 ### OpenGL ES Support ###
 
-OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGL]` rather than `[Delight start]`, and you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer]` with your EAGLView and colorRenderBuffer before calling `presentRenderbuffer:` in your rendering loop.
+OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGL]` rather than `[Delight start]`, and you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and render buffer before calling `presentRenderbuffer:` in your rendering loop.
 
 ### Pause/Resume ###
 
