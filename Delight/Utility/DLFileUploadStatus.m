@@ -10,4 +10,17 @@
 
 @implementation DLFileUploadStatus
 
+@synthesize startTime = _startTime;
+@synthesize endTime = _endTime;
+@synthesize chunkSize;
+@synthesize chunkOffset;
+@synthesize filePath = _filePath;
+
+- (void)dealloc {
+	[_startTime release];
+	[_endTime release];
+	[_filePath release];
+	[super dealloc];
+}
+
 @end
