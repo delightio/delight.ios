@@ -19,7 +19,7 @@
     NSMutableArray *pendingTouches;  
     NSMutableSet *privateViews;
     UIImage *openGLImage;
-    CGRect openGLFrame;
+    UIView *openGLView;
     
     void *bitmapData;
     CGRect keyboardFrame;

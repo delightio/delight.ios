@@ -20,7 +20,6 @@
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
-- (CGImageRef)CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle;
 @end
 
 @implementation DLScreenshotController
@@ -58,6 +57,7 @@
     [pendingTouches release];
     [privateViews release];
     [openGLImage release];
+    [openGLView release];
     [previousScreenshot release];
     
     [super dealloc];
@@ -99,9 +99,10 @@
             }
                         
             // Draw the OpenGL view, if there is one
-            if (openGLImage) {
-                CGContextDrawImage(context, openGLFrame, [openGLImage CGImage]);
+            if (openGLImage && openGLView.window == window) {
+                CGContextDrawImage(context, openGLView.frame, [openGLImage CGImage]);
                 [openGLImage release]; openGLImage = nil;
+                [openGLView release]; openGLView = nil;
             }
             
             // [self drawPendingTouchMarksInContext:context];            
@@ -163,23 +164,37 @@
                                                     kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
                                                     ref, NULL, true, kCGRenderingIntentDefault);
     
+    // Rotate the image if necessary (we want everything in "UIWindow orientation", i.e. portrait)
+    CGFloat angle;
+    switch ([[UIApplication sharedApplication] statusBarOrientation]) {
+        case UIInterfaceOrientationLandscapeLeft:  angle = -M_PI_2; break;
+        case UIInterfaceOrientationLandscapeRight: angle = M_PI_2;  break;
+        default:                                   angle = 0;       break;
+    }
+	CGRect rotatedRect = CGRectApplyAffineTransform(CGRectMake(0, 0, width, height), 
+                                                    CGAffineTransformMakeRotation(angle));
+    
     // OpenGL ES measures data in PIXELS
     // Create a graphics context with the target size measured in POINTS
     NSInteger widthInPoints; 
     NSInteger heightInPoints;
+    CGRect scaledRotatedRect;
     if (NULL != UIGraphicsBeginImageContextWithOptions) {
         // On iOS 4 and later, use UIGraphicsBeginImageContextWithOptions to take the scale into consideration
         // Set the scale parameter to your OpenGL ES view's contentScaleFactor
         // so that you get a high-resolution snapshot when its value is greater than 1.0
-        CGFloat scale       = view.contentScaleFactor;
-        widthInPoints       = width / scale;
-        heightInPoints      = height / scale;
-        UIGraphicsBeginImageContextWithOptions(CGSizeMake(widthInPoints, heightInPoints), NO, scale);
+        CGFloat scale       = scaleFactor / view.contentScaleFactor;
+        widthInPoints       = width * scale;
+        heightInPoints      = height * scale;
+        scaledRotatedRect   = CGRectMake(0, 0, rotatedRect.size.width * scale, rotatedRect.size.height * scale);
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(scaledRotatedRect.size.width, scaledRotatedRect.size.height), NO, view.contentScaleFactor);
     } else {
         // On iOS prior to 4, fall back to use UIGraphicsBeginImageContext
-        widthInPoints       = width;
-        heightInPoints      = height;
-        UIGraphicsBeginImageContext(CGSizeMake(widthInPoints, heightInPoints));
+        CGFloat scale       = scaleFactor;
+        widthInPoints       = width * scale;
+        heightInPoints      = height * scale;
+        scaledRotatedRect   = CGRectMake(0, 0, rotatedRect.size.width * scale, rotatedRect.size.height * scale);
+        UIGraphicsBeginImageContext(CGSizeMake(scaledRotatedRect.size.width, scaledRotatedRect.size.height));
     }
     
     CGContextRef cgcontext  = UIGraphicsGetCurrentContext();
@@ -188,11 +203,17 @@
     // Flip the CGImage by rendering it to the flipped bitmap context
     // Flip the y-axis since Core Graphics starts with 0 at the bottom
     CGContextScaleCTM(cgcontext, 1.0, -1.0);
-    CGContextTranslateCTM(cgcontext, 0, -heightInPoints);
+    CGContextTranslateCTM(cgcontext, 0, -scaledRotatedRect.size.height);
 
     // The size of the destination area is measured in POINTS
     CGContextSetBlendMode(cgcontext, kCGBlendModeCopy);
-    CGContextDrawImage(cgcontext, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
+    CGContextSetAllowsAntialiasing(cgcontext, NO);
+	CGContextSetInterpolationQuality(cgcontext, kCGInterpolationNone);
+
+    CGContextTranslateCTM(cgcontext, (scaledRotatedRect.size.width / 2), (scaledRotatedRect.size.height / 2));
+	CGContextRotateCTM(cgcontext, angle);
+	CGContextDrawImage(cgcontext, CGRectMake(-widthInPoints / 2.0f, -heightInPoints / 2.0f, widthInPoints, heightInPoints), iref);
+    
     // Retrieve the UIImage from the current context
     UIImage *glImage = UIGraphicsGetImageFromCurrentImageContext();
     
@@ -204,23 +225,10 @@
     CFRelease(colorspace);
     CGImageRelease(iref);
         
-    // Rotate the image if necessary (we want everything in "UIWindow orientation", i.e. portrait)
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    CGImageRef rotatedImageRef = glImage.CGImage;
-    switch (orientation) {
-        case UIInterfaceOrientationLandscapeLeft:
-            rotatedImageRef = [self CGImageRotatedByAngle:rotatedImageRef angle:-90];
-            break;
-        case UIInterfaceOrientationLandscapeRight:
-            rotatedImageRef = [self CGImageRotatedByAngle:rotatedImageRef angle:90];
-            break;
-        default:
-            break;
-    }
-    
     [openGLImage release];
-    openGLImage = [[UIImage imageWithCGImage:rotatedImageRef] retain];
-    openGLFrame = view.frame;
+    [openGLView release];
+    openGLImage = [glImage retain];
+    openGLView = [view retain];
 
     return [self screenshot];
 }
@@ -491,41 +499,6 @@
     NSString *filename = [NSString stringWithFormat:@"Documents/frame_%i.png", pngCount++];
     NSString *pngPath = [NSHomeDirectory() stringByAppendingPathComponent:filename];
     [UIImagePNGRepresentation(image) writeToFile:pngPath atomically:YES];
-}
-
-- (CGImageRef)CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle
-{
-	CGFloat angleInRadians = angle * (M_PI / 180);
-	CGFloat width = CGImageGetWidth(imgRef);
-	CGFloat height = CGImageGetHeight(imgRef);
-    
-	CGRect imgRect = CGRectMake(0, 0, width, height);
-	CGAffineTransform transform = CGAffineTransformMakeRotation(angleInRadians);
-	CGRect rotatedRect = CGRectApplyAffineTransform(imgRect, transform);
-    
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-	CGContextRef bmContext = CGBitmapContextCreate(NULL,
-												   rotatedRect.size.width,
-												   rotatedRect.size.height,
-												   8,
-												   0,
-												   colorSpace,
-												   kCGImageAlphaPremultipliedFirst);
-	CGContextSetAllowsAntialiasing(bmContext, YES);
-	CGContextSetInterpolationQuality(bmContext, kCGInterpolationHigh);
-	CGColorSpaceRelease(colorSpace);
-	CGContextTranslateCTM(bmContext,
-						  +(rotatedRect.size.width/2),
-						  +(rotatedRect.size.height/2));
-	CGContextRotateCTM(bmContext, angleInRadians);
-	CGContextDrawImage(bmContext, CGRectMake(-width/2, -height/2, width, height),
-					   imgRef);
-    
-	CGImageRef rotatedImage = CGBitmapContextCreateImage(bmContext);
-	CFRelease(bmContext);
-	[(id)rotatedImage autorelease];
-    
-	return rotatedImage;
 }
 
 #pragma mark - Notifications
