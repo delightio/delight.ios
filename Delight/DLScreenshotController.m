@@ -37,10 +37,8 @@
         pendingTouches = [[NSMutableArray alloc] init];
         privateViews = [[NSMutableSet alloc] init];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(handleKeyboardFrameChanged:)
-                                                     name:UIKeyboardWillShowNotification
-                                                   object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];    
     }
     return self;
 }
@@ -58,6 +56,7 @@
     [privateViews release];
     [openGLImage release];
     [openGLView release];
+    [keyboardWindow release];
     [previousScreenshot release];
     
     [super dealloc];
@@ -71,14 +70,14 @@
     CGSize imageSize = CGSizeMake(windowSize.width * scaleFactor, windowSize.height * scaleFactor);
     CGContextRef context = [self createBitmapContextOfSize:imageSize];
     
+    // Flip the y-axis since Core Graphics starts with 0 at the bottom
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextTranslateCTM(context, 0, -imageSize.height);
+    
     // Iterate over every window from back to front
     for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
         if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen]) {
             CGContextSaveGState(context);
-            
-            // Flip the y-axis since Core Graphics starts with 0 at the bottom
-            CGContextScaleCTM(context, 1.0, -1.0);
-            CGContextTranslateCTM(context, 0, -imageSize.height);
             
             // Center the context around the window's anchor point
             CGContextTranslateCTM(context, [window center].x, [window center].y);
@@ -93,7 +92,7 @@
                                   -[window bounds].size.width * [[window layer] anchorPoint].x,
                                   -[window bounds].size.height * [[window layer] anchorPoint].y);
             
-            if (!hidesKeyboard || window != [self keyboardWindow]) {
+            if (!hidesKeyboard || window != keyboardWindow) {
                 // Draw the view hierarchy onto our context
                 [[window layer] renderInContext:context];
             }
@@ -105,7 +104,6 @@
                 [openGLView release]; openGLView = nil;
             }
             
-            // [self drawPendingTouchMarksInContext:context];            
             [self hidePrivateViewsForWindow:window inContext:context];
             
             CGContextRestoreGState(context);
@@ -503,9 +501,16 @@
 
 #pragma mark - Notifications
 
-- (void)handleKeyboardFrameChanged:(NSNotification *)notification
+- (void)handleKeyboardWillShowNotification:(NSNotification *)notification
 {
+    keyboardWindow = [[self keyboardWindow] retain];
     keyboardFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+}
+
+- (void)handleKeyboardWillHideNotification:(NSNotification *)notification
+{
+    [keyboardWindow release];
+    keyboardWindow = nil;
 }
 
 #pragma mark - DLWindowDelegate

@@ -20,6 +20,7 @@
     NSMutableSet *privateViews;
     UIImage *openGLImage;
     UIView *openGLView;
+    UIWindow *keyboardWindow;
     
     void *bitmapData;
     CGRect keyboardFrame;
