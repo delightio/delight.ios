@@ -40,6 +40,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 @implementation Delight
 
+@synthesize appID;
 @synthesize scaleFactor;
 @synthesize frameRate;
 @synthesize maximumFrameRate;
@@ -58,15 +59,19 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return sharedInstance;
 }
 
-+ (void)start
++ (void)startWithAppID:(NSString *)appID
 {
-    [[self sharedInstance] startRecording];
+    Delight *delight = [self sharedInstance];
+    delight.appID = appID;
+    [delight startRecording];
 }
 
-+ (void)startOpenGL
++ (void)startOpenGLWithAppID:(NSString *)appID
 {
-    [self sharedInstance].autoCaptureEnabled = NO;
-    [[self sharedInstance] startRecording];
+    Delight *delight = [self sharedInstance];
+    delight.appID = appID;
+    delight.autoCaptureEnabled = NO;
+    [delight startRecording];
 }
 
 + (void)stop
@@ -138,7 +143,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 #pragma mark -
 
-- (id)init 
+- (id)init
 {
     self = [super init];
     if (self) {        
@@ -167,6 +172,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
+    [appID release];
     [screenshotController release];
     [videoEncoder release];
     
