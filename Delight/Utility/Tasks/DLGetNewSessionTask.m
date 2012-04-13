@@ -33,7 +33,7 @@
 #pragma mark XML parsing delegate
 - (void)parserDidStartDocument:(NSXMLParser *)parser {
 	// create the session object
-	_statusObject = [[DLFileUploadStatus alloc] init];
+	_statusObject = [[DLRecordingContext alloc] init];
 }
 
 @end

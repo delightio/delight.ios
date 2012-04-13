@@ -7,10 +7,10 @@
 //
 
 #import "DLTask.h"
-#import "DLFileUploadStatus.h"
+#import "DLRecordingContext.h"
 
 @interface DLGetNewSessionTask : DLTask <NSXMLParserDelegate>
 
-@property (nonatomic, retain) DLFileUploadStatus * statusObject;
+@property (nonatomic, retain) DLRecordingContext * statusObject;
 
 @end

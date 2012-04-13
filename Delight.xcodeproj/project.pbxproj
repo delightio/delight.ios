@@ -314,8 +314,8 @@
 		A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */; };
 		A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */; };
 		A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A9A3D715371A3E00B6E4AB /* UIKit.framework */; };
-		A9A9A3DB15371AE500B6E4AB /* DLFileUploadStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3D915371AE500B6E4AB /* DLFileUploadStatus.h */; };
-		A9A9A3DC15371AE500B6E4AB /* DLFileUploadStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */; };
+		A9A9A3DB15371AE500B6E4AB /* DLRecordingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */; };
+		A9A9A3DC15371AE500B6E4AB /* DLRecordingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DA15371AE500B6E4AB /* DLRecordingContext.m */; };
 		A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3DE15371E7E00B6E4AB /* DLTask.h */; };
 		A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DF15371E7E00B6E4AB /* DLTask.m */; };
 		A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */; };
@@ -638,8 +638,8 @@
 		A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTaskController.h; sourceTree = "<group>"; };
 		A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTaskController.m; sourceTree = "<group>"; };
 		A9A9A3D715371A3E00B6E4AB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		A9A9A3D915371AE500B6E4AB /* DLFileUploadStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLFileUploadStatus.h; sourceTree = "<group>"; };
-		A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLFileUploadStatus.m; sourceTree = "<group>"; };
+		A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLRecordingContext.h; sourceTree = "<group>"; };
+		A9A9A3DA15371AE500B6E4AB /* DLRecordingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLRecordingContext.m; sourceTree = "<group>"; };
 		A9A9A3DE15371E7E00B6E4AB /* DLTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTask.h; sourceTree = "<group>"; };
 		A9A9A3DF15371E7E00B6E4AB /* DLTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTask.m; sourceTree = "<group>"; };
 		A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGetNewSessionTask.h; sourceTree = "<group>"; };
@@ -1063,8 +1063,8 @@
 				A9A9A3DD15371E6A00B6E4AB /* Tasks */,
 				A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */,
 				A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */,
-				A9A9A3D915371AE500B6E4AB /* DLFileUploadStatus.h */,
-				A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */,
+				A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */,
+				A9A9A3DA15371AE500B6E4AB /* DLRecordingContext.m */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -1255,7 +1255,7 @@
 				A934140C15355DA00044077B /* S3VersionSummary.h in Headers */,
 				A934140D15355DA00044077B /* S3VersionSummaryUnmarshaller.h in Headers */,
 				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
-				A9A9A3DB15371AE500B6E4AB /* DLFileUploadStatus.h in Headers */,
+				A9A9A3DB15371AE500B6E4AB /* DLRecordingContext.h in Headers */,
 				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
 				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
 				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
@@ -1506,7 +1506,7 @@
 				A934138A15355DA00044077B /* S3VersionSummary.m in Sources */,
 				A934138B15355DA00044077B /* S3VersionSummaryUnmarshaller.m in Sources */,
 				A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */,
-				A9A9A3DC15371AE500B6E4AB /* DLFileUploadStatus.m in Sources */,
+				A9A9A3DC15371AE500B6E4AB /* DLRecordingContext.m in Sources */,
 				A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */,
 				A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */,
 				A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */,
