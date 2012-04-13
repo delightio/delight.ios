@@ -17,8 +17,10 @@ extern NSString * const DL_APP_VERSION;
 @interface DLTask : NSObject
 
 @property (nonatomic, retain) NSMutableData * receivedData;
+@property (nonatomic, retain) NSHTTPURLResponse * httpResponse;
 
 - (NSURLRequest *)URLRequest;
 - (void)processResponse;
+- (BOOL)responseContainsError;
 
 @end

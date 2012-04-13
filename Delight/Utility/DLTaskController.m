@@ -10,7 +10,17 @@
 #import <UIKit/UIKit.h>
 
 @implementation DLTaskController
+@synthesize queue = _queue;
 @synthesize controlConnection = _controlConnection;
+@synthesize task = _task;
+
+- (id)init {
+	self = [super init];
+	
+	_queue = [[NSOperationQueue alloc] init];
+	
+	return self;
+}
 
 - (void)dealloc {
 	if ( _controlConnection ) {
@@ -24,9 +34,9 @@
 	if ( _controlConnection ) return;
 	
 	// begin connection
-	NSString * urlStr = [NSString stringWithFormat:@""];
-	NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
-	_controlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] init];
+	_controlConnection = [[NSURLConnection alloc] initWithRequest:[theTask URLRequest] delegate:self];
+	_task = theTask;
 }
 
 - (void)uploadVideoAtPath:(NSString *)aPath {
@@ -43,15 +53,23 @@
 
 #pragma mark NSURLConnection delegate methods
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-	
+	_task.httpResponse = (NSHTTPURLResponse *)response;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-	
+	[_task.receivedData appendData:data];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-	
+	// check if there's error
+	if ( ![_task responseContainsError] ) {
+		// process the data
+		[_queue addOperationWithBlock:^{
+			[_task processResponse];
+		}];
+	}
+	self.task = nil;
+	self.controlConnection = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

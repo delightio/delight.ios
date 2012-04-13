@@ -634,6 +634,7 @@
 		A93412EC15355DA00044077B /* S3UploadPartResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3UploadPartResponse.h; sourceTree = "<group>"; };
 		A93412ED15355DA00044077B /* S3VersionSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3VersionSummary.h; sourceTree = "<group>"; };
 		A93412EE15355DA00044077B /* S3VersionSummaryUnmarshaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = S3VersionSummaryUnmarshaller.h; sourceTree = "<group>"; };
+		A9508D311537E99B001853A0 /* DLTaskHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DLTaskHeader.h; sourceTree = "<group>"; };
 		A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTaskController.h; sourceTree = "<group>"; };
 		A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTaskController.m; sourceTree = "<group>"; };
 		A9A9A3D715371A3E00B6E4AB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -1079,6 +1080,7 @@
 				A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */,
 				A9A9A3EA1537BEB400B6E4AB /* DLPostVideoInfoTask.h */,
 				A9A9A3EB1537BEB400B6E4AB /* DLPostVideoInfoTask.m */,
+				A9508D311537E99B001853A0 /* DLTaskHeader.h */,
 			);
 			path = Tasks;
 			sourceTree = "<group>";

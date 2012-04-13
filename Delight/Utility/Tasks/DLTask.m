@@ -10,9 +10,11 @@
 
 @implementation DLTask
 @synthesize receivedData = _receivedData;
+@synthesize httpResponse = _httpResponse;
 
 - (void)dealloc {
 	[_receivedData release];
+	[_httpResponse release];
 	[super dealloc];
 }
 
@@ -29,6 +31,11 @@
 
 - (void)processResponse {
 
+}
+
+- (BOOL)responseContainsError {
+	NSInteger theCode = [_httpResponse statusCode];
+	return !(theCode < 300 && theCode > 199);
 }
 
 @end
