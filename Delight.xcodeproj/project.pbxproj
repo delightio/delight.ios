@@ -318,8 +318,8 @@
 		A9A9A3DC15371AE500B6E4AB /* DLFileUploadStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */; };
 		A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3DE15371E7E00B6E4AB /* DLTask.h */; };
 		A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DF15371E7E00B6E4AB /* DLTask.m */; };
-		A9A9A3E41537225F00B6E4AB /* DLGetSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E21537225F00B6E4AB /* DLGetSessionTask.h */; };
-		A9A9A3E51537225F00B6E4AB /* DLGetSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E31537225F00B6E4AB /* DLGetSessionTask.m */; };
+		A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */; };
+		A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */; };
 		A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */; };
 		A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */; };
 		A9A9A3EC1537BEB400B6E4AB /* DLPostVideoInfoTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3EA1537BEB400B6E4AB /* DLPostVideoInfoTask.h */; };
@@ -641,8 +641,8 @@
 		A9A9A3DA15371AE500B6E4AB /* DLFileUploadStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLFileUploadStatus.m; sourceTree = "<group>"; };
 		A9A9A3DE15371E7E00B6E4AB /* DLTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTask.h; sourceTree = "<group>"; };
 		A9A9A3DF15371E7E00B6E4AB /* DLTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTask.m; sourceTree = "<group>"; };
-		A9A9A3E21537225F00B6E4AB /* DLGetSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGetSessionTask.h; sourceTree = "<group>"; };
-		A9A9A3E31537225F00B6E4AB /* DLGetSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGetSessionTask.m; sourceTree = "<group>"; };
+		A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGetNewSessionTask.h; sourceTree = "<group>"; };
+		A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGetNewSessionTask.m; sourceTree = "<group>"; };
 		A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLUpdateSessionTask.h; sourceTree = "<group>"; };
 		A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLUpdateSessionTask.m; sourceTree = "<group>"; };
 		A9A9A3EA1537BEB400B6E4AB /* DLPostVideoInfoTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLPostVideoInfoTask.h; sourceTree = "<group>"; };
@@ -1073,8 +1073,8 @@
 			children = (
 				A9A9A3DE15371E7E00B6E4AB /* DLTask.h */,
 				A9A9A3DF15371E7E00B6E4AB /* DLTask.m */,
-				A9A9A3E21537225F00B6E4AB /* DLGetSessionTask.h */,
-				A9A9A3E31537225F00B6E4AB /* DLGetSessionTask.m */,
+				A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */,
+				A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */,
 				A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */,
 				A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */,
 				A9A9A3EA1537BEB400B6E4AB /* DLPostVideoInfoTask.h */,
@@ -1255,7 +1255,7 @@
 				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
 				A9A9A3DB15371AE500B6E4AB /* DLFileUploadStatus.h in Headers */,
 				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
-				A9A9A3E41537225F00B6E4AB /* DLGetSessionTask.h in Headers */,
+				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
 				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
 				A9A9A3EC1537BEB400B6E4AB /* DLPostVideoInfoTask.h in Headers */,
 			);
@@ -1506,7 +1506,7 @@
 				A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */,
 				A9A9A3DC15371AE500B6E4AB /* DLFileUploadStatus.m in Sources */,
 				A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */,
-				A9A9A3E51537225F00B6E4AB /* DLGetSessionTask.m in Sources */,
+				A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */,
 				A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */,
 				A9A9A3ED1537BEB400B6E4AB /* DLPostVideoInfoTask.m in Sources */,
 			);

@@ -14,6 +14,7 @@
 
 @interface DLFileUploadStatus : NSObject
 
+@property (nonatomic, retain) NSString * sessionID;
 @property (nonatomic, retain) NSDate * startTime;
 @property (nonatomic, retain) NSDate * endTime;
 @property (nonatomic) NSInteger chunkSize;

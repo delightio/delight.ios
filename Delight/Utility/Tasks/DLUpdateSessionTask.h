@@ -7,7 +7,10 @@
 //
 
 #import "DLTask.h"
+#import "DLFileUploadStatus.h"
 
 @interface DLUpdateSessionTask : DLTask
+
+@property (nonatomic, retain) DLFileUploadStatus * fileStatus;
 
 @end

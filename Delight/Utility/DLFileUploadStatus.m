@@ -9,7 +9,7 @@
 #import "DLFileUploadStatus.h"
 
 @implementation DLFileUploadStatus
-
+@synthesize sessionID = _sessionID;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize chunkSize;
@@ -17,6 +17,7 @@
 @synthesize filePath = _filePath;
 
 - (void)dealloc {
+	[_sessionID release];
 	[_startTime release];
 	[_endTime release];
 	[_filePath release];
