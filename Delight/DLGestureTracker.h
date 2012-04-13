@@ -14,6 +14,7 @@
 
 @interface DLGestureTracker : NSObject <DLWindowDelegate> {
     void *bitmapData;
+    
     NSMutableSet *gesturesInProgress;
     NSMutableSet *gesturesCompleted;
 }

@@ -8,6 +8,16 @@
 
 #import "DLGestureTracker.h"
 #import "DLGesture.h"
+#import </usr/include/objc/objc-class.h>
+
+static void Swizzle(Class c, SEL orig, SEL new) {
+    Method origMethod = class_getInstanceMethod(c, orig);
+    Method newMethod = class_getInstanceMethod(c, new);
+    if(class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)))
+        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
+    else
+        method_exchangeImplementations(origMethod, newMethod);
+}
 
 @interface DLGestureTracker ()
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
@@ -25,14 +35,26 @@
     if (self) {
         gesturesInProgress = [[NSMutableSet alloc] init];
         gesturesCompleted = [[NSMutableSet alloc] init];
+        
         scaleFactor = 1.0f;
         bitmapData = NULL;
+        
+        // Method swizzling to intercept events
+        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
+        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
+            [window DLsetDelegate:self];
+        }
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWindowDidBecomeHiddenNotification:) name:UIWindowDidBecomeHiddenNotification object:nil];
     }
     return self;
 }
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     [gesturesInProgress release];
     [gesturesCompleted release];
     
@@ -172,15 +194,30 @@
     return context;
 }
 
+#pragma mark - Notifications
+
+- (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
+{
+    UIWindow *window = [notification object];
+    [window DLsetDelegate:self];
+}
+
+- (void)handleWindowDidBecomeHiddenNotification:(NSNotification *)notification
+{
+    UIWindow *window = [notification object];
+    [window DLsetDelegate:nil];    
+}
+
 #pragma mark - DLWindowDelegate
 
 - (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
 {
     NSMutableSet *gesturesJustCompleted = [[NSMutableSet alloc] initWithSet:gesturesInProgress];
-        
+    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+    
     for (UITouch *touch in [event allTouches]) {
         if (touch.timestamp > 0) {
-            CGPoint location = [touch locationInView:touch.window];
+            CGPoint location = [touch locationInView:keyWindow];
             
             BOOL existing = NO;
             if (touch.phase != UITouchPhaseBegan) {

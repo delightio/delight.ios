@@ -10,7 +10,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import </usr/include/objc/objc-class.h>
 #import "UIWindow+InterceptEvents.h"
 
 #define kDefaultScaleFactor 1.0f
@@ -18,15 +17,6 @@
 #define kStartingFrameRate 5.0f
 
 static Delight *sharedInstance = nil;
-
-static void Swizzle(Class c, SEL orig, SEL new) {
-    Method origMethod = class_getInstanceMethod(c, orig);
-    Method newMethod = class_getInstanceMethod(c, new);
-    if(class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)))
-        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
-    else
-        method_exchangeImplementations(origMethod, newMethod);
-}
 
 @interface Delight ()
 - (void)startRecording;
@@ -162,12 +152,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         self.autoCaptureEnabled = YES;
         frameRate = kStartingFrameRate;
 
-        // Method swizzling to intercept events
-        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
-        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-            [window DLsetDelegate:gestureTracker];
-        }
-        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     }

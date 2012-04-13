@@ -14,7 +14,7 @@ Basic Setup
 
 2. In your build settings, add `-ObjC` to "Other Linker Flags".
 
-3. In your application delegate, `#import <Delight/Delight.h>`. In `applicationDidFinishLaunching:withOptions:`, call `[Delight startWithAppID:]` after creating your window.
+3. In your application delegate, `#import <Delight/Delight.h>`. In `applicationDidFinishLaunching:withOptions:`, call `[Delight startWithAppID:]`.
 
 Advanced Setup
 --------------
@@ -29,7 +29,7 @@ OpenGL ES screen capturing requires some extra work. You must call `[Delight sta
 
 ### Pause/Resume ###
 
-Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording.
+Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To stop recording altogether, call `[Delight stop]`.
 
 ### Private Views ###
 

@@ -14,17 +14,17 @@
 // The distance required before a tap becomes a swipe
 #define kMinimumSwipeDistance 40
 
-@implementation DLGesture
-
-@synthesize locations;
-@synthesize type;
-
 static CGFloat DistanceBetweenTwoPoints(CGPoint point1, CGPoint point2)
 {
     CGFloat dx = point2.x - point1.x;
     CGFloat dy = point2.y - point1.y;
     return sqrt(dx*dx + dy*dy);
 };
+
+@implementation DLGesture
+
+@synthesize locations;
+@synthesize type;
 
 - (id)init
 {
