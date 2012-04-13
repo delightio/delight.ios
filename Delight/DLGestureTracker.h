@@ -14,7 +14,8 @@
 
 @interface DLGestureTracker : NSObject <DLWindowDelegate> {
     void *bitmapData;
-    NSMutableArray *pendingTouches;
+    NSMutableSet *gesturesInProgress;
+    NSMutableSet *gesturesCompleted;
 }
 
 @property (nonatomic, assign) CGFloat scaleFactor;

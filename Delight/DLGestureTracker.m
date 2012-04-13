@@ -7,6 +7,7 @@
 //
 
 #import "DLGestureTracker.h"
+#import "DLGesture.h"
 
 @interface DLGestureTracker ()
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
@@ -22,7 +23,8 @@
 {
     self = [super init];
     if (self) {
-        pendingTouches = [[NSMutableArray alloc] init];
+        gesturesInProgress = [[NSMutableSet alloc] init];
+        gesturesCompleted = [[NSMutableSet alloc] init];
         scaleFactor = 1.0f;
         bitmapData = NULL;
     }
@@ -31,7 +33,8 @@
 
 - (void)dealloc
 {
-    [pendingTouches release];
+    [gesturesInProgress release];
+    [gesturesCompleted release];
     
     if (bitmapData != NULL) {
         free(bitmapData);
@@ -63,78 +66,73 @@
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context
 {    
     // Draw touch points
-    NSMutableArray *objectsToRemove = [NSMutableArray array];
     CGContextSetRGBStrokeColor(context, 0, 0, 1, 0.7);
     CGContextSetLineWidth(context, 5.0);
     CGContextSetLineJoin(context, kCGLineJoinRound);
-    CGPoint lastLocations[4];
-    CGPoint startLocation = CGPointZero;
-    NSInteger strokeCount = 0;
     CGFloat scale = [UIScreen mainScreen].scale;
+    CGFloat tapCircleRadius = 7 * scaleFactor * scale;
     
+    NSMutableSet *allGestures = [[NSMutableSet alloc] init];
     @synchronized(self) {
-        BOOL lineBegun = NO;
-        for (NSMutableDictionary *touch in pendingTouches) {
-            CGPoint location = [[touch objectForKey:@"location"] CGPointValue];
+        [allGestures unionSet:gesturesInProgress];
+        [allGestures unionSet:gesturesCompleted];
+    }
+    
+    for (DLGesture *gesture in allGestures) {
+        BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue]];
 
-            BOOL locationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location];
-            location.x *= scaleFactor * scale;
-            location.y *= scaleFactor * scale;
-            NSInteger decayCount = [[touch objectForKey:@"decayCount"] integerValue];
-            UITouchPhase phase = [[touch objectForKey:@"phase"] intValue];
-            
-            // Increase the decay count
-            [touch setObject:[NSNumber numberWithInteger:decayCount+1] forKey:@"decayCount"];
-            [objectsToRemove addObject:touch];
-            
-            if (!locationIsInPrivateView) {
-                switch (phase) {
-                    case UITouchPhaseBegan:
-                        startLocation = location;
-                        CGContextMoveToPoint(context, location.x, location.y);
-                        lineBegun = YES;
-                        break;
-                    case UITouchPhaseEnded:
-                    case UITouchPhaseCancelled:
-                        CGContextStrokePath(context);
-                        double distance = sqrt((location.y - startLocation.y)*(location.y - startLocation.y) + (location.x - startLocation.x)*(location.x-startLocation.x));
-                        
-                        if (distance > 10 && strokeCount > 0) {
-                            CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
-                            double angle = atan2(location.y - lastLocation.y, location.x - lastLocation.x);
-                            
-                            CGContextSetRGBFillColor(context, 0, 0, 1, 1.0); 
-                            CGContextMoveToPoint(context, location.x, location.y);
-                            CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI + M_PI/8), location.y + 50*sin(angle + M_PI + M_PI/8));
-                            CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI - M_PI/8), location.y + 50*sin(angle + M_PI - M_PI/8));
-                            CGContextAddLineToPoint(context, location.x, location.y);
-                            CGContextFillPath(context);
-                        } else {
-                            CGContextSetRGBFillColor(context, 0, 0, 1, 0.7);                                 
-                            CGContextFillEllipseInRect(context, CGRectMake(location.x - 8, location.y - 8, 16, 16));    
-                        }
-                        break;
-                    case UITouchPhaseMoved:
-                    case UITouchPhaseStationary:
-                        if (lineBegun) {
-                            CGContextAddLineToPoint(context, location.x, location.y);
-                        } else {
-                            CGContextMoveToPoint(context, location.x, location.y);
-                        }
-                        if (CGPointEqualToPoint(startLocation, CGPointZero)) {
-                            startLocation = location;
-                        }
-                        for (NSInteger i = 0; i <= 2; i++) {
+        if (!startLocationIsInPrivateView) {
+            if (gesture.type == DLGestureTypeTap) {
+                // Tap: draw a circle at the start point
+                CGPoint location = [[gesture.locations objectAtIndex:0] CGPointValue];
+                CGPoint scaledLocation = CGPointMake(location.x * scaleFactor * scale, location.y * scaleFactor * scale);
+                
+                CGContextSetRGBFillColor(context, 0, 0, 1, 0.7);                                 
+                CGContextFillEllipseInRect(context, CGRectMake(scaledLocation.x - tapCircleRadius, scaledLocation.y - tapCircleRadius, 2 * tapCircleRadius + 1, 2 * tapCircleRadius + 1));
+            } else {
+                // Swipe: draw a line from start to finish with an arrowhead
+                CGPoint startLocation;
+                NSInteger strokeCount = 0;
+                CGPoint lastLocations[4];
+
+                for (NSUInteger i = 0; i < [gesture.locations count]; i++) {
+                    CGPoint location = [[gesture.locations objectAtIndex:i] CGPointValue];
+                    CGPoint scaledLocation = CGPointMake(location.x * scaleFactor * scale, location.y * scaleFactor * scale);
+
+                    if (i == 0) {
+                        startLocation = scaledLocation;
+                        CGContextMoveToPoint(context, scaledLocation.x, scaledLocation.y);
+                    } else if (i < [gesture.locations count] - 1) {
+                        for (NSInteger i = 0; i < 3; i++) {
                             lastLocations[i] = lastLocations[i+1];
                         }
-                        lastLocations[3] = location;
+                        lastLocations[3] = scaledLocation;
                         strokeCount++;
-                        break;
-                }
+                        
+                        CGContextAddLineToPoint(context, scaledLocation.x, scaledLocation.y);
+                    } else {
+                        CGContextStrokePath(context);
+                        
+                        CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
+                        double angle = atan2(scaledLocation.y - lastLocation.y, scaledLocation.x - lastLocation.x);
+                        
+                        CGContextSetRGBFillColor(context, 0, 0, 1, 1.0); 
+                        CGContextMoveToPoint(context, scaledLocation.x, scaledLocation.y);
+                        CGContextAddLineToPoint(context, scaledLocation.x + 50*cos(angle + M_PI + M_PI/8), scaledLocation.y + 50*sin(angle + M_PI + M_PI/8));
+                        CGContextAddLineToPoint(context, scaledLocation.x + 50*cos(angle + M_PI - M_PI/8), scaledLocation.y + 50*sin(angle + M_PI - M_PI/8));
+                        CGContextAddLineToPoint(context, scaledLocation.x, scaledLocation.y);
+                        CGContextFillPath(context);
+                    }
+                }                
             }
         }
-        [pendingTouches removeObjectsInArray:objectsToRemove];
-    }         
+    }
+    
+    [allGestures release];
+    
+    @synchronized(self) {
+        [gesturesCompleted removeAllObjects];
+    }
 }
 
 - (CGContextRef)createBitmapContextOfSize:(CGSize)size
@@ -178,20 +176,47 @@
 
 - (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
 {
-    @synchronized(self) {
-        for (UITouch *touch in [event allTouches]) {
-            if (touch.timestamp > 0) {
-                CGPoint location = [touch locationInView:touch.window];
-                
-                // UITouch objects seem to get reused. We can't copy or clone them, so create a poor man's touch object using a dictionary.
-                NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGPoint:location], @"location",
-                                                   [NSNumber numberWithInteger:0], @"decayCount", 
-                                                   [NSNumber numberWithInt:touch.phase], @"phase",
-                                                   nil];
-                [pendingTouches addObject:dictionary];
+    NSMutableSet *gesturesJustCompleted = [[NSMutableSet alloc] initWithSet:gesturesInProgress];
+        
+    for (UITouch *touch in [event allTouches]) {
+        if (touch.timestamp > 0) {
+            CGPoint location = [touch locationInView:touch.window];
+            
+            BOOL existing = NO;
+            if (touch.phase != UITouchPhaseBegan) {
+                // Check if this touch is part of an existing gesture
+                @synchronized(self) {
+                    for (DLGesture *gesture in gesturesInProgress) {
+                        if ([gesture locationBelongsToGesture:location]) {
+                            [gesture addLocation:location];
+                            
+                            if (touch.phase != UITouchPhaseEnded && touch.phase != UITouchPhaseCancelled) {
+                                // Still in progress
+                                [gesturesJustCompleted removeObject:gesture];
+                            }
+                            existing = YES;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (!existing) {
+                // This is part of a new gesture
+                DLGesture *gesture = [[DLGesture alloc] initWithLocation:location];
+                @synchronized(self) {
+                    [gesturesInProgress addObject:gesture];
+                }
+                [gesture release];
             }
         }
     }
+    
+    // Any gestures that were not updated are now completed
+    [gesturesCompleted unionSet:gesturesJustCompleted];
+    [gesturesInProgress minusSet:gesturesJustCompleted];
+    
+    [gesturesJustCompleted release];
 }
 
 @end
