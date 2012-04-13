@@ -8,6 +8,6 @@
 
 #import "DLTask.h"
 
-@interface DLGetSessionTask : DLTask
+@interface DLGetSessionTask : DLTask <NSXMLParserDelegate>
 
 @end
