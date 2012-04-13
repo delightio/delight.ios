@@ -11,6 +11,7 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import </usr/include/objc/objc-class.h>
+#import "UIWindow+InterceptEvents.h"
 
 #define kDefaultScaleFactor 1.0f
 #define kDefaultMaxFrameRate 100.0f
@@ -48,6 +49,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize autoCaptureEnabled;
 @synthesize screenshotController;
 @synthesize videoEncoder;
+@synthesize gestureTracker;
 
 #pragma mark - Class methods
 
@@ -148,8 +150,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];
+        
         videoEncoder = [[DLVideoEncoder alloc] init];
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
+
+        gestureTracker = [[DLGestureTracker alloc] init];
+        gestureTracker.delegate = self;
         
         self.scaleFactor = kDefaultScaleFactor;
         self.maximumFrameRate = kDefaultMaxFrameRate;
@@ -159,7 +165,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         // Method swizzling to intercept events
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
         for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-            [window DLsetDelegate:screenshotController];
+            [window DLsetDelegate:gestureTracker];
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
@@ -175,6 +181,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [appID release];
     [screenshotController release];
     [videoEncoder release];
+    [gestureTracker release];
     
     [super dealloc];
 }
@@ -224,6 +231,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     scaleFactor = aScaleFactor;
     screenshotController.scaleFactor = scaleFactor;
     videoEncoder.videoSize = screenshotController.imageSize;
+    gestureTracker.scaleFactor = scaleFactor;
 }
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
@@ -257,7 +265,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
         
         if (previousScreenshot) {
-            UIImage *touchedUpScreenshot = [screenshotController drawPendingTouchMarksOnImage:previousScreenshot];
+            UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
             [videoEncoder writeFrameImage:touchedUpScreenshot];
             [previousScreenshot release];
         }
@@ -317,6 +325,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)handleWillResignActive:(NSNotification *)notification
 {
     [self stopRecording];
+}
+
+#pragma mark - DLGestureTrackerDelegate
+
+- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location
+{
+    return [screenshotController locationIsInPrivateView:location];
 }
 
 @end

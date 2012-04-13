@@ -11,6 +11,8 @@
 		83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
 		83149B2D15338CC500003862 /* DLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2B15338CC500003862 /* DLVideoEncoder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2C15338CC500003862 /* DLVideoEncoder.m */; };
+		8391626F1537C21000549347 /* DLGestureTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8391626D1537C21000549347 /* DLGestureTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		839162701537C21000549347 /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
 		83B8969914EAECD6006D93C2 /* Delight.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969314EAECD6006D93C2 /* Delight.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -31,6 +33,8 @@
 		83149B2715337E5C00003862 /* DLScreenshotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLScreenshotController.m; sourceTree = "<group>"; };
 		83149B2B15338CC500003862 /* DLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLVideoEncoder.h; sourceTree = "<group>"; };
 		83149B2C15338CC500003862 /* DLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLVideoEncoder.m; sourceTree = "<group>"; };
+		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGestureTracker.h; sourceTree = "<group>"; };
+		8391626E1537C21000549347 /* DLGestureTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGestureTracker.m; sourceTree = "<group>"; };
 		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Delight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B8968514EAEC68006D93C2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		83B8968914EAEC68006D93C2 /* Delight-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Delight-Info.plist"; sourceTree = "<group>"; };
@@ -109,6 +113,8 @@
 				83149B2715337E5C00003862 /* DLScreenshotController.m */,
 				83149B2B15338CC500003862 /* DLVideoEncoder.h */,
 				83149B2C15338CC500003862 /* DLVideoEncoder.m */,
+				8391626D1537C21000549347 /* DLGestureTracker.h */,
+				8391626E1537C21000549347 /* DLGestureTracker.m */,
 				83B8969514EAECD6006D93C2 /* UIWindow+InterceptEvents.h */,
 				83B8969614EAECD6006D93C2 /* UIWindow+InterceptEvents.m */,
 				83B8968814EAEC68006D93C2 /* Supporting Files */,
@@ -137,6 +143,7 @@
 				83B8969B14EAECD6006D93C2 /* UIWindow+InterceptEvents.h in Headers */,
 				83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */,
 				83149B2D15338CC500003862 /* DLVideoEncoder.h in Headers */,
+				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +260,7 @@
 				83B8969C14EAECD6006D93C2 /* UIWindow+InterceptEvents.m in Sources */,
 				83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */,
 				83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */,
+				839162701537C21000549347 /* DLGestureTracker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

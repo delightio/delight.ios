@@ -10,13 +10,11 @@
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
-#import "UIWindow+InterceptEvents.h"
 
 /*
    DLScreenshotController takes and stores screenshots of a UIView.
  */
-@interface DLScreenshotController : NSObject <DLWindowDelegate> {
-    NSMutableArray *pendingTouches;  
+@interface DLScreenshotController : NSObject {
     NSMutableSet *privateViews;
     UIImage *openGLImage;
     UIView *openGLView;
@@ -35,8 +33,8 @@
 
 - (UIImage *)screenshot;
 - (UIImage *)openGLScreenshotForView:(UIView *)view colorRenderBuffer:(GLuint)colorRenderBuffer;
-- (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image;
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 - (void)unregisterPrivateView:(UIView *)view;
+- (BOOL)locationIsInPrivateView:(CGPoint)location;
 
 @end

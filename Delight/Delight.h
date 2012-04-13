@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "DLScreenshotController.h"
 #import "DLVideoEncoder.h"
+#import "DLGestureTracker.h"
 
-@interface Delight : NSObject {
+@interface Delight : NSObject <DLGestureTrackerDelegate> {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
@@ -25,6 +26,7 @@
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
+@property (nonatomic, readonly) DLGestureTracker *gestureTracker;
 
 /**************
  * UIKit apps *
