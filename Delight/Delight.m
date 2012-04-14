@@ -10,22 +10,13 @@
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import </usr/include/objc/objc-class.h>
+#import "UIWindow+InterceptEvents.h"
 
 #define kDefaultScaleFactor 1.0f
 #define kDefaultMaxFrameRate 100.0f
 #define kStartingFrameRate 5.0f
 
 static Delight *sharedInstance = nil;
-
-static void Swizzle(Class c, SEL orig, SEL new) {
-    Method origMethod = class_getInstanceMethod(c, orig);
-    Method newMethod = class_getInstanceMethod(c, new);
-    if(class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)))
-        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
-    else
-        method_exchangeImplementations(origMethod, newMethod);
-}
 
 @interface Delight ()
 - (void)startRecording;
@@ -40,6 +31,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 @implementation Delight
 
+@synthesize appID;
 @synthesize scaleFactor;
 @synthesize frameRate;
 @synthesize maximumFrameRate;
@@ -47,6 +39,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize autoCaptureEnabled;
 @synthesize screenshotController;
 @synthesize videoEncoder;
+@synthesize gestureTracker;
 
 #pragma mark - Class methods
 
@@ -58,15 +51,19 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return sharedInstance;
 }
 
-+ (void)start
++ (void)startWithAppID:(NSString *)appID
 {
-    [[self sharedInstance] startRecording];
+    Delight *delight = [self sharedInstance];
+    delight.appID = appID;
+    [delight startRecording];
 }
 
-+ (void)startOpenGL
++ (void)startOpenGLWithAppID:(NSString *)appID
 {
-    [self sharedInstance].autoCaptureEnabled = NO;
-    [[self sharedInstance] startRecording];
+    Delight *delight = [self sharedInstance];
+    delight.appID = appID;
+    delight.autoCaptureEnabled = NO;
+    [delight startRecording];
 }
 
 + (void)stop
@@ -138,25 +135,23 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 #pragma mark -
 
-- (id)init 
+- (id)init
 {
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];
+        
         videoEncoder = [[DLVideoEncoder alloc] init];
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
+
+        gestureTracker = [[DLGestureTracker alloc] init];
+        gestureTracker.delegate = self;
         
         self.scaleFactor = kDefaultScaleFactor;
         self.maximumFrameRate = kDefaultMaxFrameRate;
         self.autoCaptureEnabled = YES;
         frameRate = kStartingFrameRate;
 
-        // Method swizzling to intercept events
-        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
-        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-            [window DLsetDelegate:screenshotController];
-        }
-        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     }
@@ -167,8 +162,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
+    [appID release];
     [screenshotController release];
     [videoEncoder release];
+    [gestureTracker release];
     
     [super dealloc];
 }
@@ -217,7 +214,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     scaleFactor = aScaleFactor;
     screenshotController.scaleFactor = scaleFactor;
-    videoEncoder.videoSize = CGSizeMake([[UIScreen mainScreen] bounds].size.width * scaleFactor, [[UIScreen mainScreen] bounds].size.height * scaleFactor);
+    videoEncoder.videoSize = screenshotController.imageSize;
+    gestureTracker.scaleFactor = scaleFactor;
 }
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
@@ -251,7 +249,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
         
         if (previousScreenshot) {
-            UIImage *touchedUpScreenshot = [screenshotController drawPendingTouchMarksOnImage:previousScreenshot];
+            UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
             [videoEncoder writeFrameImage:touchedUpScreenshot];
             [previousScreenshot release];
         }
@@ -311,6 +309,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)handleWillResignActive:(NSNotification *)notification
 {
     [self stopRecording];
+}
+
+#pragma mark - DLGestureTrackerDelegate
+
+- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location
+{
+    return [screenshotController locationIsInPrivateView:location];
 }
 
 @end

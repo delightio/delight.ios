@@ -16,11 +16,8 @@
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
 - (void)hidePrivateViewsForWindow:(UIWindow *)window inContext:(CGContextRef)context;
-- (BOOL)locationIsInPrivateView:(CGPoint)location;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
-- (void)drawPendingTouchMarksInContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
-- (CGImageRef)CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle;
 @end
 
 @implementation DLScreenshotController
@@ -29,19 +26,18 @@
 @synthesize hidesKeyboard;
 @synthesize writesToPNG;
 @synthesize previousScreenshot;
+@synthesize imageSize;
 
 - (id)init
 {
     self = [super init];
     if (self) {
         bitmapData = NULL;
-        pendingTouches = [[NSMutableArray alloc] init];
         privateViews = [[NSMutableSet alloc] init];
+        self.scaleFactor = 1.0f;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(handleKeyboardFrameChanged:)
-                                                     name:UIKeyboardWillShowNotification
-                                                   object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];    
     }
     return self;
 }
@@ -55,9 +51,10 @@
         bitmapData = NULL;
     }
     
-    [pendingTouches release];
     [privateViews release];
     [openGLImage release];
+    [openGLView release];
+    [keyboardWindow release];
     [previousScreenshot release];
     
     [super dealloc];
@@ -65,20 +62,27 @@
 
 #pragma mark - Public methods
 
+- (void)setScaleFactor:(CGFloat)aScaleFactor
+{
+    scaleFactor = aScaleFactor;
+    
+    UIScreen *mainScreen = [UIScreen mainScreen];
+    imageSize = CGSizeMake(mainScreen.bounds.size.width * scaleFactor * mainScreen.scale, mainScreen.bounds.size.height * scaleFactor * mainScreen.scale);
+}
+
 - (UIImage *)screenshot
 {
     CGSize windowSize = [[UIScreen mainScreen] bounds].size;
-    CGSize imageSize = CGSizeMake(windowSize.width * scaleFactor, windowSize.height * scaleFactor);
     CGContextRef context = [self createBitmapContextOfSize:imageSize];
+    
+    // Flip the y-axis since Core Graphics starts with 0 at the bottom
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextTranslateCTM(context, 0, -imageSize.height);
     
     // Iterate over every window from back to front
     for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
         if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen]) {
             CGContextSaveGState(context);
-            
-            // Flip the y-axis since Core Graphics starts with 0 at the bottom
-            CGContextScaleCTM(context, 1.0, -1.0);
-            CGContextTranslateCTM(context, 0, -imageSize.height);
             
             // Center the context around the window's anchor point
             CGContextTranslateCTM(context, [window center].x, [window center].y);
@@ -86,25 +90,25 @@
             // Apply the window's transform about the anchor point
             CGContextTranslateCTM(context, (imageSize.width - windowSize.width) / 2, (imageSize.height - windowSize.height) / 2);
             CGContextConcatCTM(context, [window transform]);   
-            CGContextScaleCTM(context, scaleFactor, scaleFactor);
+            CGContextScaleCTM(context, scaleFactor * [UIScreen mainScreen].scale, scaleFactor * [UIScreen mainScreen].scale);
             
             // Offset by the portion of the bounds left of and above the anchor point
             CGContextTranslateCTM(context,
                                   -[window bounds].size.width * [[window layer] anchorPoint].x,
                                   -[window bounds].size.height * [[window layer] anchorPoint].y);
             
-            if (!hidesKeyboard || window != [self keyboardWindow]) {
+            if (!hidesKeyboard || window != keyboardWindow) {
                 // Draw the view hierarchy onto our context
                 [[window layer] renderInContext:context];
             }
                         
             // Draw the OpenGL view, if there is one
-            if (openGLImage) {
-                CGContextDrawImage(context, openGLFrame, [openGLImage CGImage]);
+            if (openGLImage && openGLView.window == window) {
+                CGContextDrawImage(context, openGLView.frame, [openGLImage CGImage]);
                 [openGLImage release]; openGLImage = nil;
+                [openGLView release]; openGLView = nil;
             }
             
-            // [self drawPendingTouchMarksInContext:context];            
             [self hidePrivateViewsForWindow:window inContext:context];
             
             CGContextRestoreGState(context);
@@ -163,23 +167,37 @@
                                                     kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
                                                     ref, NULL, true, kCGRenderingIntentDefault);
     
+    // Rotate the image if necessary (we want everything in "UIWindow orientation", i.e. portrait)
+    CGFloat angle;
+    switch ([[UIApplication sharedApplication] statusBarOrientation]) {
+        case UIInterfaceOrientationLandscapeLeft:  angle = -M_PI_2; break;
+        case UIInterfaceOrientationLandscapeRight: angle = M_PI_2;  break;
+        default:                                   angle = 0;       break;
+    }
+	CGRect rotatedRect = CGRectApplyAffineTransform(CGRectMake(0, 0, width, height), 
+                                                    CGAffineTransformMakeRotation(angle));
+    
     // OpenGL ES measures data in PIXELS
     // Create a graphics context with the target size measured in POINTS
     NSInteger widthInPoints; 
     NSInteger heightInPoints;
+    CGRect scaledRotatedRect;
     if (NULL != UIGraphicsBeginImageContextWithOptions) {
         // On iOS 4 and later, use UIGraphicsBeginImageContextWithOptions to take the scale into consideration
         // Set the scale parameter to your OpenGL ES view's contentScaleFactor
         // so that you get a high-resolution snapshot when its value is greater than 1.0
-        CGFloat scale       = view.contentScaleFactor;
-        widthInPoints       = width / scale;
-        heightInPoints      = height / scale;
-        UIGraphicsBeginImageContextWithOptions(CGSizeMake(widthInPoints, heightInPoints), NO, scale);
+        CGFloat scale       = scaleFactor / view.contentScaleFactor;
+        widthInPoints       = width * scale;
+        heightInPoints      = height * scale;
+        scaledRotatedRect   = CGRectMake(0, 0, rotatedRect.size.width * scale, rotatedRect.size.height * scale);
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(scaledRotatedRect.size.width, scaledRotatedRect.size.height), NO, view.contentScaleFactor);
     } else {
         // On iOS prior to 4, fall back to use UIGraphicsBeginImageContext
-        widthInPoints       = width;
-        heightInPoints      = height;
-        UIGraphicsBeginImageContext(CGSizeMake(widthInPoints, heightInPoints));
+        CGFloat scale       = scaleFactor;
+        widthInPoints       = width * scale;
+        heightInPoints      = height * scale;
+        scaledRotatedRect   = CGRectMake(0, 0, rotatedRect.size.width * scale, rotatedRect.size.height * scale);
+        UIGraphicsBeginImageContext(CGSizeMake(scaledRotatedRect.size.width, scaledRotatedRect.size.height));
     }
     
     CGContextRef cgcontext  = UIGraphicsGetCurrentContext();
@@ -188,11 +206,17 @@
     // Flip the CGImage by rendering it to the flipped bitmap context
     // Flip the y-axis since Core Graphics starts with 0 at the bottom
     CGContextScaleCTM(cgcontext, 1.0, -1.0);
-    CGContextTranslateCTM(cgcontext, 0, -heightInPoints);
+    CGContextTranslateCTM(cgcontext, 0, -scaledRotatedRect.size.height);
 
     // The size of the destination area is measured in POINTS
     CGContextSetBlendMode(cgcontext, kCGBlendModeCopy);
-    CGContextDrawImage(cgcontext, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
+    CGContextSetAllowsAntialiasing(cgcontext, NO);
+	CGContextSetInterpolationQuality(cgcontext, kCGInterpolationNone);
+
+    CGContextTranslateCTM(cgcontext, (scaledRotatedRect.size.width / 2), (scaledRotatedRect.size.height / 2));
+	CGContextRotateCTM(cgcontext, angle);
+	CGContextDrawImage(cgcontext, CGRectMake(-widthInPoints / 2.0f, -heightInPoints / 2.0f, widthInPoints, heightInPoints), iref);
+    
     // Retrieve the UIImage from the current context
     UIImage *glImage = UIGraphicsGetImageFromCurrentImageContext();
     
@@ -204,42 +228,12 @@
     CFRelease(colorspace);
     CGImageRelease(iref);
         
-    // Rotate the image if necessary (we want everything in "UIWindow orientation", i.e. portrait)
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    CGImageRef rotatedImageRef = glImage.CGImage;
-    switch (orientation) {
-        case UIInterfaceOrientationLandscapeLeft:
-            rotatedImageRef = [self CGImageRotatedByAngle:rotatedImageRef angle:-90];
-            break;
-        case UIInterfaceOrientationLandscapeRight:
-            rotatedImageRef = [self CGImageRotatedByAngle:rotatedImageRef angle:90];
-            break;
-        default:
-            break;
-    }
-    
     [openGLImage release];
-    openGLImage = [[UIImage imageWithCGImage:rotatedImageRef] retain];
-    openGLFrame = view.frame;
+    [openGLView release];
+    openGLImage = [glImage retain];
+    openGLView = [view retain];
 
     return [self screenshot];
-}
-
-- (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image
-{
-    CGContextRef context = [self createBitmapContextOfSize:image.size];
-    CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
-    CGContextScaleCTM(context, 1.0, -1.0);
-    CGContextTranslateCTM(context, 0, -image.size.height);
-
-    [self drawPendingTouchMarksInContext:context];
-    
-    CGImageRef cgImage = CGBitmapContextCreateImage(context);
-    UIImage *touchMarkImage = [UIImage imageWithCGImage:cgImage];
-    CGImageRelease(cgImage);
-    CGContextRelease(context);
-    
-    return touchMarkImage;
 }
 
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description
@@ -323,81 +317,6 @@
     CGColorSpaceRelease( colorSpace );
     
     return context;
-}
-
-- (void)drawPendingTouchMarksInContext:(CGContextRef)context
-{
-    // Draw touch points
-    NSMutableArray *objectsToRemove = [NSMutableArray array];
-    CGContextSetRGBStrokeColor(context, 0, 0, 1, 0.7);
-    CGContextSetLineWidth(context, 5.0);
-    CGContextSetLineJoin(context, kCGLineJoinRound);
-    CGPoint lastLocations[4];
-    CGPoint startLocation = CGPointZero;
-    NSInteger strokeCount = 0;
-    
-    @synchronized(self) {
-        BOOL lineBegun = NO;
-        for (NSMutableDictionary *touch in pendingTouches) {
-            CGPoint location = [[touch objectForKey:@"location"] CGPointValue];
-            BOOL locationIsInPrivateView = [self locationIsInPrivateView:location];
-            location.x *= scaleFactor;
-            location.y *= scaleFactor;
-            NSInteger decayCount = [[touch objectForKey:@"decayCount"] integerValue];
-            UITouchPhase phase = [[touch objectForKey:@"phase"] intValue];
-            
-            // Increase the decay count
-            [touch setObject:[NSNumber numberWithInteger:decayCount+1] forKey:@"decayCount"];
-            [objectsToRemove addObject:touch];
-            
-            if (!locationIsInPrivateView) {
-                switch (phase) {
-                    case UITouchPhaseBegan:
-                        startLocation = location;
-                        CGContextMoveToPoint(context, location.x, location.y);
-                        lineBegun = YES;
-                        break;
-                    case UITouchPhaseEnded:
-                    case UITouchPhaseCancelled:
-                        CGContextStrokePath(context);
-                        double distance = sqrt((location.y - startLocation.y)*(location.y - startLocation.y) + (location.x - startLocation.x)*(location.x-startLocation.x));
-                        
-                        if (distance > 10 && strokeCount > 0) {
-                            CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
-                            double angle = atan2(location.y - lastLocation.y, location.x - lastLocation.x);
-                            
-                            CGContextSetRGBFillColor(context, 0, 0, 1, 1.0); 
-                            CGContextMoveToPoint(context, location.x, location.y);
-                            CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI + M_PI/8), location.y + 50*sin(angle + M_PI + M_PI/8));
-                            CGContextAddLineToPoint(context, location.x + 50*cos(angle + M_PI - M_PI/8), location.y + 50*sin(angle + M_PI - M_PI/8));
-                            CGContextAddLineToPoint(context, location.x, location.y);
-                            CGContextFillPath(context);
-                        } else {
-                            CGContextSetRGBFillColor(context, 0, 0, 1, 0.7);                                 
-                            CGContextFillEllipseInRect(context, CGRectMake(location.x - 8, location.y - 8, 16, 16));    
-                        }
-                        break;
-                    case UITouchPhaseMoved:
-                    case UITouchPhaseStationary:
-                        if (lineBegun) {
-                            CGContextAddLineToPoint(context, location.x, location.y);
-                        } else {
-                            CGContextMoveToPoint(context, location.x, location.y);
-                        }
-                        if (CGPointEqualToPoint(startLocation, CGPointZero)) {
-                            startLocation = location;
-                        }
-                        for (NSInteger i = 0; i <= 2; i++) {
-                            lastLocations[i] = lastLocations[i+1];
-                        }
-                        lastLocations[3] = location;
-                        strokeCount++;
-                        break;
-                }
-            }
-        }
-        [pendingTouches removeObjectsInArray:objectsToRemove];
-    }         
 }
 
 - (void)drawLabelCenteredAt:(CGPoint)point inWindow:(UIWindow *)window inContext:(CGContextRef)context text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform
@@ -493,66 +412,18 @@
     [UIImagePNGRepresentation(image) writeToFile:pngPath atomically:YES];
 }
 
-- (CGImageRef)CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle
-{
-	CGFloat angleInRadians = angle * (M_PI / 180);
-	CGFloat width = CGImageGetWidth(imgRef);
-	CGFloat height = CGImageGetHeight(imgRef);
-    
-	CGRect imgRect = CGRectMake(0, 0, width, height);
-	CGAffineTransform transform = CGAffineTransformMakeRotation(angleInRadians);
-	CGRect rotatedRect = CGRectApplyAffineTransform(imgRect, transform);
-    
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-	CGContextRef bmContext = CGBitmapContextCreate(NULL,
-												   rotatedRect.size.width,
-												   rotatedRect.size.height,
-												   8,
-												   0,
-												   colorSpace,
-												   kCGImageAlphaPremultipliedFirst);
-	CGContextSetAllowsAntialiasing(bmContext, YES);
-	CGContextSetInterpolationQuality(bmContext, kCGInterpolationHigh);
-	CGColorSpaceRelease(colorSpace);
-	CGContextTranslateCTM(bmContext,
-						  +(rotatedRect.size.width/2),
-						  +(rotatedRect.size.height/2));
-	CGContextRotateCTM(bmContext, angleInRadians);
-	CGContextDrawImage(bmContext, CGRectMake(-width/2, -height/2, width, height),
-					   imgRef);
-    
-	CGImageRef rotatedImage = CGBitmapContextCreateImage(bmContext);
-	CFRelease(bmContext);
-	[(id)rotatedImage autorelease];
-    
-	return rotatedImage;
-}
-
 #pragma mark - Notifications
 
-- (void)handleKeyboardFrameChanged:(NSNotification *)notification
+- (void)handleKeyboardWillShowNotification:(NSNotification *)notification
 {
+    keyboardWindow = [[self keyboardWindow] retain];
     keyboardFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 }
 
-#pragma mark - DLWindowDelegate
-
-- (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
+- (void)handleKeyboardWillHideNotification:(NSNotification *)notification
 {
-    @synchronized(self) {
-        for (UITouch *touch in [event allTouches]) {
-            if (touch.timestamp > 0) {
-                CGPoint location = [touch locationInView:touch.window];
-                
-                // UITouch objects seem to get reused. We can't copy or clone them, so create a poor man's touch object using a dictionary.
-                NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGPoint:location], @"location",
-                                                   [NSNumber numberWithInteger:0], @"decayCount", 
-                                                   [NSNumber numberWithInt:touch.phase], @"phase",
-                                                   nil];
-                [pendingTouches addObject:dictionary];
-            }
-        }
-    }
+    [keyboardWindow release];
+    keyboardWindow = nil;
 }
 
 @end

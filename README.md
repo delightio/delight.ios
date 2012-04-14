@@ -14,22 +14,22 @@ Basic Setup
 
 2. In your build settings, add `-ObjC` to "Other Linker Flags".
 
-3. In your application delegate, `#import <Delight/Delight.h>`. In `applicationDidFinishLaunching:withOptions:`, call `[Delight start]`
+3. In your application delegate, `#import <Delight/Delight.h>`. In `applicationDidFinishLaunching:withOptions:`, call `[Delight startWithAppID:]`.
 
 Advanced Setup
 --------------
 
 ### Scale Factor and Frame Rate ###
 
-By default, it will record at a scale factor of 1 (full size) at as many frames per second as possible. This may use up a lot of CPU, so you may want to scale down the video or limit the frame rate. To do so, call `[Delight setScaleFactor:]` and/or `[Delight setMaximumFrameRate:]` before `[Delight start]`.
+By default, it will record at a scale factor of 1 (full size) at as many frames per second as possible. This may use up a lot of CPU, so you may want to scale down the video or limit the frame rate. To do so, call `[Delight setScaleFactor:]` and/or `[Delight setMaximumFrameRate:]` before `[Delight startWithAppID:]`.
 
 ### OpenGL ES Support ###
 
-OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGL]` rather than `[Delight start]`, and you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and render buffer before calling `presentRenderbuffer:` in your rendering loop.
+OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGLWithAppID:]` rather than `[Delight startWithAppID:]`, and you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and render buffer before calling `presentRenderbuffer:` in your rendering loop.
 
 ### Pause/Resume ###
 
-Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording.
+Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To stop recording altogether, call `[Delight stop]`.
 
 ### Private Views ###
 
