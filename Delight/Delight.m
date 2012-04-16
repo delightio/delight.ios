@@ -15,6 +15,7 @@
 
 #define kDefaultScaleFactor 1.0f
 #define kDefaultMaxFrameRate 100.0f
+#define kDefaultMaximumRecordingDuration 60.0f*10
 #define kStartingFrameRate 5.0f
 
 static Delight *sharedInstance = nil;
@@ -37,6 +38,7 @@ static Delight *sharedInstance = nil;
 @synthesize scaleFactor;
 @synthesize frameRate;
 @synthesize maximumFrameRate;
+@synthesize maximumRecordingDuration;
 @synthesize paused;
 @synthesize autoCaptureEnabled;
 @synthesize screenshotController;
@@ -66,7 +68,7 @@ static Delight *sharedInstance = nil;
     Delight *delight = [self sharedInstance];
     delight.appID = appID;
     delight.autoCaptureEnabled = NO;
-    [delight startRecording];
+	[delight tryCreateNewSession];
 }
 
 + (void)stop
@@ -149,6 +151,7 @@ static Delight *sharedInstance = nil;
         
         self.scaleFactor = kDefaultScaleFactor;
         self.maximumFrameRate = kDefaultMaxFrameRate;
+        self.maximumRecordingDuration = kDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
         frameRate = kStartingFrameRate;
 
@@ -195,8 +198,10 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
-    [videoEncoder stopRecording];
-    recordingContext.endTime = [NSDate date];
+    if (recordingContext && videoEncoder.recording) {
+        [videoEncoder stopRecording];
+        recordingContext.endTime = [NSDate date];
+    }
 }
 
 - (void)pause
@@ -267,6 +272,11 @@ static Delight *sharedInstance = nil;
     } 
     
     processing = NO;
+    
+    if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
+        // We've exceeded the maximum recording duration
+        [self stopRecording];
+    }
 }
 
 - (void)takeScreenshot
@@ -334,9 +344,7 @@ static Delight *sharedInstance = nil;
 
 - (void)handleWillResignActive:(NSNotification *)notification
 {
-    if ( recordingContext ) {
-		[self stopRecording]; // update properties in recordingContext as well.
-	}
+    [self stopRecording]; // update properties in recordingContext as well.
 }
 
 #pragma mark - DLGestureTrackerDelegate

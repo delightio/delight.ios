@@ -28,6 +28,7 @@
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, readonly) float frameRate;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
+@property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
