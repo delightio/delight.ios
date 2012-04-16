@@ -9,7 +9,8 @@
 #import <Foundation/Foundation.h>
 
 #define DL_REQUEST_TIMEOUT	30.0
-NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
+
+extern NSString * const DL_BASE_URL;
 extern NSString * const DL_ACCESS_TOKEN;
 extern NSString * const DL_APP_LOCALE;
 extern NSString * const DL_APP_VERSION;
@@ -19,6 +20,7 @@ extern NSString * const DL_APP_VERSION;
 @property (nonatomic, retain) NSMutableData * receivedData;
 @property (nonatomic, retain) NSHTTPURLResponse * httpResponse;
 
+- (NSString *)stringByAddingPercentEscapes:(NSString *)str;
 - (NSURLRequest *)URLRequest;
 - (void)processResponse;
 - (BOOL)responseContainsError;

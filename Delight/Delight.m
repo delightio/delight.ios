@@ -7,6 +7,7 @@
 //
 
 #import "Delight.h"
+#import "DLTaskController.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -27,6 +28,7 @@ static Delight *sharedInstance = nil;
 - (void)takeScreenshot;
 - (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 - (void)screenshotTimerFired;
+- (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 @end
 
 @implementation Delight
@@ -55,7 +57,8 @@ static Delight *sharedInstance = nil;
 {
     Delight *delight = [self sharedInstance];
     delight.appID = appID;
-    [delight startRecording];
+	[delight tryCreateNewSession];
+//    [delight startRecording];
 }
 
 + (void)startOpenGLWithAppID:(NSString *)appID
@@ -154,6 +157,9 @@ static Delight *sharedInstance = nil;
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+		
+		// create task controller
+		taskController = [[DLTaskController alloc] init];
     }
     return self;
 }
@@ -166,6 +172,8 @@ static Delight *sharedInstance = nil;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
+	
+	[taskController release];
     
     [super dealloc];
 }
@@ -297,6 +305,10 @@ static Delight *sharedInstance = nil;
     if (autoCaptureEnabled) {
         [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
     }
+}
+
+- (void)tryCreateNewSession {
+	[taskController requestSessionID];
 }
 
 #pragma mark - Notifications

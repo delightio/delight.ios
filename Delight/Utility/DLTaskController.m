@@ -62,6 +62,8 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	// check if there's error
+	NSString * str = [[NSString alloc] initWithData:_task.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"%@", str);
 	if ( ![_task responseContainsError] ) {
 		// process the data
 		[_queue addOperationWithBlock:^{
@@ -73,7 +75,7 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	
+	NSLog(@"error: %@", error);
 }
 
 @end

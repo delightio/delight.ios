@@ -8,6 +8,8 @@
 
 #import "DLTask.h"
 
+NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
+
 @implementation DLTask
 @synthesize receivedData = _receivedData;
 @synthesize httpResponse = _httpResponse;
@@ -23,6 +25,12 @@
 		_receivedData = [[NSMutableData alloc] init];
 	}
 	return _receivedData;
+}
+
+- (NSString *)stringByAddingPercentEscapes:(NSString *)str {
+	CFStringRef percentWord = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)str, NULL, CFSTR(":/?#[]@!$&’()*+,;="), kCFStringEncodingUTF8);
+	str = (NSString *)percentWord;
+	return [str autorelease];
 }
 
 - (NSURLRequest *)URLRequest {

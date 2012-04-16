@@ -11,11 +11,14 @@
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
 
+@class DLTaskController;
+
 @interface Delight : NSObject <DLGestureTrackerDelegate> {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
     NSTimeInterval lastScreenshotTime;
+	DLTaskController * taskController;
 }
 
 @property (nonatomic, retain) NSString *appID;
