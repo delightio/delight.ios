@@ -142,11 +142,8 @@ static Delight *sharedInstance = nil;
 {
     self = [super init];
     if (self) {        
-        screenshotController = [[DLScreenshotController alloc] init];
-        
+        screenshotController = [[DLScreenshotController alloc] init];        
         videoEncoder = [[DLVideoEncoder alloc] init];
-        videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
-
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
         
@@ -183,6 +180,8 @@ static Delight *sharedInstance = nil;
 {
     if (!videoEncoder.recording) {
         [videoEncoder startNewRecording];
+        recordingContext.startTime = [NSDate date];
+        recordingContext.filePath = videoEncoder.outputPath;
         
         if (autoCaptureEnabled) {
             if (frameRate > maximumFrameRate) {
@@ -197,6 +196,7 @@ static Delight *sharedInstance = nil;
 - (void)stopRecording 
 {
     [videoEncoder stopRecording];
+    recordingContext.endTime = [NSDate date];
 }
 
 - (void)pause
@@ -316,6 +316,8 @@ static Delight *sharedInstance = nil;
 
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
 	recordingContext = [ctx retain];
+    videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], ctx.sessionID];
+
 	[self startRecording];
 }
 
