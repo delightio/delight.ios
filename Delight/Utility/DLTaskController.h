@@ -9,11 +9,23 @@
 #import <Foundation/Foundation.h>
 #import "DLTaskHeader.h"
 
+@class DLTaskController;
+
+@protocol DLRecordingSessionDelegate <NSObject>
+
+@required
+- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
+@optional
+- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl;
+
+@end
+
 @interface DLTaskController : NSObject <NSURLConnectionDataDelegate>
 
 @property (nonatomic, retain) NSOperationQueue * queue;
 @property (nonatomic, retain) NSURLConnection * controlConnection;
 @property (nonatomic, retain) DLTask * task;
+@property (nonatomic, assign) id<DLRecordingSessionDelegate> sessionDelegate;
 
 - (void)requestSessionID;
 - (void)uploadVideoAtPath:(NSString *)aPath;

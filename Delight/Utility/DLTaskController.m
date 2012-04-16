@@ -13,6 +13,7 @@
 @synthesize queue = _queue;
 @synthesize controlConnection = _controlConnection;
 @synthesize task = _task;
+@synthesize sessionDelegate = _sessionDelegate;
 
 - (id)init {
 	self = [super init];
@@ -35,6 +36,7 @@
 	
 	// begin connection
 	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] init];
+	theTask.taskController = self;
 	_controlConnection = [[NSURLConnection alloc] initWithRequest:[theTask URLRequest] delegate:self];
 	_task = theTask;
 }

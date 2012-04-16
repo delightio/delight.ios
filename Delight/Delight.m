@@ -7,11 +7,11 @@
 //
 
 #import "Delight.h"
-#import "DLTaskController.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIWindow+InterceptEvents.h"
+#import "DLTaskController.h"
 
 #define kDefaultScaleFactor 1.0f
 #define kDefaultMaxFrameRate 100.0f
@@ -160,6 +160,7 @@ static Delight *sharedInstance = nil;
 		
 		// create task controller
 		taskController = [[DLTaskController alloc] init];
+		taskController.sessionDelegate = self;
     }
     return self;
 }
@@ -307,20 +308,33 @@ static Delight *sharedInstance = nil;
     }
 }
 
+#pragma mark - Session
+
 - (void)tryCreateNewSession {
 	[taskController requestSessionID];
+}
+
+- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
+	recordingContext = [ctx retain];
+	[self startRecording];
+}
+
+- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl {
+	// implement clean up logic or whatever needed if server denies creating a new session
 }
 
 #pragma mark - Notifications
 
 - (void)handleDidBecomeActive:(NSNotification *)notification
 {
-    [self startRecording];
+//    [self startRecording];
 }
 
 - (void)handleWillResignActive:(NSNotification *)notification
 {
-    [self stopRecording];
+    if ( recordingContext ) {
+		[self stopRecording]; // update properties in recordingContext as well.
+	}
 }
 
 #pragma mark - DLGestureTrackerDelegate

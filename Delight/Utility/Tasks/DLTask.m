@@ -7,10 +7,12 @@
 //
 
 #import "DLTask.h"
+#import "DLTaskController.h"
 
 NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
 
 @implementation DLTask
+@synthesize taskController = _taskController;
 @synthesize receivedData = _receivedData;
 @synthesize httpResponse = _httpResponse;
 

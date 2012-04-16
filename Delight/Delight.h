@@ -12,13 +12,16 @@
 #import "DLGestureTracker.h"
 
 @class DLTaskController;
+@class DLRecordingContext;
+@protocol DLRecordingSessionDelegate;
 
-@interface Delight : NSObject <DLGestureTrackerDelegate> {
+@interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate> {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
     NSTimeInterval lastScreenshotTime;
 	DLTaskController * taskController;
+	DLRecordingContext * recordingContext;
 }
 
 @property (nonatomic, retain) NSString *appID;
