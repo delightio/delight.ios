@@ -10,6 +10,4 @@
 
 @interface DLUploadVideoFileTask : DLTask
 
-@property (nonatomic, retain) NSString * videoURLString;
-
 @end

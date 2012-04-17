@@ -74,6 +74,15 @@
 						// upload completed successfully, notify Delight server
 						[theTask processResponse];
 					}
+					// post video info to delight server
+					DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
+					postTask.recordingContext = aSession;
+					theRequest = [postTask URLRequest];
+					postTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
+					if ( error == nil ) {
+						[postTask processResponse];
+					}
+					[postTask release];
 				}
 				[theTask release];
 			}
@@ -86,6 +95,7 @@
 			if ( error == nil ) {
 				[sessTask processResponse];
 			}
+			[sessTask release];
 			// end the task
 			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 		});
@@ -109,8 +119,9 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	// check if there's error
-	NSString * str = [[NSString alloc] initWithData:_task.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"%@", str);
+//	NSString * str = [[NSString alloc] initWithData:_task.receivedData encoding:NSUTF8StringEncoding];
+//	NSLog(@"%@", str);
+//	[str release];
 	if ( ![_task responseContainsError] ) {
 		// process the data
 		[_queue addOperationWithBlock:^{
