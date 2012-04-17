@@ -10,6 +10,9 @@
 #import "DLTaskController.h"
 
 NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
+NSString * const DL_ACCESS_TOKEN = @"";
+NSString * const DL_APP_LOCALE = @"";
+NSString * const DL_APP_VERSION = @"";
 
 @implementation DLTask
 @synthesize recordingContext = _recordingContext;
