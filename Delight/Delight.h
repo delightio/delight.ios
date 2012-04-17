@@ -51,7 +51,7 @@
  ******************/
 
 // Start recording
-+ (void)startOpenGLWithAppID:(NSString *)appID;
++ (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes;
 
 // This must be called in your render loop before presentRenderbuffer:
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
