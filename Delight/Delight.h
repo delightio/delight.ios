@@ -18,8 +18,6 @@
 
 @required
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
-@optional
-- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl;
 
 @end
 

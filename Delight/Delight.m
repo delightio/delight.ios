@@ -332,13 +332,14 @@ static Delight *sharedInstance = nil;
 
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
 	recordingContext = [ctx retain];
-    videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], ctx.sessionID];
-
-	[self startRecording];
-}
-
-- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl {
-	// implement clean up logic or whatever needed if server denies creating a new session
+	if ( recordingContext.shouldRecordVideo ) {
+		// start recording
+		videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], ctx.sessionID];
+		
+		[self startRecording];
+	} else {
+		// there's no need to record the session. Clean up delight?
+	}
 }
 
 #pragma mark - Notifications

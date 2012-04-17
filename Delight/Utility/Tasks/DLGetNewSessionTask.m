@@ -7,6 +7,7 @@
 //
 
 #import "DLGetNewSessionTask.h"
+#import "DLTaskController.h"
 
 NSString * const DLAppSessionElementName = @"app_session";
 NSString * const DLUploadURIElementName = @"upload_uris";
@@ -15,11 +16,11 @@ NSString * const DLIDElementName = @"id";
 NSString * const DLRecordElementName = @"record";
 
 @implementation DLGetNewSessionTask
-@synthesize statusObject = _statusObject;
+@synthesize recordingContext = _recordingContext;
 @synthesize contentOfCurrentProperty = _contentOfCurrentProperty;
 
 - (void)dealloc {
-	[_statusObject release];
+	[_recordingContext release];
 	[_contentOfCurrentProperty release];
 	[super dealloc];
 }
@@ -46,10 +47,10 @@ NSString * const DLRecordElementName = @"record";
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
 	if ( [elementName isEqualToString:DLAppSessionElementName] ) {
 		// create a new session object
-		_statusObject = [[DLRecordingContext alloc] init];
+		_recordingContext = [[DLRecordingContext alloc] init];
 	} else if ( [elementName isEqualToString:DLUploadURIElementName] ) {
 		// we can get the URI directly from the attribute
-		_statusObject.uploadURLString = [attributeDict objectForKey:@"screen"];
+		_recordingContext.uploadURLString = [attributeDict objectForKey:@"screen"];
 	} else {
 		// prepare the string buffer
 		_contentOfCurrentProperty = [[NSMutableString alloc] initWithCapacity:16];
@@ -58,11 +59,11 @@ NSString * const DLRecordElementName = @"record";
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
 	if ( [elementName isEqualToString:DLIDElementName] ) {
-		_statusObject.sessionID = _contentOfCurrentProperty;
+		_recordingContext.sessionID = _contentOfCurrentProperty;
 	} else if ( [elementName isEqualToString:DLRecordElementName] ) {
-		_statusObject.shouldRecordVideo = [_contentOfCurrentProperty boolValue];
+		_recordingContext.shouldRecordVideo = [_contentOfCurrentProperty boolValue];
 	} else if ( [elementName isEqualToString:DLWifiOnlyElementName] ) {
-		_statusObject.wifiUploadOnly = [_contentOfCurrentProperty boolValue];
+		_recordingContext.wifiUploadOnly = [_contentOfCurrentProperty boolValue];
 	}
 	self.contentOfCurrentProperty = nil;
 }
@@ -73,9 +74,11 @@ NSString * const DLRecordElementName = @"record";
 	}
 }
 
-- (void)parserDidStartDocument:(NSXMLParser *)parser {
-	// create the session object
-	_statusObject = [[DLRecordingContext alloc] init];
+- (void)parserDidEndDocument:(NSXMLParser *)parser {
+	// call the method in Delight in main thread
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.taskController handleSessionTaskCompletion:self];
+	});
 }
 
 @end

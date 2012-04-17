@@ -7,6 +7,7 @@
 //
 
 #import "DLTaskController.h"
+#import "Delight.h"
 #import <UIKit/UIKit.h>
 
 @implementation DLTaskController
@@ -53,6 +54,12 @@
 	}
 }
 
+#pragma mark Task Management
+- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
+	[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
+	self.task = nil;
+}
+
 #pragma mark NSURLConnection delegate methods
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
 	_task.httpResponse = (NSHTTPURLResponse *)response;
@@ -72,7 +79,6 @@
 			[_task processResponse];
 		}];
 	}
-	self.task = nil;
 	self.controlConnection = nil;
 }
 

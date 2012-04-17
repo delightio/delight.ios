@@ -31,4 +31,7 @@
 - (void)requestSessionID;
 - (void)uploadVideoAtPath:(NSString *)aPath;
 
+// task management
+- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;
+
 @end
