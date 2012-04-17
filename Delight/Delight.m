@@ -58,11 +58,12 @@ static Delight *sharedInstance = nil;
     [delight startRecording];
 }
 
-+ (void)startOpenGLWithAppID:(NSString *)appID
++ (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes
 {
     Delight *delight = [self sharedInstance];
     delight.appID = appID;
     delight.autoCaptureEnabled = NO;
+    delight.videoEncoder.encodesRawGLBytes = encodeRawBytes;
     [delight startRecording];
 }
 
@@ -233,26 +234,31 @@ static Delight *sharedInstance = nil;
     
     @synchronized(self) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
         NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
-        UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
-        if (glView) {
-            [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
+
+        if (videoEncoder.encodesRawGLBytes && glView) {
+            [videoEncoder encodeRawBytesForGLView:glView colorRenderBuffer:colorRenderBuffer];
         } else {
-            [screenshotController screenshot];
+            UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
+            if (glView) {
+                [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
+            } else {
+                [screenshotController screenshot];
+            }
+
+            if (previousScreenshot) {
+                UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
+                [videoEncoder writeFrameImage:touchedUpScreenshot];
+                [previousScreenshot release];
+            }
         }
+        
         NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
         
         frameCount++;
         elapsedTime += (end - start);
         lastScreenshotTime = end;
         // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
-        
-        if (previousScreenshot) {
-            UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
-            [videoEncoder writeFrameImage:touchedUpScreenshot];
-            [previousScreenshot release];
-        }
         
         [pool drain];
     } 
