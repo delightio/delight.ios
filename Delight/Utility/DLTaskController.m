@@ -42,7 +42,7 @@
 	_task = theTask;
 }
 
-- (void)uploadVideoAtPath:(NSString *)aPath {
+- (void)uploadSession:(DLRecordingContext *)aSession {
 	// check if we can run background task
 	UIDevice* device = [UIDevice currentDevice];
 	BOOL backgroundSupported = NO;
@@ -51,6 +51,28 @@
 	if ( !backgroundSupported ) {
 		// upload next time when the app is launched
 		return;
+	} else {
+		// upload in the background
+		UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+			// task expires. clean it up if it has not finished yet
+		}];
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			DLUploadVideoFileTask * theTask = [[DLUploadVideoFileTask alloc] init];
+			theTask.recordingContext = aSession;
+			theTask.backgroundTaskIdentifier = bgIdf;
+			// make a synchronous call
+			NSURLRequest * theRequest = [theTask URLRequest];
+			if ( theRequest ) {
+				NSHTTPURLResponse * theResponse = nil;
+				NSError * error = nil;
+				theTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
+				theTask.httpResponse = theResponse;
+				if ( error == nil && ![theTask responseContainsError] ) {
+					// upload completed successfully, notify Delight server
+					[theTask processResponse];
+				}
+			}
+		});
 	}
 }
 

@@ -29,7 +29,7 @@
 @property (nonatomic, assign) id<DLRecordingSessionDelegate> sessionDelegate;
 
 - (void)requestSessionID;
-- (void)uploadVideoAtPath:(NSString *)aPath;
+- (void)uploadSession:(DLRecordingContext *)aSession;
 
 // task management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;

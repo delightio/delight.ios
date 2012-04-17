@@ -16,11 +16,9 @@ NSString * const DLIDElementName = @"id";
 NSString * const DLRecordElementName = @"record";
 
 @implementation DLGetNewSessionTask
-@synthesize recordingContext = _recordingContext;
 @synthesize contentOfCurrentProperty = _contentOfCurrentProperty;
 
 - (void)dealloc {
-	[_recordingContext release];
 	[_contentOfCurrentProperty release];
 	[super dealloc];
 }
@@ -47,10 +45,10 @@ NSString * const DLRecordElementName = @"record";
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
 	if ( [elementName isEqualToString:DLAppSessionElementName] ) {
 		// create a new session object
-		_recordingContext = [[DLRecordingContext alloc] init];
+		self.recordingContext = [[[DLRecordingContext alloc] init] autorelease];
 	} else if ( [elementName isEqualToString:DLUploadURIElementName] ) {
 		// we can get the URI directly from the attribute
-		_recordingContext.uploadURLString = [attributeDict objectForKey:@"screen"];
+		self.recordingContext.uploadURLString = [attributeDict objectForKey:@"screen"];
 	} else {
 		// prepare the string buffer
 		_contentOfCurrentProperty = [[NSMutableString alloc] initWithCapacity:16];
@@ -59,11 +57,11 @@ NSString * const DLRecordElementName = @"record";
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
 	if ( [elementName isEqualToString:DLIDElementName] ) {
-		_recordingContext.sessionID = _contentOfCurrentProperty;
+		self.recordingContext.sessionID = _contentOfCurrentProperty;
 	} else if ( [elementName isEqualToString:DLRecordElementName] ) {
-		_recordingContext.shouldRecordVideo = [_contentOfCurrentProperty boolValue];
+		self.recordingContext.shouldRecordVideo = [_contentOfCurrentProperty boolValue];
 	} else if ( [elementName isEqualToString:DLWifiOnlyElementName] ) {
-		_recordingContext.wifiUploadOnly = [_contentOfCurrentProperty boolValue];
+		self.recordingContext.wifiUploadOnly = [_contentOfCurrentProperty boolValue];
 	}
 	self.contentOfCurrentProperty = nil;
 }

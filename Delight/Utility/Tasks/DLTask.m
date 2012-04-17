@@ -12,11 +12,13 @@
 NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
 
 @implementation DLTask
+@synthesize recordingContext = _recordingContext;
 @synthesize taskController = _taskController;
 @synthesize receivedData = _receivedData;
 @synthesize httpResponse = _httpResponse;
 
 - (void)dealloc {
+	[_recordingContext release];
 	[_receivedData release];
 	[_httpResponse release];
 	[super dealloc];

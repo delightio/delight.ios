@@ -11,7 +11,6 @@
 
 @interface DLGetNewSessionTask : DLTask <NSXMLParserDelegate>
 
-@property (nonatomic, retain) DLRecordingContext * recordingContext;
 @property (nonatomic, retain) NSMutableString * contentOfCurrentProperty;
 
 @end
