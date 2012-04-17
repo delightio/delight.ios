@@ -8,4 +8,4 @@
 
 #import "DLGetNewSessionTask.h"
 #import "DLUpdateSessionTask.h"
-#import "DLPostVideoInfoTask.h"
+#import "DLUploadVideoFileTask.h"

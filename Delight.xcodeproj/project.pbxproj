@@ -41,8 +41,8 @@
 		A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */; };
 		A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */; };
 		A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */; };
-		A9A9A3EC1537BEB400B6E4AB /* DLPostVideoInfoTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3EA1537BEB400B6E4AB /* DLPostVideoInfoTask.h */; };
-		A9A9A3ED1537BEB400B6E4AB /* DLPostVideoInfoTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3EB1537BEB400B6E4AB /* DLPostVideoInfoTask.m */; };
+		A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */; };
+		A9A9A3ED1537BEB400B6E4AB /* DLUploadVideoFileTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,8 +82,8 @@
 		A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGetNewSessionTask.m; sourceTree = "<group>"; };
 		A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLUpdateSessionTask.h; sourceTree = "<group>"; };
 		A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLUpdateSessionTask.m; sourceTree = "<group>"; };
-		A9A9A3EA1537BEB400B6E4AB /* DLPostVideoInfoTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLPostVideoInfoTask.h; sourceTree = "<group>"; };
-		A9A9A3EB1537BEB400B6E4AB /* DLPostVideoInfoTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLPostVideoInfoTask.m; sourceTree = "<group>"; };
+		A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLUploadVideoFileTask.h; sourceTree = "<group>"; };
+		A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLUploadVideoFileTask.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,8 +191,8 @@
 				A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */,
 				A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */,
 				A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */,
-				A9A9A3EA1537BEB400B6E4AB /* DLPostVideoInfoTask.h */,
-				A9A9A3EB1537BEB400B6E4AB /* DLPostVideoInfoTask.m */,
+				A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */,
+				A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */,
 				A9508D311537E99B001853A0 /* DLTaskHeader.h */,
 			);
 			path = Tasks;
@@ -214,7 +214,7 @@
 				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
 				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
 				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
-				A9A9A3EC1537BEB400B6E4AB /* DLPostVideoInfoTask.h in Headers */,
+				A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */,
 				83149B2D15338CC500003862 /* DLVideoEncoder.h in Headers */,
 				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
@@ -339,7 +339,7 @@
 				A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */,
 				A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */,
 				A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */,
-				A9A9A3ED1537BEB400B6E4AB /* DLPostVideoInfoTask.m in Sources */,
+				A9A9A3ED1537BEB400B6E4AB /* DLUploadVideoFileTask.m in Sources */,
 				83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */,
 				839162701537C21000549347 /* DLGestureTracker.m in Sources */,
 				83827A561538BD82002EA080 /* DLGesture.m in Sources */,

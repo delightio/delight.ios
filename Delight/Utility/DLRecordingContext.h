@@ -15,6 +15,9 @@
 @interface DLRecordingContext : NSObject
 
 @property (nonatomic, retain) NSString * sessionID;
+@property (nonatomic, retain) NSString * uploadURLString;
+@property (nonatomic) BOOL shouldRecordVideo;
+@property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic, retain) NSDate * startTime;
 @property (nonatomic, retain) NSDate * endTime;
 @property (nonatomic) NSInteger chunkSize;

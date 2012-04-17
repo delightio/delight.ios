@@ -11,14 +11,15 @@
 
 @class DLTaskController;
 
-@protocol DLRecordingSessionDelegate <NSObject>
-
-@required
-- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
-@optional
-- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl;
-
-@end
+@protocol DLRecordingSessionDelegate;
+//@protocol DLRecordingSessionDelegate <NSObject>
+//
+//@required
+//- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
+//@optional
+//- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl;
+//
+//@end
 
 @interface DLTaskController : NSObject <NSURLConnectionDataDelegate>
 
@@ -28,6 +29,9 @@
 @property (nonatomic, assign) id<DLRecordingSessionDelegate> sessionDelegate;
 
 - (void)requestSessionID;
-- (void)uploadVideoAtPath:(NSString *)aPath;
+- (void)uploadSession:(DLRecordingContext *)aSession;
+
+// task management
+- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;
 
 @end

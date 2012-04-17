@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DLRecordingContext.h"
 
 #define DL_REQUEST_TIMEOUT	30.0
 
@@ -20,6 +21,7 @@ extern NSString * const DL_APP_VERSION;
 @interface DLTask : NSObject
 
 @property (nonatomic, assign) DLTaskController * taskController;
+@property (nonatomic, retain) DLRecordingContext * recordingContext;
 @property (nonatomic, retain) NSMutableData * receivedData;
 @property (nonatomic, retain) NSHTTPURLResponse * httpResponse;
 

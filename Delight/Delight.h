@@ -13,7 +13,13 @@
 
 @class DLTaskController;
 @class DLRecordingContext;
-@protocol DLRecordingSessionDelegate;
+
+@protocol DLRecordingSessionDelegate <NSObject>
+
+@required
+- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
+
+@end
 
 @interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate> {
     BOOL processing;
@@ -51,7 +57,7 @@
  ******************/
 
 // Start recording
-+ (void)startOpenGLWithAppID:(NSString *)appID;
++ (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes;
 
 // This must be called in your render loop before presentRenderbuffer:
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;

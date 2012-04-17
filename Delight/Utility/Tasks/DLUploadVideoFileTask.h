@@ -1,5 +1,5 @@
 //
-//  DLPostVideoInfoTask.h
+//  DLUploadVideoFileTask.h
 //  Delight
 //
 //  Created by Bill So on 4/13/12.
@@ -8,10 +8,11 @@
 
 #import "DLTask.h"
 #import "DLRecordingContext.h"
+#import <UIKit/UIKit.h>
 
-@interface DLPostVideoInfoTask : DLTask
+@interface DLUploadVideoFileTask : DLTask
 
 @property (nonatomic, retain) NSString * videoURLString;
-@property (nonatomic, retain) DLRecordingContext * fileStatus;
+@property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskIdentifier;
 
 @end

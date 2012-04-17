@@ -10,6 +10,9 @@
 
 @implementation DLRecordingContext
 @synthesize sessionID = _sessionID;
+@synthesize uploadURLString = _uploadURLString;
+@synthesize shouldRecordVideo = _shouldRecordVideo;
+@synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize chunkSize;
@@ -21,6 +24,7 @@
 	[_startTime release];
 	[_endTime release];
 	[_filePath release];
+	[_uploadURLString release];
 	[super dealloc];
 }
 

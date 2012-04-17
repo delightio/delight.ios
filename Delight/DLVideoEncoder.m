@@ -20,6 +20,7 @@
 
 @synthesize recording;
 @synthesize paused;
+@synthesize encodesRawGLBytes;
 @synthesize outputPath;
 @synthesize videoSize;
 @synthesize averageBitRate;
@@ -28,10 +29,7 @@
 {
     self = [super init];
     if (self) {
-        videoWriter = nil;
-        videoWriterInput = nil;
-        avAdaptor = nil;
-        
+        pixelFormat = kCVPixelFormatType_32ARGB;
         averageBitRate = kDefaultBitRate;
     }
     return self;
@@ -49,7 +47,11 @@
 - (void)startNewRecording
 {
     [self cleanupWriter];
-    [self setupWriter];
+    
+    // Delay setting up the writer if encoding raw bytes - we need the exact size of the view first
+    if (!encodesRawGLBytes) {
+        [self setupWriter];
+    }
     
     recording = YES;
 }
@@ -102,6 +104,44 @@
         }
     }
 }
+    
+- (void)encodeRawBytesForGLView:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
+{
+    if (!videoWriter) {
+        pixelFormat = kCVPixelFormatType_32BGRA;
+        
+        // Get the size of the backing CAEAGLLayer
+        GLint backingWidth, backingHeight;
+        glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderBuffer);
+        glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
+        glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
+        self.videoSize = CGSizeMake(backingWidth, backingHeight);
+        
+        [self setupWriter];
+    }
+    
+    CVPixelBufferRef pixel_buffer = NULL;
+    
+    CVReturn status = CVPixelBufferPoolCreatePixelBuffer (NULL, avAdaptor.pixelBufferPool, &pixel_buffer);
+    if ((pixel_buffer == NULL) || (status != kCVReturnSuccess)) {
+        return;
+    } else {
+        CVPixelBufferLockBaseAddress(pixel_buffer, 0);
+        GLubyte *pixelBufferData = (GLubyte *)CVPixelBufferGetBaseAddress(pixel_buffer);
+        glReadPixels(0, 0, videoSize.width, videoSize.height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
+    }
+    
+    // May need to add a check here, because if two consecutive times with the same value are added to the movie, it aborts recording
+    float millisElapsed = ([[NSDate date] timeIntervalSince1970] - recordingStartTime - totalPauseDuration) * 1000.0;
+    CMTime time = CMTimeMake((int)millisElapsed, 1000);
+    
+    if (![avAdaptor appendPixelBuffer:pixel_buffer withPresentationTime:time]){
+        NSLog(@"Problem appending pixel buffer at time: %lld", time.value);
+    } 
+    
+    CVPixelBufferUnlockBaseAddress(pixel_buffer, 0);
+    CVPixelBufferRelease(pixel_buffer);
+}
 
 - (void)pause
 {
@@ -141,9 +181,8 @@
     
     NSParameterAssert(videoWriterInput);
     videoWriterInput.expectsMediaDataInRealTime = YES;
-    NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                      [NSNumber numberWithInt:kCVPixelFormatType_32ARGB], kCVPixelBufferPixelFormatTypeKey, nil];                                      
     
+    NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:pixelFormat], kCVPixelBufferPixelFormatTypeKey, nil];                                      
     avAdaptor = [[AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:videoWriterInput sourcePixelBufferAttributes:bufferAttributes] retain];
     
     [videoWriter addInput:videoWriterInput];
