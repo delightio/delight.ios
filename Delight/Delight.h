@@ -11,17 +11,30 @@
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
 
-@interface Delight : NSObject <DLGestureTrackerDelegate> {
+@class DLTaskController;
+@class DLRecordingContext;
+
+@protocol DLRecordingSessionDelegate <NSObject>
+
+@required
+- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
+
+@end
+
+@interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate> {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
     NSTimeInterval lastScreenshotTime;
+	DLTaskController * taskController;
+	DLRecordingContext * recordingContext;
 }
 
 @property (nonatomic, retain) NSString *appID;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, readonly) float frameRate;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
+@property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;

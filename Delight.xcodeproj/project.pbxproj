@@ -28,6 +28,23 @@
 		83B896B314EAEFBF006D93C2 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AD14EAEFBF006D93C2 /* CoreVideo.framework */; };
 		83B896B414EAEFBF006D93C2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AE14EAEFBF006D93C2 /* QuartzCore.framework */; };
 		83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896B614EAF090006D93C2 /* OpenGLES.framework */; };
+		A93411C815352A3F0044077B /* DLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2C15338CC500003862 /* DLVideoEncoder.m */; };
+		A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2B15338CC500003862 /* DLVideoEncoder.h */; };
+		A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */; };
+		A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */; };
+		A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */; };
+		A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */; };
+		A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A9A3D715371A3E00B6E4AB /* UIKit.framework */; };
+		A9A9A3DB15371AE500B6E4AB /* DLRecordingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */; };
+		A9A9A3DC15371AE500B6E4AB /* DLRecordingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DA15371AE500B6E4AB /* DLRecordingContext.m */; };
+		A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3DE15371E7E00B6E4AB /* DLTask.h */; };
+		A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DF15371E7E00B6E4AB /* DLTask.m */; };
+		A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */; };
+		A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */; };
+		A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */; };
+		A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */; };
+		A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */; };
+		A9A9A3ED1537BEB400B6E4AB /* DLUploadVideoFileTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +72,22 @@
 		83B896AD14EAEFBF006D93C2 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		83B896AE14EAEFBF006D93C2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		83B896B614EAF090006D93C2 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		A9508D311537E99B001853A0 /* DLTaskHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DLTaskHeader.h; sourceTree = "<group>"; };
+		A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLPostVideoTask.h; sourceTree = "<group>"; };
+		A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLPostVideoTask.m; sourceTree = "<group>"; };
+		A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTaskController.h; sourceTree = "<group>"; };
+		A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTaskController.m; sourceTree = "<group>"; };
+		A9A9A3D715371A3E00B6E4AB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLRecordingContext.h; sourceTree = "<group>"; };
+		A9A9A3DA15371AE500B6E4AB /* DLRecordingContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLRecordingContext.m; sourceTree = "<group>"; };
+		A9A9A3DE15371E7E00B6E4AB /* DLTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTask.h; sourceTree = "<group>"; };
+		A9A9A3DF15371E7E00B6E4AB /* DLTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTask.m; sourceTree = "<group>"; };
+		A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGetNewSessionTask.h; sourceTree = "<group>"; };
+		A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGetNewSessionTask.m; sourceTree = "<group>"; };
+		A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLUpdateSessionTask.h; sourceTree = "<group>"; };
+		A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLUpdateSessionTask.m; sourceTree = "<group>"; };
+		A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLUploadVideoFileTask.h; sourceTree = "<group>"; };
+		A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLUploadVideoFileTask.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +95,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */,
 				83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */,
 				83B896AF14EAEFBF006D93C2 /* AssetsLibrary.framework in Frameworks */,
 				83B896B014EAEFBF006D93C2 /* AVFoundation.framework in Frameworks */,
@@ -96,6 +130,7 @@
 		83B8968414EAEC68006D93C2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A9A9A3D715371A3E00B6E4AB /* UIKit.framework */,
 				83B896B614EAF090006D93C2 /* OpenGLES.framework */,
 				83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */,
 				83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */,
@@ -111,6 +146,7 @@
 		83B8968714EAEC68006D93C2 /* Delight */ = {
 			isa = PBXGroup;
 			children = (
+				A9A9A3CC1536EA3600B6E4AB /* Utility */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
 				83149B2615337E5C00003862 /* DLScreenshotController.h */,
@@ -138,6 +174,36 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		A9A9A3CC1536EA3600B6E4AB /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				A9A9A3DD15371E6A00B6E4AB /* Tasks */,
+				A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */,
+				A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */,
+				A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */,
+				A9A9A3DA15371AE500B6E4AB /* DLRecordingContext.m */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		A9A9A3DD15371E6A00B6E4AB /* Tasks */ = {
+			isa = PBXGroup;
+			children = (
+				A9A9A3DE15371E7E00B6E4AB /* DLTask.h */,
+				A9A9A3DF15371E7E00B6E4AB /* DLTask.m */,
+				A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */,
+				A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */,
+				A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */,
+				A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */,
+				A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */,
+				A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */,
+				A9508D311537E99B001853A0 /* DLTaskHeader.h */,
+				A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */,
+				A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */,
+			);
+			path = Tasks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -148,9 +214,17 @@
 				83B8969914EAECD6006D93C2 /* Delight.h in Headers */,
 				83B8969B14EAECD6006D93C2 /* UIWindow+InterceptEvents.h in Headers */,
 				83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */,
+				A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */,
+				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
+				A9A9A3DB15371AE500B6E4AB /* DLRecordingContext.h in Headers */,
+				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
+				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
+				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
+				A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */,
 				83149B2D15338CC500003862 /* DLVideoEncoder.h in Headers */,
 				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
+				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,9 +340,17 @@
 				83B8969A14EAECD6006D93C2 /* Delight.m in Sources */,
 				83B8969C14EAECD6006D93C2 /* UIWindow+InterceptEvents.m in Sources */,
 				83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */,
+				A93411C815352A3F0044077B /* DLVideoEncoder.m in Sources */,
+				A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */,
+				A9A9A3DC15371AE500B6E4AB /* DLRecordingContext.m in Sources */,
+				A9A9A3E115371E7E00B6E4AB /* DLTask.m in Sources */,
+				A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */,
+				A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */,
+				A9A9A3ED1537BEB400B6E4AB /* DLUploadVideoFileTask.m in Sources */,
 				83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */,
 				839162701537C21000549347 /* DLGestureTracker.m in Sources */,
 				83827A561538BD82002EA080 /* DLGesture.m in Sources */,
+				A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

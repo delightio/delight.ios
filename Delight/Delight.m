@@ -11,9 +11,11 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIWindow+InterceptEvents.h"
+#import "DLTaskController.h"
 
 #define kDefaultScaleFactor 1.0f
 #define kDefaultMaxFrameRate 100.0f
+#define kDefaultMaximumRecordingDuration 60.0f*10
 #define kStartingFrameRate 5.0f
 
 static Delight *sharedInstance = nil;
@@ -27,6 +29,7 @@ static Delight *sharedInstance = nil;
 - (void)takeScreenshot;
 - (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 - (void)screenshotTimerFired;
+- (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 @end
 
 @implementation Delight
@@ -35,6 +38,7 @@ static Delight *sharedInstance = nil;
 @synthesize scaleFactor;
 @synthesize frameRate;
 @synthesize maximumFrameRate;
+@synthesize maximumRecordingDuration;
 @synthesize paused;
 @synthesize autoCaptureEnabled;
 @synthesize screenshotController;
@@ -55,7 +59,8 @@ static Delight *sharedInstance = nil;
 {
     Delight *delight = [self sharedInstance];
     delight.appID = appID;
-    [delight startRecording];
+	[delight tryCreateNewSession];
+//    [delight startRecording];
 }
 
 + (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes
@@ -64,7 +69,7 @@ static Delight *sharedInstance = nil;
     delight.appID = appID;
     delight.autoCaptureEnabled = NO;
     delight.videoEncoder.encodesRawGLBytes = encodeRawBytes;
-    [delight startRecording];
+	[delight tryCreateNewSession];
 }
 
 + (void)stop
@@ -140,21 +145,23 @@ static Delight *sharedInstance = nil;
 {
     self = [super init];
     if (self) {        
-        screenshotController = [[DLScreenshotController alloc] init];
-        
+        screenshotController = [[DLScreenshotController alloc] init];        
         videoEncoder = [[DLVideoEncoder alloc] init];
-        videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], @"output.mp4"];
-
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
         
         self.scaleFactor = kDefaultScaleFactor;
         self.maximumFrameRate = kDefaultMaxFrameRate;
+        self.maximumRecordingDuration = kDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
         frameRate = kStartingFrameRate;
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+		
+		// create task controller
+		taskController = [[DLTaskController alloc] init];
+		taskController.sessionDelegate = self;
     }
     return self;
 }
@@ -167,6 +174,8 @@ static Delight *sharedInstance = nil;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
+	
+	[taskController release];
     
     [super dealloc];
 }
@@ -175,6 +184,8 @@ static Delight *sharedInstance = nil;
 {
     if (!videoEncoder.recording) {
         [videoEncoder startNewRecording];
+        recordingContext.startTime = [NSDate date];
+        recordingContext.filePath = videoEncoder.outputPath;
         
         if (autoCaptureEnabled) {
             if (frameRate > maximumFrameRate) {
@@ -188,7 +199,10 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
-    [videoEncoder stopRecording];
+    if (recordingContext && videoEncoder.recording) {
+        [videoEncoder stopRecording];
+        recordingContext.endTime = [NSDate date];
+    }
 }
 
 - (void)pause
@@ -264,6 +278,11 @@ static Delight *sharedInstance = nil;
     } 
     
     processing = NO;
+    
+    if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
+        // We've exceeded the maximum recording duration
+        [self stopRecording];
+    }
 }
 
 - (void)takeScreenshot
@@ -305,16 +324,37 @@ static Delight *sharedInstance = nil;
     }
 }
 
+#pragma mark - Session
+
+- (void)tryCreateNewSession {
+	[taskController requestSessionID];
+}
+
+- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
+	recordingContext = [ctx retain];
+	if ( recordingContext.shouldRecordVideo ) {
+		// start recording
+		videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], ctx.sessionID];
+		
+		[self startRecording];
+	} else {
+		// there's no need to record the session. Clean up video encoder?
+	}
+}
+
 #pragma mark - Notifications
 
 - (void)handleDidBecomeActive:(NSNotification *)notification
 {
-    [self startRecording];
+//    [self startRecording];
 }
 
 - (void)handleWillResignActive:(NSNotification *)notification
 {
-    [self stopRecording];
+	if ( recordingContext.shouldRecordVideo ) {
+		[self stopRecording];
+	}
+	[taskController uploadSession:recordingContext];
 }
 
 #pragma mark - DLGestureTrackerDelegate
