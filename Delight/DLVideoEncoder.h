@@ -19,7 +19,7 @@
     AVAssetWriter *videoWriter;
     AVAssetWriterInput *videoWriterInput;
     AVAssetWriterInputPixelBufferAdaptor *avAdaptor;
-    int pixelFormat;
+    CVPixelBufferPoolRef pixelBufferPool;
     
     NSTimeInterval recordingStartTime;
     NSTimeInterval pauseStartTime;

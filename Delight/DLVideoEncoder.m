@@ -29,7 +29,6 @@
 {
     self = [super init];
     if (self) {
-        pixelFormat = kCVPixelFormatType_32ARGB;
         averageBitRate = kDefaultBitRate;
     }
     return self;
@@ -85,7 +84,7 @@
                 NSLog(@"Error creating pixel buffer:  status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
             } else {
                 // set image data into pixel buffer
-                CVPixelBufferLockBaseAddress( pixelBuffer, 0 );
+                CVPixelBufferLockBaseAddress(pixelBuffer, 0);
                 uint8_t* destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
                 CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image)), destPixels);  //XXX:  will work if the pixel buffer is contiguous and has the same bytesPerRow as the input data
                 
@@ -107,9 +106,7 @@
     
 - (void)encodeRawBytesForGLView:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
-    if (!videoWriter) {
-        pixelFormat = kCVPixelFormatType_32ARGB;
-        
+    if (!videoWriter) {        
         // Get the size of the backing CAEAGLLayer
         GLint backingWidth, backingHeight;
         glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderBuffer);
@@ -122,13 +119,13 @@
     
     CVPixelBufferRef pixel_buffer = NULL;
     
-    CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, avAdaptor.pixelBufferPool, &pixel_buffer);
+    CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, pixelBufferPool, &pixel_buffer);
     if ((pixel_buffer == NULL) || (status != kCVReturnSuccess)) {
         return;
     } else {
         CVPixelBufferLockBaseAddress(pixel_buffer, 0);
         GLubyte *pixelBufferData = (GLubyte *)CVPixelBufferGetBaseAddress(pixel_buffer);
-        glReadPixels(0, 0, videoSize.width, videoSize.height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData + 1);
+        glReadPixels(0, 0, videoSize.width, videoSize.height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData + 1);  // + 1 to convert RGBA->ARGB
     }
     
     // May need to add a check here, because if two consecutive times with the same value are added to the movie, it aborts recording
@@ -140,7 +137,7 @@
     } 
     
     CVPixelBufferUnlockBaseAddress(pixel_buffer, 0);
-    CVPixelBufferRelease(pixel_buffer);
+    CVPixelBufferRelease(pixel_buffer);    
 }
 
 - (void)pause
@@ -173,7 +170,7 @@
     NSDictionary *videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
                                    AVVideoCodecH264, AVVideoCodecKey,
                                    [NSNumber numberWithInt:videoSize.width], AVVideoWidthKey,
-                                   [NSNumber numberWithInt:videoSize.height + (encodesRawGLBytes ? 1 : 0)], AVVideoHeightKey,
+                                   [NSNumber numberWithInt:videoSize.height], AVVideoHeightKey,
                                    videoCompressionProps, AVVideoCompressionPropertiesKey,
                                    nil];
     
@@ -182,7 +179,7 @@
     NSParameterAssert(videoWriterInput);
     videoWriterInput.expectsMediaDataInRealTime = YES;
     
-    NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:pixelFormat], kCVPixelBufferPixelFormatTypeKey, nil];                                      
+    NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kCVPixelFormatType_32ARGB], kCVPixelBufferPixelFormatTypeKey, nil];                                      
     avAdaptor = [[AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:videoWriterInput sourcePixelBufferAttributes:bufferAttributes] retain];
     
     [videoWriter addInput:videoWriterInput];
@@ -191,7 +188,18 @@
     
     recordingStartTime = [[NSDate date] timeIntervalSince1970];
     totalPauseDuration = 0.0f;
-
+    
+    // Create our own pixel buffer, since when encoding raw bytes we need the buffer to be at least 1 byte larger
+    // than the avAdaptor's pixel buffer to account for RGBA->ARGB offset shift.
+    if (encodesRawGLBytes) {
+        pixelBufferPool = NULL;
+        NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:kCVPixelFormatType_32ARGB], kCVPixelBufferPixelFormatTypeKey, 
+                                    [NSNumber numberWithUnsignedInt:videoSize.width], kCVPixelBufferWidthKey,
+                                    [NSNumber numberWithUnsignedInt:videoSize.height + 1], kCVPixelBufferHeightKey, nil];        
+        CVPixelBufferPoolCreate(kCFAllocatorDefault, NULL,
+                                (CFDictionaryRef)attributes, &pixelBufferPool);
+    }
+    
     return YES;
 }
 
@@ -228,6 +236,10 @@
     [avAdaptor release]; avAdaptor = nil;
     [videoWriterInput release]; videoWriterInput = nil;
     [videoWriter release]; videoWriter = nil;
+    
+    if (pixelBufferPool) {
+        CVPixelBufferPoolRelease(pixelBufferPool); pixelBufferPool = NULL;
+    }
 }
 
 - (NSURL *)tempFileURL 
