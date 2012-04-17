@@ -58,23 +58,36 @@
 			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 		}];
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			DLUploadVideoFileTask * theTask = [[DLUploadVideoFileTask alloc] init];
-			theTask.recordingContext = aSession;
-			theTask.backgroundTaskIdentifier = bgIdf;
-			// make a synchronous call
-			NSURLRequest * theRequest = [theTask URLRequest];
-			if ( theRequest ) {
-				NSHTTPURLResponse * theResponse = nil;
-				NSError * error = nil;
-				theTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
-				theTask.httpResponse = theResponse;
-				if ( error == nil && ![theTask responseContainsError] ) {
-					// upload completed successfully, notify Delight server
-					[theTask processResponse];
+			NSURLRequest * theRequest = nil;
+			NSHTTPURLResponse * theResponse = nil;
+			NSError * error = nil;
+			if ( aSession.shouldRecordVideo ) {
+				// if this is a "recording" session, upload the video recorded
+				DLUploadVideoFileTask * theTask = [[DLUploadVideoFileTask alloc] init];
+				theTask.recordingContext = aSession;
+				// make a synchronous call
+				theRequest = [theTask URLRequest];
+				if ( theRequest ) {
+					theTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
+					theTask.httpResponse = theResponse;
+					if ( error == nil && ![theTask responseContainsError] ) {
+						// upload completed successfully, notify Delight server
+						[theTask processResponse];
+					}
 				}
+				[theTask release];
 			}
-			[[UIApplication sharedApplication] endBackgroundTask:theTask.backgroundTaskIdentifier];
-			[theTask release];
+			// we need to upload session info to server no matter what.
+			DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
+			sessTask.recordingContext = aSession;
+			theRequest = [sessTask URLRequest];
+			sessTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
+			sessTask.httpResponse = theResponse;
+			if ( error == nil ) {
+				[sessTask processResponse];
+			}
+			// end the task
+			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 		});
 	}
 }

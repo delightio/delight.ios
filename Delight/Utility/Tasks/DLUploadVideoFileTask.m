@@ -10,7 +10,6 @@
 
 @implementation DLUploadVideoFileTask
 @synthesize videoURLString = _videoURLString;
-@synthesize backgroundTaskIdentifier = _backgroundTaskIdentifier;
 
 - (NSURLRequest *)URLRequest {
 	NSInputStream * theStream = [NSInputStream inputStreamWithFileAtPath:self.recordingContext.filePath];

@@ -9,17 +9,19 @@
 #import "DLUpdateSessionTask.h"
 
 @implementation DLUpdateSessionTask
-@synthesize fileStatus = _fileStatus;
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"http://%@/app_sessions.xml?duration=%d&app_user_id=%@", DL_BASE_URL, (NSInteger)[_fileStatus.endTime timeIntervalSinceDate:_fileStatus.startTime]];
+	NSString * urlStr = [NSString stringWithFormat:@"http://%@/app_sessions/%@.xml", DL_BASE_URL, self.recordingContext.sessionID];
+	NSString * paramStr = [NSString stringWithFormat:@"id=%@&app_session[duration]=%.1f", self.recordingContext.sessionID, [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime]];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
+	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPMethod:@"PUT"];
 	return request;
 }
 
 - (void)processResponse {
-	
+	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"received data: %@", str);
 }
 
 @end

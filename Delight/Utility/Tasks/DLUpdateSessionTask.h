@@ -7,10 +7,8 @@
 //
 
 #import "DLTask.h"
-#import "DLRecordingContext.h"
 
 @interface DLUpdateSessionTask : DLTask
 
-@property (nonatomic, retain) DLRecordingContext * fileStatus;
 
 @end

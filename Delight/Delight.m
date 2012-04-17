@@ -338,7 +338,7 @@ static Delight *sharedInstance = nil;
 		
 		[self startRecording];
 	} else {
-		// there's no need to record the session. Clean up delight?
+		// there's no need to record the session. Clean up video encoder?
 	}
 }
 
@@ -351,7 +351,9 @@ static Delight *sharedInstance = nil;
 
 - (void)handleWillResignActive:(NSNotification *)notification
 {
-    [self stopRecording]; // update properties in recordingContext as well.
+	if ( recordingContext.shouldRecordVideo ) {
+		[self stopRecording];
+	}
 	[taskController uploadSession:recordingContext];
 }
 
