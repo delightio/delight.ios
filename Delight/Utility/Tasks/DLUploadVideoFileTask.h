@@ -7,12 +7,7 @@
 //
 
 #import "DLTask.h"
-#import "DLRecordingContext.h"
-#import <UIKit/UIKit.h>
 
 @interface DLUploadVideoFileTask : DLTask
-
-@property (nonatomic, retain) NSString * videoURLString;
-@property (nonatomic) UIBackgroundTaskIdentifier backgroundTaskIdentifier;
 
 @end

@@ -9,8 +9,6 @@
 #import "DLUploadVideoFileTask.h"
 
 @implementation DLUploadVideoFileTask
-@synthesize videoURLString = _videoURLString;
-@synthesize backgroundTaskIdentifier = _backgroundTaskIdentifier;
 
 - (NSURLRequest *)URLRequest {
 	NSInputStream * theStream = [NSInputStream inputStreamWithFileAtPath:self.recordingContext.filePath];
@@ -28,8 +26,9 @@
 }
 
 - (void)processResponse {
-	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"received data: %@", str);
+//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+//	NSLog(@"received data: %@", str);
+//	[str release];
 }
 
 @end
