@@ -13,7 +13,15 @@
 
 @class DLTaskController;
 @class DLRecordingContext;
-@protocol DLRecordingSessionDelegate;
+
+@protocol DLRecordingSessionDelegate <NSObject>
+
+@required
+- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
+@optional
+- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl;
+
+@end
 
 @interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate> {
     BOOL processing;

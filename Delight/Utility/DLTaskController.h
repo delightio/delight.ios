@@ -11,14 +11,15 @@
 
 @class DLTaskController;
 
-@protocol DLRecordingSessionDelegate <NSObject>
-
-@required
-- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
-@optional
-- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl;
-
-@end
+@protocol DLRecordingSessionDelegate;
+//@protocol DLRecordingSessionDelegate <NSObject>
+//
+//@required
+//- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
+//@optional
+//- (void)sessionRequestDeniedForTaskController:(DLTaskController *)ctrl;
+//
+//@end
 
 @interface DLTaskController : NSObject <NSURLConnectionDataDelegate>
 
