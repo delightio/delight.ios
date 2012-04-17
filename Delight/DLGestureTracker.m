@@ -68,6 +68,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image
 {
+    if (![gesturesInProgress count] && ![gesturesCompleted count]) {
+        // If no gestures to draw, just return the original image
+        return image;
+    }
+    
     CGContextRef context = [self createBitmapContextOfSize:image.size];
     CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
     CGContextScaleCTM(context, 1.0, -1.0);

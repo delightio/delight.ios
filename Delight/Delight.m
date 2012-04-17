@@ -282,7 +282,7 @@ static Delight *sharedInstance = nil;
 
 - (void)screenshotTimerFired
 {
-    if (!paused) {
+    if (!paused && videoEncoder.recording) {
         if (!processing) {
             [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
             if (frameRate + 1 <= maximumFrameRate) {
