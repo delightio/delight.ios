@@ -55,6 +55,7 @@
 		// upload in the background
 		UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			// task expires. clean it up if it has not finished yet
+			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 		}];
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 			DLUploadVideoFileTask * theTask = [[DLUploadVideoFileTask alloc] init];
@@ -72,6 +73,8 @@
 					[theTask processResponse];
 				}
 			}
+			[[UIApplication sharedApplication] endBackgroundTask:theTask.backgroundTaskIdentifier];
+			[theTask release];
 		});
 	}
 }

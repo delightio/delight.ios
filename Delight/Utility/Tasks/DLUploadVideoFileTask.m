@@ -18,6 +18,9 @@
 	if ( theStream ) {
 		request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.recordingContext.uploadURLString] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:600.0];
 		[request setHTTPMethod:@"PUT"];
+		// get file length
+		NSDictionary * attrDict = [[NSFileManager defaultManager] attributesOfItemAtPath:self.recordingContext.filePath error:nil];
+		[request setValue:[NSString stringWithFormat:@"%qu", [attrDict fileSize]] forHTTPHeaderField:@"Content-Length"];
 		// open up the file
 		[request setHTTPBodyStream:theStream];
 	}

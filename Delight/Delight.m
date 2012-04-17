@@ -352,6 +352,7 @@ static Delight *sharedInstance = nil;
 - (void)handleWillResignActive:(NSNotification *)notification
 {
     [self stopRecording]; // update properties in recordingContext as well.
+	[taskController uploadSession:recordingContext];
 }
 
 #pragma mark - DLGestureTrackerDelegate
