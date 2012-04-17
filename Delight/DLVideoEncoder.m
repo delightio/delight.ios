@@ -108,7 +108,7 @@
 - (void)encodeRawBytesForGLView:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
     if (!videoWriter) {
-        pixelFormat = kCVPixelFormatType_32BGRA;
+        pixelFormat = kCVPixelFormatType_32ARGB;
         
         // Get the size of the backing CAEAGLLayer
         GLint backingWidth, backingHeight;
@@ -122,13 +122,13 @@
     
     CVPixelBufferRef pixel_buffer = NULL;
     
-    CVReturn status = CVPixelBufferPoolCreatePixelBuffer (NULL, avAdaptor.pixelBufferPool, &pixel_buffer);
+    CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, avAdaptor.pixelBufferPool, &pixel_buffer);
     if ((pixel_buffer == NULL) || (status != kCVReturnSuccess)) {
         return;
     } else {
         CVPixelBufferLockBaseAddress(pixel_buffer, 0);
         GLubyte *pixelBufferData = (GLubyte *)CVPixelBufferGetBaseAddress(pixel_buffer);
-        glReadPixels(0, 0, videoSize.width, videoSize.height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
+        glReadPixels(0, 0, videoSize.width, videoSize.height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData + 1);
     }
     
     // May need to add a check here, because if two consecutive times with the same value are added to the movie, it aborts recording
@@ -173,7 +173,7 @@
     NSDictionary *videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
                                    AVVideoCodecH264, AVVideoCodecKey,
                                    [NSNumber numberWithInt:videoSize.width], AVVideoWidthKey,
-                                   [NSNumber numberWithInt:videoSize.height], AVVideoHeightKey,
+                                   [NSNumber numberWithInt:videoSize.height + (encodesRawGLBytes ? 1 : 0)], AVVideoHeightKey,
                                    videoCompressionProps, AVVideoCompressionPropertiesKey,
                                    nil];
     
