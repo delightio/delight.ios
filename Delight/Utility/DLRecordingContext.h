@@ -23,5 +23,6 @@
 @property (nonatomic) NSInteger chunkSize;
 @property (nonatomic) NSInteger chunkOffset;
 @property (nonatomic, retain) NSString * filePath;
+@property (nonatomic, retain) NSMutableIndexSet * finishedTaskIndex;
 
 @end

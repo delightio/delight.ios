@@ -18,14 +18,24 @@
 @synthesize chunkSize;
 @synthesize chunkOffset;
 @synthesize filePath = _filePath;
+@synthesize finishedTaskIndex = _finishedTaskIndex;
 
 - (void)dealloc {
 	[_sessionID release];
+	[_uploadURLString release];
 	[_startTime release];
 	[_endTime release];
 	[_filePath release];
-	[_uploadURLString release];
+	[_finishedTaskIndex release];
 	[super dealloc];
+}
+
+- (NSMutableIndexSet *)finishedTaskIndex {
+	if ( _finishedTaskIndex == nil ) {
+		// create the index set object
+		_finishedTaskIndex = [[NSMutableIndexSet alloc] init];
+	}
+	return _finishedTaskIndex;
 }
 
 @end
