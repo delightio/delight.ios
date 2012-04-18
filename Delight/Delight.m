@@ -32,7 +32,7 @@ static Delight *sharedInstance = nil;
 
 @implementation Delight
 
-@synthesize appID;
+@synthesize appToken;
 @synthesize scaleFactor;
 @synthesize frameRate;
 @synthesize maximumFrameRate;
@@ -53,18 +53,18 @@ static Delight *sharedInstance = nil;
     return sharedInstance;
 }
 
-+ (void)startWithAppID:(NSString *)appID
++ (void)startWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
-    delight.appID = appID;
+    delight.appToken = appToken;
 	[delight tryCreateNewSession];
 //    [delight startRecording];
 }
 
-+ (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes
++ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes
 {
     Delight *delight = [self sharedInstance];
-    delight.appID = appID;
+    delight.appToken = appToken;
     delight.autoCaptureEnabled = NO;
     delight.videoEncoder.encodesRawGLBytes = encodeRawBytes;
 	[delight tryCreateNewSession];
@@ -178,7 +178,7 @@ static Delight *sharedInstance = nil;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    [appID release];
+    [appToken release];
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];

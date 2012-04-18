@@ -33,7 +33,7 @@
 	DLRecordingContext * recordingContext;
 }
 
-@property (nonatomic, retain) NSString *appID;
+@property (nonatomic, retain) NSString *appToken;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, readonly) float frameRate;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
@@ -49,7 +49,7 @@
  **************/
 
 // Start recording
-+ (void)startWithAppID:(NSString *)appID;
++ (void)startWithAppToken:(NSString *)appToken;
 
 // Manually trigger a screen capture. Doesn't need to be called, but can be used if you want to ensure
 // that a screenshot is taken at a particular time.
@@ -60,7 +60,7 @@
  ******************/
 
 // Start recording
-+ (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes;
++ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 
 // Either of these must be called at the end of your render loop
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
