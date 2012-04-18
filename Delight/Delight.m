@@ -14,9 +14,10 @@
 #import "DLTaskController.h"
 
 #define kDefaultScaleFactor 1.0f
-#define kDefaultMaxFrameRate 100.0f
+#define kDefaultMaximumFrameRate 100.0f
 #define kDefaultMaximumRecordingDuration 60.0f*10
 #define kStartingFrameRate 5.0f
+#define kMaximumSessionInactiveTime 60.0f*5
 
 static Delight *sharedInstance = nil;
 
@@ -159,14 +160,16 @@ static Delight *sharedInstance = nil;
         gestureTracker.delegate = self;
         
         self.scaleFactor = kDefaultScaleFactor;
-        self.maximumFrameRate = kDefaultMaxFrameRate;
+        self.maximumFrameRate = kDefaultMaximumFrameRate;
         self.maximumRecordingDuration = kDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
         frameRate = kStartingFrameRate;
 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-		
+
 		// create task controller
 		taskController = [[DLTaskController alloc] init];
 		taskController.sessionDelegate = self;
@@ -327,6 +330,7 @@ static Delight *sharedInstance = nil;
 }
 
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
+    [recordingContext release];
 	recordingContext = [ctx retain];
 	if ( recordingContext.shouldRecordVideo ) {
 		// start recording
@@ -340,17 +344,41 @@ static Delight *sharedInstance = nil;
 
 #pragma mark - Notifications
 
-- (void)handleDidBecomeActive:(NSNotification *)notification
-{
-//    [self startRecording];
-}
-
-- (void)handleWillResignActive:(NSNotification *)notification
+- (void)handleDidEnterBackground:(NSNotification *)notification
 {
 	if ( recordingContext.shouldRecordVideo ) {
 		[self stopRecording];
 	}
 	[taskController uploadSession:recordingContext];
+    appInBackground = YES;
+}
+
+- (void)handleWillEnterForeground:(NSNotification *)notification
+{
+    [self tryCreateNewSession];
+}
+
+- (void)handleDidBecomeActive:(NSNotification *)notification
+{
+    // In iOS 4, locking the screen does not trigger didEnterBackground: notification. Check if we've been inactive for a long time.
+    if (resignActiveTime > 0 && !appInBackground && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
+        NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
+        if (inactiveTime > kMaximumSessionInactiveTime) {
+            // We've been inactive for a long time, stop the previous recording and create a new session
+            if (recordingContext.shouldRecordVideo) {
+                [self stopRecording];
+            }
+            [taskController uploadSession:recordingContext];
+            [self tryCreateNewSession];
+        }
+    }
+    
+    appInBackground = NO;
+}
+
+- (void)handleWillResignActive:(NSNotification *)notification
+{
+    resignActiveTime = [[NSDate date] timeIntervalSince1970];
 }
 
 #pragma mark - DLGestureTrackerDelegate

@@ -29,6 +29,9 @@
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
     NSTimeInterval lastScreenshotTime;
+    NSTimeInterval resignActiveTime;
+    BOOL appInBackground;
+    
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
 }
