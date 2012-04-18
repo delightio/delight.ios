@@ -104,20 +104,15 @@
     }
 }
     
-- (void)encodeRawBytesForGLView:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
+- (void)encodeRawBytesForGLView:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {
-    if (!videoWriter) {        
-        // Get the size of the backing CAEAGLLayer
-        GLint backingWidth, backingHeight;
-        glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderBuffer);
-        glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
-        glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
+    if (!videoWriter) {
         self.videoSize = CGSizeMake(backingWidth, backingHeight);
-        
         [self setupWriter];
     }
     
     CVPixelBufferRef pixel_buffer = NULL;
+    NSLog(@"backing width: %i, height: %i", backingWidth, backingHeight);
     
     CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, pixelBufferPool, &pixel_buffer);
     if ((pixel_buffer == NULL) || (status != kCVReturnSuccess)) {

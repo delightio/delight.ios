@@ -7,6 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <OpenGLES/EAGL.h>
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
 #import "DLScreenshotController.h"
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
@@ -59,8 +62,9 @@
 // Start recording
 + (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes;
 
-// This must be called in your render loop before presentRenderbuffer:
+// Either of these must be called at the end of your render loop
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
++ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 
 /*********************
  * Recording control *

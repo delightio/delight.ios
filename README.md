@@ -25,7 +25,9 @@ By default, it will record at a scale factor of 1 (full size) at as many frames 
 
 ### OpenGL ES Support ###
 
-OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGLWithAppID:]` rather than `[Delight startWithAppID:]`, and you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and render buffer before calling `presentRenderbuffer:` in your rendering loop.
+OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGLWithAppID:encodeRawBytes:]` rather than `[Delight startWithAppID:]`. The encodesRawBytes parameter is used to toggle a performance boost; when enabled, capturing is faster, but gestures are not shown and the scale factor cannot be changed.
+
+Additionally, you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and renderbuffer before calling `presentRenderbuffer:` in your rendering loop. If you are using a GLKView and don't have access to the renderbuffer, you can call `[Delight takeOpenGLScreenshot:backingWidth:backingHeight:]` instead and pass your GLKView along with its renderWidth and renderHeight.
 
 ### Pause/Resume ###
 

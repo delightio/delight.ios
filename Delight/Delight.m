@@ -25,9 +25,7 @@ static Delight *sharedInstance = nil;
 - (void)stopRecording;
 - (void)pause;
 - (void)resume;
-- (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
-- (void)takeScreenshot;
-- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 - (void)screenshotTimerFired;
 - (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 @end
@@ -90,12 +88,22 @@ static Delight *sharedInstance = nil;
 
 + (void)takeScreenshot
 {
-    [[self sharedInstance] takeScreenshot];
+    [[self sharedInstance] takeScreenshot:nil backingWidth:0 backingHeight:0];
 }
 
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
-    [[self sharedInstance] takeOpenGLScreenshot:glView colorRenderBuffer:colorRenderBuffer];
+    GLint backingWidth, backingHeight;
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderBuffer);
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
+
+    [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
+}
+
++ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
+{
+    [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
 }
 
 + (CGFloat)scaleFactor
@@ -242,8 +250,10 @@ static Delight *sharedInstance = nil;
     }
 }
 
-- (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
+- (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {
+    if (paused || processing || (glView && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime < 1.0f / maximumFrameRate)) return;
+        
     processing = YES;
     
     @synchronized(self) {
@@ -251,11 +261,11 @@ static Delight *sharedInstance = nil;
         NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
 
         if (videoEncoder.encodesRawGLBytes && glView) {
-            [videoEncoder encodeRawBytesForGLView:glView colorRenderBuffer:colorRenderBuffer];
+            [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
         } else {
             UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
             if (glView) {
-                [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
+                [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
             } else {
                 [screenshotController screenshot];
             }
@@ -282,20 +292,6 @@ static Delight *sharedInstance = nil;
     if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
         // We've exceeded the maximum recording duration
         [self stopRecording];
-    }
-}
-
-- (void)takeScreenshot
-{   
-    if (!paused && !processing) {
-        [self takeScreenshot:nil colorRenderBuffer:0];
-    }
-}
-
-- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
-{
-    if (!paused && !processing && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime >= 1.0f / maximumFrameRate) {
-        [self takeScreenshot:glView colorRenderBuffer:colorRenderBuffer];
     }
 }
 
