@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2615337E5C00003862 /* DLScreenshotController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
-		83149B2D15338CC500003862 /* DLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2B15338CC500003862 /* DLVideoEncoder.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2C15338CC500003862 /* DLVideoEncoder.m */; };
 		83827A551538BD82002EA080 /* DLGesture.h in Headers */ = {isa = PBXBuildFile; fileRef = 83827A531538BD81002EA080 /* DLGesture.h */; };
 		83827A561538BD82002EA080 /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
 		8391626F1537C21000549347 /* DLGestureTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8391626D1537C21000549347 /* DLGestureTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -221,7 +219,6 @@
 				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
 				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
 				A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */,
-				83149B2D15338CC500003862 /* DLVideoEncoder.h in Headers */,
 				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
@@ -347,7 +344,6 @@
 				A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */,
 				A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */,
 				A9A9A3ED1537BEB400B6E4AB /* DLUploadVideoFileTask.m in Sources */,
-				83149B2E15338CC500003862 /* DLVideoEncoder.m in Sources */,
 				839162701537C21000549347 /* DLGestureTracker.m in Sources */,
 				83827A561538BD82002EA080 /* DLGesture.m in Sources */,
 				A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */,

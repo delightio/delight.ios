@@ -59,6 +59,20 @@
 	[super dealloc];
 }
 
+- (BOOL)didFinishTask:(DLFinishedTaskIdentifier)idfr {
+	BOOL flag;
+	@synchronized (self) {
+		flag = [self.finishedTaskIndex containsIndex:idfr];
+	}
+	return flag;
+}
+
+- (void)setTaskFinished:(DLFinishedTaskIdentifier)idfr {
+	@synchronized (self) {
+		[self.finishedTaskIndex addIndex:idfr];
+	}
+}
+
 - (NSMutableIndexSet *)finishedTaskIndex {
 	if ( _finishedTaskIndex == nil ) {
 		// create the index set object

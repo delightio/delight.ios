@@ -24,6 +24,8 @@
 //	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
 //	NSLog(@"received data: %@", str);
 //	[str release];
+	[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
+	self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
 }
 
 @end
