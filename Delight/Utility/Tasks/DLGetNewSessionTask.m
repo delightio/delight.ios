@@ -11,22 +11,30 @@
 
 NSString * const DLAppSessionElementName = @"app_session";
 NSString * const DLUploadURIElementName = @"upload_uris";
-NSString * const DLWifiOnlyElementName = @"wifi_transmission_only";
+NSString * const DLWifiOnlyElementName = @"uploading_on_wifi_only";
 NSString * const DLIDElementName = @"id";
-NSString * const DLRecordElementName = @"record";
+NSString * const DLRecordElementName = @"recording";
 
 @implementation DLGetNewSessionTask
+@synthesize appToken = _appToken;
 @synthesize contentOfCurrentProperty = _contentOfCurrentProperty;
 
 - (void)dealloc {
+	[_appToken release];
 	[_contentOfCurrentProperty release];
 	[super dealloc];
 }
 
 - (NSURLRequest *)URLRequest {
 	NSString * urlStr = [NSString stringWithFormat:@"http://%@/app_sessions.xml", DL_BASE_URL];
-//	NSString * paramStr = @"app_session[app_token]=0f65540b93150fe142744e9d&app_session[app_version]=1&app_session[locale]=en-US&app_session[delight_version]=1";
-	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[locale]=%@&app_session[delight_version]=1", DL_ACCESS_TOKEN, DL_APP_VERSION, DL_APP_LOCALE];
+	NSDictionary * dict = [[NSBundle mainBundle] infoDictionary];
+	NSString * buildVer = [dict objectForKey:(NSString *)kCFBundleVersionKey];
+	if ( buildVer == nil ) buildVer = @"";
+	else buildVer = [self stringByAddingPercentEscapes:buildVer];
+	NSString * dotVer = [dict objectForKey:@"CFBundleShortVersionString"];
+	if ( dotVer == nil ) dotVer = @"";
+	else dotVer = [self stringByAddingPercentEscapes:dotVer];
+	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[locale]=%@&app_session[delight_version]=1", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier]];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
@@ -38,7 +46,9 @@ NSString * const DLRecordElementName = @"record";
 	// parse the object into Cocoa objects
 	NSXMLParser * parser = [[NSXMLParser alloc] initWithData:self.receivedData];
 	[parser setDelegate:self];
-	[parser parse];
+	if ( ![parser parse] ) {
+		NSLog(@"error parsing xml: %@", [parser parserError]);
+	}
 }
 
 #pragma mark XML parsing delegate

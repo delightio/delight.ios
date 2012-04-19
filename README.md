@@ -14,18 +14,20 @@ Basic Setup
 
 2. In your build settings, add `-ObjC` to "Other Linker Flags".
 
-3. In your application delegate, `#import <Delight/Delight.h>`. In `applicationDidFinishLaunching:withOptions:`, call `[Delight startWithAppID:]`.
+3. In your application delegate, `#import <Delight/Delight.h>`. In `applicationDidFinishLaunching:withOptions:`, call `[Delight startWithAppToken:]`.
 
 Advanced Setup
 --------------
 
 ### Scale Factor and Frame Rate ###
 
-By default, it will record at a scale factor of 1 (full size) at as many frames per second as possible. This may use up a lot of CPU, so you may want to scale down the video or limit the frame rate. To do so, call `[Delight setScaleFactor:]` and/or `[Delight setMaximumFrameRate:]` before `[Delight startWithAppID:]`.
+By default, it will record at a scale factor of 1 (full size) at as many frames per second as possible. This may use up a lot of CPU, so you may want to scale down the video or limit the frame rate. To do so, call `[Delight setScaleFactor:]` and/or `[Delight setMaximumFrameRate:]` before `[Delight startWithAppToken:]`.
 
 ### OpenGL ES Support ###
 
-OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGLWithAppID:]` rather than `[Delight startWithAppID:]`, and you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and render buffer before calling `presentRenderbuffer:` in your rendering loop.
+OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGLWithAppToken:encodeRawBytes:]` rather than `[Delight startWithAppToken:]`. The encodesRawBytes parameter is used to toggle a performance boost; when enabled, capturing is faster, but gestures are not shown and the scale factor cannot be changed.
+
+Additionally, you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and renderbuffer before calling `presentRenderbuffer:` in your rendering loop. If you are using a GLKView and don't have access to the renderbuffer, you can call `[Delight takeOpenGLScreenshot:backingWidth:backingHeight:]` instead and pass your GLKView along with its renderWidth and renderHeight.
 
 ### Pause/Resume ###
 

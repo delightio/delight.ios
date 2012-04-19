@@ -134,14 +134,8 @@
     return image;
 }
 
-- (UIImage *)openGLScreenshotForView:(UIView *)view colorRenderBuffer:(GLuint)colorRenderBuffer
+- (UIImage *)openGLScreenshotForView:(UIView *)view backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {
-    // Get the size of the backing CAEAGLLayer
-    GLint backingWidth, backingHeight;
-    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderBuffer);
-    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
-    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
-    
     NSInteger x = 0;
     NSInteger y = 0; 
     NSInteger width = backingWidth;

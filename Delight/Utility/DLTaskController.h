@@ -24,11 +24,10 @@
 @interface DLTaskController : NSObject <NSURLConnectionDataDelegate>
 
 @property (nonatomic, retain) NSOperationQueue * queue;
-@property (nonatomic, retain) NSURLConnection * controlConnection;
 @property (nonatomic, retain) DLTask * task;
 @property (nonatomic, assign) id<DLRecordingSessionDelegate> sessionDelegate;
 
-- (void)requestSessionID;
+- (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)uploadSession:(DLRecordingContext *)aSession;
 
 // task management

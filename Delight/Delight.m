@@ -10,13 +10,14 @@
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "UIWindow+InterceptEvents.h"
+#import "UIWindow+DLInterceptEvents.h"
 #import "DLTaskController.h"
 
-#define kDefaultScaleFactor 1.0f
-#define kDefaultMaxFrameRate 100.0f
-#define kDefaultMaximumRecordingDuration 60.0f*10
-#define kStartingFrameRate 5.0f
+#define kDLDefaultScaleFactor 1.0f
+#define kDLDefaultMaximumFrameRate 30.0f
+#define kDLDefaultMaximumRecordingDuration 60.0f*10
+#define kDLStartingFrameRate 5.0f
+#define kDLMaximumSessionInactiveTime 60.0f*5
 
 static Delight *sharedInstance = nil;
 
@@ -25,16 +26,15 @@ static Delight *sharedInstance = nil;
 - (void)stopRecording;
 - (void)pause;
 - (void)resume;
-- (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 - (void)takeScreenshot;
-- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 - (void)screenshotTimerFired;
 - (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 @end
 
 @implementation Delight
 
-@synthesize appID;
+@synthesize appToken;
 @synthesize scaleFactor;
 @synthesize frameRate;
 @synthesize maximumFrameRate;
@@ -55,18 +55,17 @@ static Delight *sharedInstance = nil;
     return sharedInstance;
 }
 
-+ (void)startWithAppID:(NSString *)appID
++ (void)startWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
-    delight.appID = appID;
+    delight.appToken = appToken;
 	[delight tryCreateNewSession];
-//    [delight startRecording];
 }
 
-+ (void)startOpenGLWithAppID:(NSString *)appID encodeRawBytes:(BOOL)encodeRawBytes
++ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes
 {
     Delight *delight = [self sharedInstance];
-    delight.appID = appID;
+    delight.appToken = appToken;
     delight.autoCaptureEnabled = NO;
     delight.videoEncoder.encodesRawGLBytes = encodeRawBytes;
 	[delight tryCreateNewSession];
@@ -90,12 +89,22 @@ static Delight *sharedInstance = nil;
 
 + (void)takeScreenshot
 {
-    [[self sharedInstance] takeScreenshot];
+    [[self sharedInstance] takeScreenshot:nil backingWidth:0 backingHeight:0];
 }
 
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
-    [[self sharedInstance] takeOpenGLScreenshot:glView colorRenderBuffer:colorRenderBuffer];
+    GLint backingWidth, backingHeight;
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderBuffer);
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
+
+    [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
+}
+
++ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
+{
+    [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
 }
 
 + (CGFloat)scaleFactor
@@ -150,15 +159,17 @@ static Delight *sharedInstance = nil;
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
         
-        self.scaleFactor = kDefaultScaleFactor;
-        self.maximumFrameRate = kDefaultMaxFrameRate;
-        self.maximumRecordingDuration = kDefaultMaximumRecordingDuration;
+        self.scaleFactor = kDLDefaultScaleFactor;
+        self.maximumFrameRate = kDLDefaultMaximumFrameRate;
+        self.maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
-        frameRate = kStartingFrameRate;
+        frameRate = kDLStartingFrameRate;
 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-		
+
 		// create task controller
 		taskController = [[DLTaskController alloc] init];
 		taskController.sessionDelegate = self;
@@ -170,7 +181,7 @@ static Delight *sharedInstance = nil;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    [appID release];
+    [appToken release];
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
@@ -199,7 +210,7 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
-    if (recordingContext && videoEncoder.recording) {
+    if (videoEncoder.recording) {
         [videoEncoder stopRecording];
         recordingContext.endTime = [NSDate date];
     }
@@ -242,8 +253,10 @@ static Delight *sharedInstance = nil;
     }
 }
 
-- (void)takeScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
+- (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {
+    if (paused || processing || (glView && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime < 1.0f / maximumFrameRate)) return;
+        
     processing = YES;
     
     @synchronized(self) {
@@ -251,11 +264,11 @@ static Delight *sharedInstance = nil;
         NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
 
         if (videoEncoder.encodesRawGLBytes && glView) {
-            [videoEncoder encodeRawBytesForGLView:glView colorRenderBuffer:colorRenderBuffer];
+            [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
         } else {
             UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
             if (glView) {
-                [screenshotController openGLScreenshotForView:glView colorRenderBuffer:colorRenderBuffer];
+                [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
             } else {
                 [screenshotController screenshot];
             }
@@ -272,7 +285,12 @@ static Delight *sharedInstance = nil;
         frameCount++;
         elapsedTime += (end - start);
         lastScreenshotTime = end;
-        // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
+        
+#ifdef DEBUG
+        if (frameCount % (int)(3 * ceil(frameRate)) == 0) {
+            DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, frameRate);
+        }
+#endif
         
         [pool drain];
     } 
@@ -286,22 +304,13 @@ static Delight *sharedInstance = nil;
 }
 
 - (void)takeScreenshot
-{   
-    if (!paused && !processing) {
-        [self takeScreenshot:nil colorRenderBuffer:0];
-    }
-}
-
-- (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
 {
-    if (!paused && !processing && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime >= 1.0f / maximumFrameRate) {
-        [self takeScreenshot:glView colorRenderBuffer:colorRenderBuffer];
-    }
+    [self takeScreenshot:nil backingWidth:0 backingHeight:0];
 }
 
 - (void)screenshotTimerFired
 {
-    if (!paused) {
+    if (!paused && videoEncoder.recording) {
         if (!processing) {
             [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
             if (frameRate + 1 <= maximumFrameRate) {
@@ -313,10 +322,6 @@ static Delight *sharedInstance = nil;
                 frameRate--;
             }
         }
-        
-        if (frameCount % 30 == 0) {
-            NSLog(@"Frame rate: %.0f fps", frameRate);
-        }
     }
     
     if (autoCaptureEnabled) {
@@ -327,10 +332,16 @@ static Delight *sharedInstance = nil;
 #pragma mark - Session
 
 - (void)tryCreateNewSession {
-	[taskController requestSessionID];
+#ifdef DL_OFFLINE_RECORDING
+    videoEncoder.outputPath = [NSString stringWithFormat:@"%@/output.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+    [self startRecording];
+#else
+	[taskController requestSessionIDWithAppToken:self.appToken];
+#endif
 }
 
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
+    [recordingContext release];
 	recordingContext = [ctx retain];
 	if ( recordingContext.shouldRecordVideo ) {
 		// start recording
@@ -339,22 +350,56 @@ static Delight *sharedInstance = nil;
 		[self startRecording];
 	} else {
 		// there's no need to record the session. Clean up video encoder?
+		recordingContext.startTime = [NSDate date];
 	}
 }
 
 #pragma mark - Notifications
 
+- (void)handleDidEnterBackground:(NSNotification *)notification
+{
+#ifdef DL_OFFLINE_RECORDING
+    [self stopRecording];
+#else
+	if ( recordingContext.shouldRecordVideo ) {
+		[self stopRecording];
+	} else {
+		recordingContext.endTime = [NSDate date];
+	}
+	[taskController uploadSession:recordingContext];
+#endif
+    
+    appInBackground = YES;
+}
+
+- (void)handleWillEnterForeground:(NSNotification *)notification
+{
+    [self tryCreateNewSession];
+}
+
 - (void)handleDidBecomeActive:(NSNotification *)notification
 {
-//    [self startRecording];
+    // In iOS 4, locking the screen does not trigger didEnterBackground: notification. Check if we've been inactive for a long time.
+    if (resignActiveTime > 0 && !appInBackground && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
+        NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
+        if (inactiveTime > kDLMaximumSessionInactiveTime) {
+            // We've been inactive for a long time, stop the previous recording and create a new session
+            if (recordingContext.shouldRecordVideo) {
+                [self stopRecording];
+            } else {
+				recordingContext.endTime = [NSDate date];
+			}
+            [taskController uploadSession:recordingContext];
+            [self tryCreateNewSession];
+        }
+    }
+    
+    appInBackground = NO;
 }
 
 - (void)handleWillResignActive:(NSNotification *)notification
 {
-	if ( recordingContext.shouldRecordVideo ) {
-		[self stopRecording];
-	}
-	[taskController uploadSession:recordingContext];
+    resignActiveTime = [[NSDate date] timeIntervalSince1970];
 }
 
 #pragma mark - DLGestureTrackerDelegate

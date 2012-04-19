@@ -9,10 +9,10 @@
 #import "DLGesture.h"
 
 // The maximum difference in distance between two touches that can be considered to be part of the same gesture
-#define kGestureDistanceThreshold 40
+#define kDLGestureDistanceThreshold 40
 
 // The distance required before a tap becomes a swipe
-#define kMinimumSwipeDistance 40
+#define kDLMinimumSwipeDistance 40
 
 static CGFloat DistanceBetweenTwoPoints(CGPoint point1, CGPoint point2)
 {
@@ -53,7 +53,7 @@ static CGFloat DistanceBetweenTwoPoints(CGPoint point1, CGPoint point2)
 {
     [locations addObject:[NSValue valueWithCGPoint:location]];
     
-    if (DistanceBetweenTwoPoints(location, [[locations objectAtIndex:0] CGPointValue]) >= kMinimumSwipeDistance) {
+    if (DistanceBetweenTwoPoints(location, [[locations objectAtIndex:0] CGPointValue]) >= kDLMinimumSwipeDistance) {
         type = DLGestureTypeSwipe;
     }
 }
@@ -63,7 +63,7 @@ static CGFloat DistanceBetweenTwoPoints(CGPoint point1, CGPoint point2)
     if (![locations count]) return NO;
     
     CGPoint lastLocation = [[locations lastObject] CGPointValue];
-    return (DistanceBetweenTwoPoints(location, lastLocation) <= kGestureDistanceThreshold);
+    return (DistanceBetweenTwoPoints(location, lastLocation) <= kDLGestureDistanceThreshold);
 }
 
 @end
