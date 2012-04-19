@@ -32,7 +32,7 @@
 @property (nonatomic, readonly) CGSize imageSize;
 
 - (UIImage *)screenshot;
-- (UIImage *)openGLScreenshotForView:(UIView *)view colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (UIImage *)openGLScreenshotForView:(UIView *)view backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 - (void)unregisterPrivateView:(UIView *)view;
 - (BOOL)locationIsInPrivateView:(CGPoint)location;

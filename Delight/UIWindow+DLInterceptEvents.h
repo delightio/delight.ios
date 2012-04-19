@@ -1,5 +1,5 @@
 //
-//  UIWindow+InterceptEvents.h
+//  UIWindow+DLInterceptEvents.h
 //  Delight
 //
 //  Created by Chris Haugli on 1/23/12.
@@ -10,7 +10,7 @@
 
 @protocol DLWindowDelegate;
 
-@interface UIWindow (InterceptEvents)
+@interface UIWindow (DLInterceptEvents)
 
 - (void)DLsetDelegate:(id<DLWindowDelegate>)delegate;
 - (void)DLsendEvent:(UIEvent *)event;

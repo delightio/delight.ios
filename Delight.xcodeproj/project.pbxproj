@@ -17,8 +17,8 @@
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
 		83B8969914EAECD6006D93C2 /* Delight.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969314EAECD6006D93C2 /* Delight.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83B8969A14EAECD6006D93C2 /* Delight.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969414EAECD6006D93C2 /* Delight.m */; };
-		83B8969B14EAECD6006D93C2 /* UIWindow+InterceptEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969514EAECD6006D93C2 /* UIWindow+InterceptEvents.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		83B8969C14EAECD6006D93C2 /* UIWindow+InterceptEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969614EAECD6006D93C2 /* UIWindow+InterceptEvents.m */; };
+		83B8969B14EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		83B8969C14EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */; };
 		83B896AF14EAEFBF006D93C2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */; };
 		83B896B014EAEFBF006D93C2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */; };
 		83B896B114EAEFBF006D93C2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AB14EAEFBF006D93C2 /* CoreGraphics.framework */; };
@@ -61,8 +61,8 @@
 		83B8968D14EAEC68006D93C2 /* Delight-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Delight-Prefix.pch"; sourceTree = "<group>"; };
 		83B8969314EAECD6006D93C2 /* Delight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Delight.h; sourceTree = "<group>"; };
 		83B8969414EAECD6006D93C2 /* Delight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Delight.m; sourceTree = "<group>"; };
-		83B8969514EAECD6006D93C2 /* UIWindow+InterceptEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+InterceptEvents.h"; sourceTree = "<group>"; };
-		83B8969614EAECD6006D93C2 /* UIWindow+InterceptEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+InterceptEvents.m"; sourceTree = "<group>"; };
+		83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+DLInterceptEvents.h"; sourceTree = "<group>"; };
+		83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+DLInterceptEvents.m"; sourceTree = "<group>"; };
 		83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		83B896AB14EAEFBF006D93C2 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -155,8 +155,8 @@
 				83827A541538BD82002EA080 /* DLGesture.m */,
 				8391626D1537C21000549347 /* DLGestureTracker.h */,
 				8391626E1537C21000549347 /* DLGestureTracker.m */,
-				83B8969514EAECD6006D93C2 /* UIWindow+InterceptEvents.h */,
-				83B8969614EAECD6006D93C2 /* UIWindow+InterceptEvents.m */,
+				83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */,
+				83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */,
 				83B8968814EAEC68006D93C2 /* Supporting Files */,
 			);
 			path = Delight;
@@ -210,7 +210,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				83B8969914EAECD6006D93C2 /* Delight.h in Headers */,
-				83B8969B14EAECD6006D93C2 /* UIWindow+InterceptEvents.h in Headers */,
+				83B8969B14EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h in Headers */,
 				83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */,
 				A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */,
 				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
@@ -335,7 +335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				83B8969A14EAECD6006D93C2 /* Delight.m in Sources */,
-				83B8969C14EAECD6006D93C2 /* UIWindow+InterceptEvents.m in Sources */,
+				83B8969C14EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m in Sources */,
 				83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */,
 				A93411C815352A3F0044077B /* DLVideoEncoder.m in Sources */,
 				A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */,
@@ -416,6 +416,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Delight/Delight-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "Delight/Delight-Info.plist";
 				PRODUCT_NAME = Delight;

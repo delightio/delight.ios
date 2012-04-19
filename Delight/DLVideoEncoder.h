@@ -19,7 +19,7 @@
     AVAssetWriter *videoWriter;
     AVAssetWriterInput *videoWriterInput;
     AVAssetWriterInputPixelBufferAdaptor *avAdaptor;
-    int pixelFormat;
+    CVPixelBufferPoolRef pixelBufferPool;
     
     NSTimeInterval recordingStartTime;
     NSTimeInterval pauseStartTime;
@@ -36,7 +36,7 @@
 - (void)startNewRecording;
 - (void)stopRecording;
 - (void)writeFrameImage:(UIImage *)frameImage;
-- (void)encodeRawBytesForGLView:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
+- (void)encodeRawBytesForGLView:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 - (void)pause;
 - (void)resume;
 
