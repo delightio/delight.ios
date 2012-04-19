@@ -350,6 +350,7 @@ static Delight *sharedInstance = nil;
 		[self startRecording];
 	} else {
 		// there's no need to record the session. Clean up video encoder?
+		recordingContext.startTime = [NSDate date];
 	}
 }
 
@@ -383,7 +384,9 @@ static Delight *sharedInstance = nil;
             // We've been inactive for a long time, stop the previous recording and create a new session
             if (recordingContext.shouldRecordVideo) {
                 [self stopRecording];
-            }
+            } else {
+				recordingContext.endTime = [NSDate date];
+			}
             [taskController uploadSession:recordingContext];
             [self tryCreateNewSession];
         }
