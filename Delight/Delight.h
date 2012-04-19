@@ -96,5 +96,6 @@
 // Register/unregister views that should be censored
 + (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 + (void)unregisterPrivateView:(UIView *)view;
++ (NSSet *)privateViews;
 
 @end

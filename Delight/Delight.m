@@ -148,6 +148,11 @@ static Delight *sharedInstance = nil;
     [[self sharedInstance].screenshotController unregisterPrivateView:view];
 }
 
++ (NSSet *)privateViews
+{
+    return [self sharedInstance].screenshotController.privateViews;
+}
+
 #pragma mark -
 
 - (id)init

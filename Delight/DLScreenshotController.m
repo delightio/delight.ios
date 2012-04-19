@@ -8,6 +8,9 @@
 
 #import "DLScreenshotController.h"
 #import <QuartzCore/QuartzCore.h>
+#import </usr/include/objc/objc-runtime.h>
+
+#define kDLDescriptionKey "DLDescription"
 
 @interface DLScreenshotController ()
 - (UIWindow *)keyboardWindow;
@@ -27,6 +30,7 @@
 @synthesize writesToPNG;
 @synthesize previousScreenshot;
 @synthesize imageSize;
+@synthesize privateViews;
 
 - (id)init
 {
@@ -232,22 +236,19 @@
 
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description
 {
-    [privateViews addObject:[NSDictionary dictionaryWithObjectsAndKeys:view, @"view", 
-                             description, @"description", nil]];
+    if (![privateViews containsObject:view]) {
+        objc_setAssociatedObject(view, kDLDescriptionKey, description, OBJC_ASSOCIATION_RETAIN);
+        [privateViews addObject:view];
+        DLDebugLog(@"Registered private view: %@", [view class]);
+    }
 }
 
 - (void)unregisterPrivateView:(UIView *)view
 {
-    NSDictionary *dictionaryToRemove = nil;
-    for (NSDictionary *dictionary in privateViews) {
-        if ([dictionary objectForKey:@"view"] == view) {
-            dictionaryToRemove = dictionary;
-            break;
-        }
-    }
-    
-    if (dictionaryToRemove) {
-        [privateViews removeObject:dictionaryToRemove];
+    if ([privateViews containsObject:view]) {
+        objc_setAssociatedObject(view, kDLDescriptionKey, nil, OBJC_ASSOCIATION_RETAIN);
+        [privateViews removeObject:view];
+        DLDebugLog(@"Unregistered private view: %@", [view class]);
     }
 }
 
@@ -335,32 +336,32 @@
 - (void)hidePrivateViewsForWindow:(UIWindow *)window inContext:(CGContextRef)context
 {
     // Black out private views
-    for (NSDictionary *dictionary in privateViews) {
-        UIView *view = [dictionary objectForKey:@"view"];
-        NSString *description = [dictionary objectForKey:@"description"];
-        
+    for (UIView *view in privateViews) {
+        NSString *description = objc_getAssociatedObject(view, kDLDescriptionKey);
+
         if ([view window] == window) {
             CGRect frameInWindow = [view convertRect:view.frame toView:window];
             CGContextSetGrayFillColor(context, 0.1, 1.0);
             CGContextFillRect(context, frameInWindow);
             UIView *windowRootView = ([window.subviews count] > 0 ? [window.subviews objectAtIndex:0] : nil);
             
-            [self drawLabelCenteredAt:CGPointMake(CGRectGetMidX(frameInWindow), CGRectGetMidY(frameInWindow))
-                             inWindow:window
-                            inContext:context 
-                                 text:description 
-                            textColor:[UIColor whiteColor] 
-                      backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
-                             fontSize:24.0
-                            transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
+            if ((NSNull *)description != [NSNull null]) {
+                [self drawLabelCenteredAt:CGPointMake(CGRectGetMidX(frameInWindow), CGRectGetMidY(frameInWindow))
+                                 inWindow:window
+                                inContext:context 
+                                     text:description 
+                                textColor:[UIColor whiteColor] 
+                          backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
+                                 fontSize:24.0
+                                transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
+            }
         }
     }
 }
 
 - (BOOL)locationIsInPrivateView:(CGPoint)location
 {
-    for (NSDictionary *dictionary in privateViews) {
-        UIView *view = [dictionary objectForKey:@"view"];
+    for (UIView *view in privateViews) {
         CGRect frameInWindow = [view convertRect:view.frame toView:view.window];
             
         if (CGRectContainsPoint(frameInWindow, location)) {
