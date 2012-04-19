@@ -1,17 +1,17 @@
 //
-//  UIWindow+InterceptEvents.m
+//  UIWindow+DLInterceptEvents.m
 //  Delight
 //
 //  Created by Chris Haugli on 1/23/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "UIWindow+InterceptEvents.h"
+#import "UIWindow+DLInterceptEvents.h"
 #import </usr/include/objc/objc-runtime.h>
 
-MAKE_CATEGORIES_LOADABLE(UIWindow_InterceptEvents);
+DL_MAKE_CATEGORIES_LOADABLE(UIWindow_DLInterceptEvents);
 
-@implementation UIWindow (InterceptEvents)
+@implementation UIWindow (DLInterceptEvents)
 
 - (void)DLsetDelegate:(id<DLWindowDelegate>)delegate
 {

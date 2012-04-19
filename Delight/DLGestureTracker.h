@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UIWindow+InterceptEvents.h"
+#import "UIWindow+DLInterceptEvents.h"
 
 @protocol DLWindowDelegate;
 @protocol DLGestureTrackerDelegate;

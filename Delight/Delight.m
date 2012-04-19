@@ -10,14 +10,14 @@
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "UIWindow+InterceptEvents.h"
+#import "UIWindow+DLInterceptEvents.h"
 #import "DLTaskController.h"
 
-#define kDefaultScaleFactor 1.0f
-#define kDefaultMaximumFrameRate 100.0f
-#define kDefaultMaximumRecordingDuration 60.0f*10
-#define kStartingFrameRate 5.0f
-#define kMaximumSessionInactiveTime 60.0f*5
+#define kDLDefaultScaleFactor 1.0f
+#define kDLDefaultMaximumFrameRate 100.0f
+#define kDLDefaultMaximumRecordingDuration 60.0f*10
+#define kDLStartingFrameRate 5.0f
+#define kDLMaximumSessionInactiveTime 60.0f*5
 
 static Delight *sharedInstance = nil;
 
@@ -159,11 +159,11 @@ static Delight *sharedInstance = nil;
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
         
-        self.scaleFactor = kDefaultScaleFactor;
-        self.maximumFrameRate = kDefaultMaximumFrameRate;
-        self.maximumRecordingDuration = kDefaultMaximumRecordingDuration;
+        self.scaleFactor = kDLDefaultScaleFactor;
+        self.maximumFrameRate = kDLDefaultMaximumFrameRate;
+        self.maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
-        frameRate = kStartingFrameRate;
+        frameRate = kDLStartingFrameRate;
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -378,7 +378,7 @@ static Delight *sharedInstance = nil;
     // In iOS 4, locking the screen does not trigger didEnterBackground: notification. Check if we've been inactive for a long time.
     if (resignActiveTime > 0 && !appInBackground && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
         NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
-        if (inactiveTime > kMaximumSessionInactiveTime) {
+        if (inactiveTime > kDLMaximumSessionInactiveTime) {
             // We've been inactive for a long time, stop the previous recording and create a new session
             if (recordingContext.shouldRecordVideo) {
                 [self stopRecording];

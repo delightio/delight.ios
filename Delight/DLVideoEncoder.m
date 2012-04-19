@@ -8,7 +8,7 @@
 
 #import "DLVideoEncoder.h"
 
-#define kDefaultBitRate 500.0*1024.0
+#define kDLDefaultBitRate 500.0*1024.0
 
 @interface DLVideoEncoder ()
 - (BOOL)setupWriter;
@@ -29,7 +29,7 @@
 {
     self = [super init];
     if (self) {
-        averageBitRate = kDefaultBitRate;
+        averageBitRate = kDLDefaultBitRate;
     }
     return self;
 }
