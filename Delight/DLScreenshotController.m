@@ -343,7 +343,7 @@
         NSString *description = objc_getAssociatedObject(view, kDLDescriptionKey);
 
         if ([view window] == window) {
-            CGRect frameInWindow = [view convertRect:view.frame toView:window];
+            CGRect frameInWindow = [view convertRect:view.bounds toView:window];
             CGContextSetGrayFillColor(context, 0.1, 1.0);
             CGContextFillRect(context, frameInWindow);
             UIView *windowRootView = ([window.subviews count] > 0 ? [window.subviews objectAtIndex:0] : nil);
@@ -355,7 +355,7 @@
                                      text:description 
                                 textColor:[UIColor whiteColor] 
                           backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
-                                 fontSize:24.0
+                                 fontSize:18.0
                                 transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
             }
         }
@@ -365,7 +365,7 @@
 - (BOOL)locationIsInPrivateView:(CGPoint)location
 {
     for (UIView *view in privateViews) {
-        CGRect frameInWindow = [view convertRect:view.frame toView:view.window];
+        CGRect frameInWindow = [view convertRect:view.bounds toView:view.window];
             
         if (CGRectContainsPoint(frameInWindow, location)) {
             return YES;
