@@ -40,8 +40,8 @@
         privateViews = [[NSMutableSet alloc] init];
         self.scaleFactor = 1.0f;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];    
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardDidShowNotification:) name:UIKeyboardDidShowNotification object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardDidHideNotification:) name:UIKeyboardDidHideNotification object:nil];    
     }
     return self;
 }
@@ -355,7 +355,7 @@
                                      text:description 
                                 textColor:[UIColor whiteColor] 
                           backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
-                                 fontSize:18.0
+                                 fontSize:18.0*scaleFactor
                                 transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
             }
         }
@@ -364,24 +364,30 @@
 
 - (BOOL)locationIsInPrivateView:(CGPoint)location
 {
+    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+    
     for (UIView *view in privateViews) {
-        CGRect frameInWindow = [view convertRect:view.bounds toView:view.window];
+        CGRect frameInWindow = [view convertRect:view.bounds toView:keyWindow];
             
         if (CGRectContainsPoint(frameInWindow, location)) {
             return YES;
         }
     }
-    
+
+    if (keyboardWindow && hidesKeyboard) {
+        if (CGRectContainsPoint(keyboardFrame, location)) {
+            return YES;
+        }
+    }
+
     return NO;
 }
 
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context
 {
-    CGContextSaveGState(context);
+    if (!window) return;
     
-    // Flip the y-axis since Core Graphics starts with 0 at the bottom
-    CGContextScaleCTM(context, 1.0, -1.0);
-    CGContextTranslateCTM(context, 0, -window.frame.size.height * scaleFactor);
+    CGContextSaveGState(context);
     
     CGRect scaledKeyboardFrame = CGRectMake(keyboardFrame.origin.x * scaleFactor,
                                             keyboardFrame.origin.y * scaleFactor,
@@ -412,13 +418,13 @@
 
 #pragma mark - Notifications
 
-- (void)handleKeyboardWillShowNotification:(NSNotification *)notification
+- (void)handleKeyboardDidShowNotification:(NSNotification *)notification
 {
     keyboardWindow = [[self keyboardWindow] retain];
     keyboardFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 }
 
-- (void)handleKeyboardWillHideNotification:(NSNotification *)notification
+- (void)handleKeyboardDidHideNotification:(NSNotification *)notification
 {
     [keyboardWindow release];
     keyboardWindow = nil;
