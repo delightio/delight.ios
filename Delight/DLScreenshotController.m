@@ -389,10 +389,11 @@
     
     CGContextSaveGState(context);
     
-    CGRect scaledKeyboardFrame = CGRectMake(keyboardFrame.origin.x * scaleFactor,
-                                            keyboardFrame.origin.y * scaleFactor,
-                                            keyboardFrame.size.width * scaleFactor,
-                                            keyboardFrame.size.height * scaleFactor);
+    CGFloat contentScale = [[UIScreen mainScreen] scale];
+    CGRect scaledKeyboardFrame = CGRectMake(keyboardFrame.origin.x * scaleFactor * contentScale,
+                                            keyboardFrame.origin.y * scaleFactor * contentScale,
+                                            keyboardFrame.size.width * scaleFactor * contentScale,
+                                            keyboardFrame.size.height * scaleFactor * contentScale);
     
     CGContextSetGrayFillColor(context, 0.7, 1.0);
     CGContextFillRect(context, scaledKeyboardFrame);
@@ -403,7 +404,7 @@
                          text:@"Keyboard is hidden"
                     textColor:[UIColor blackColor]
               backgroundColor:[UIColor colorWithWhite:0.7 alpha:1.0]
-                     fontSize:24.0*scaleFactor
+                     fontSize:24.0*scaleFactor*contentScale
                     transform:CGAffineTransformMake(window.transform.a, window.transform.b, window.transform.c, window.transform.d, 0, 0)]; // Only take into account scale/rotation
     
     CGContextRestoreGState(context);
