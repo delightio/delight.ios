@@ -11,6 +11,7 @@
 
 @interface DLGetNewSessionTask : DLTask <NSXMLParserDelegate>
 
+@property (nonatomic, retain) NSString * appToken;
 @property (nonatomic, retain) NSMutableString * contentOfCurrentProperty;
 
 @end

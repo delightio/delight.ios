@@ -28,11 +28,12 @@
 	return _queue;
 }
 
-- (void)requestSessionID {
+- (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
 	
 	// begin connection
 	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] init];
+	theTask.appToken = aToken;
 	theTask.taskController = self;
 	_task = theTask;
 	[self.queue addOperation:theTask];

@@ -336,7 +336,7 @@ static Delight *sharedInstance = nil;
     videoEncoder.outputPath = [NSString stringWithFormat:@"%@/output.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
     [self startRecording];
 #else
-	[taskController requestSessionID];
+	[taskController requestSessionIDWithAppToken:self.appToken];
 #endif
 }
 

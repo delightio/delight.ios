@@ -15,9 +15,7 @@
 @class DLTaskController;
 
 extern NSString * const DL_BASE_URL;
-extern NSString * const DL_ACCESS_TOKEN;
 extern NSString * const DL_APP_LOCALE;
-extern NSString * const DL_APP_VERSION;
 
 @interface DLTask : NSOperation
 
