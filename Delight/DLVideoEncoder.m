@@ -68,7 +68,7 @@
 - (void)writeFrameImage:(UIImage *)frameImage
 {
     if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
-        NSLog(@"Not ready for video data");
+        DLDebugLog(@"Not ready for video data");
     } else {
         float millisElapsed = ([[NSDate date] timeIntervalSince1970] - recordingStartTime - totalPauseDuration) * 1000.0;
         CMTime time = CMTimeMake((int)millisElapsed, 1000);
@@ -81,7 +81,7 @@
             int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &pixelBuffer);
             if(status != 0){
                 //could not get a buffer from the pool
-                NSLog(@"Error creating pixel buffer:  status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+                DLDebugLog(@"Error creating pixel buffer:  status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
             } else {
                 // set image data into pixel buffer
                 CVPixelBufferLockBaseAddress(pixelBuffer, 0);
@@ -91,7 +91,7 @@
                 if(status == 0){
                     BOOL success = [avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time];
                     if (!success)
-                        NSLog(@"Warning:  Unable to write buffer to video: %@", videoWriter.error);
+                        DLDebugLog(@"Warning:  Unable to write buffer to video: %@", videoWriter.error);
                 }
                 
                 CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
@@ -112,7 +112,6 @@
     }
     
     CVPixelBufferRef pixel_buffer = NULL;
-    NSLog(@"backing width: %i, height: %i", backingWidth, backingHeight);
     
     CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, pixelBufferPool, &pixel_buffer);
     if ((pixel_buffer == NULL) || (status != kCVReturnSuccess)) {
@@ -207,7 +206,7 @@
     // Wait for the video
     int status = videoWriter.status;
     while (status == AVAssetWriterStatusUnknown) {
-        NSLog(@"Waiting...");
+        DLDebugLog(@"Waiting...");
         [NSThread sleepForTimeInterval:0.5f];
         status = videoWriter.status;
     }
@@ -215,12 +214,12 @@
     @synchronized(self) {
         BOOL success = [videoWriter finishWriting];
         if (!success) {
-            NSLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
+            DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
         }
         
         [self cleanupWriter];
         
-        NSLog(@"Completed recording, file is stored at:  %@", outputPath);
+        DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
     }
     
     [pool drain];
@@ -244,7 +243,7 @@
     if ([fileManager fileExistsAtPath:outputPath]) {
         NSError *error;
         if ([fileManager removeItemAtPath:outputPath error:&error] == NO) {
-            NSLog(@"Could not delete old recording file at path:  %@", outputPath);
+            DLDebugLog(@"Could not delete old recording file at path:  %@", outputPath);
         }
     }
     

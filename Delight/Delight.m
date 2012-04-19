@@ -14,7 +14,7 @@
 #import "DLTaskController.h"
 
 #define kDLDefaultScaleFactor 1.0f
-#define kDLDefaultMaximumFrameRate 100.0f
+#define kDLDefaultMaximumFrameRate 30.0f
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
 #define kDLStartingFrameRate 5.0f
 #define kDLMaximumSessionInactiveTime 60.0f*5
@@ -285,7 +285,12 @@ static Delight *sharedInstance = nil;
         frameCount++;
         elapsedTime += (end - start);
         lastScreenshotTime = end;
-        // NSLog(@"%i frames, current %.3f, average %.3f", frameCount, (end - start), elapsedTime / frameCount);        
+        
+#ifdef DEBUG
+        if (frameCount % (int)(3 * ceil(frameRate)) == 0) {
+            DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, frameRate);
+        }
+#endif
         
         [pool drain];
     } 
@@ -317,10 +322,6 @@ static Delight *sharedInstance = nil;
                 frameRate--;
             }
         }
-        
-        if (frameCount % 30 == 0) {
-            NSLog(@"Frame rate: %.0f fps", frameRate);
-        }
     }
     
     if (autoCaptureEnabled) {
@@ -331,7 +332,7 @@ static Delight *sharedInstance = nil;
 #pragma mark - Session
 
 - (void)tryCreateNewSession {
-#if DL_OFFLINE_RECORDING
+#ifdef DL_OFFLINE_RECORDING
     videoEncoder.outputPath = [NSString stringWithFormat:@"%@/output.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
     [self startRecording];
 #else
@@ -356,7 +357,7 @@ static Delight *sharedInstance = nil;
 
 - (void)handleDidEnterBackground:(NSNotification *)notification
 {
-#if DL_OFFLINE_RECORDING
+#ifdef DL_OFFLINE_RECORDING
     [self stopRecording];
 #else
 	if ( recordingContext.shouldRecordVideo ) {

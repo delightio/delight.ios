@@ -6,4 +6,10 @@
     #import <Foundation/Foundation.h>
 
     #define DL_MAKE_CATEGORIES_LOADABLE(UNIQUE_NAME) @interface FORCELOAD_##UNIQUE_NAME @end @implementation FORCELOAD_##UNIQUE_NAME @end
+
+    #ifdef DEBUG
+        #define DLDebugLog(format, args...)	NSLog(format, ## args)
+    #else
+        #define DLDebugLog(format, args...)
+    #endif
 #endif
