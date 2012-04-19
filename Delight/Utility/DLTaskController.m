@@ -58,80 +58,39 @@
 				[sessTask cancel];
 				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 			}];
+			sessTask.taskController = self;
 			sessTask.backgroundTaskIdentifier = bgIdf;
 			sessTask.recordingContext = aSession;
 			[self.queue addOperation:sessTask];
 			[sessTask release];
 		}
-		if ( ![aSession didFinishTask:DLFinishedUploadVideoFile] ) {
-			DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
-			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-				// task expires. clean it up if it has not finished yet
-				[uploadTask cancel];
-				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-			}];
-			uploadTask.backgroundTaskIdentifier = bgIdf;
-			uploadTask.recordingContext = aSession;
-			[self.queue addOperation:uploadTask];
-			[uploadTask release];
-		} else if ( ![aSession didFinishTask:DLFinishedPostVideo] ) {
-			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
-			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-				// task expires. clean it up if it has not finished yet
-				[postTask cancel];
-				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-			}];
-			postTask.backgroundTaskIdentifier = bgIdf;
-			postTask.recordingContext = aSession;
-			[self.queue addOperation:postTask];
-			[postTask release];
+		if ( aSession.shouldRecordVideo ) {
+			if ( ![aSession didFinishTask:DLFinishedUploadVideoFile] ) {
+				DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
+				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+					// task expires. clean it up if it has not finished yet
+					[uploadTask cancel];
+					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+				}];
+				uploadTask.taskController = self;
+				uploadTask.backgroundTaskIdentifier = bgIdf;
+				uploadTask.recordingContext = aSession;
+				[self.queue addOperation:uploadTask];
+				[uploadTask release];
+			} else if ( ![aSession didFinishTask:DLFinishedPostVideo] ) {
+				DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
+				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+					// task expires. clean it up if it has not finished yet
+					[postTask cancel];
+					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+				}];
+				postTask.taskController = self;
+				postTask.backgroundTaskIdentifier = bgIdf;
+				postTask.recordingContext = aSession;
+				[self.queue addOperation:postTask];
+				[postTask release];
+			}
 		}
-//		UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-//			// task expires. clean it up if it has not finished yet
-//			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-//		}];
-//		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//			NSURLRequest * theRequest = nil;
-//			NSHTTPURLResponse * theResponse = nil;
-//			NSError * error = nil;
-//			if ( aSession.shouldRecordVideo ) {
-//				// if this is a "recording" session, upload the video recorded
-//				DLUploadVideoFileTask * theTask = [[DLUploadVideoFileTask alloc] init];
-//				theTask.recordingContext = aSession;
-//				// make a synchronous call
-//				theRequest = [theTask URLRequest];
-//				if ( theRequest ) {
-//					theTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
-//					theTask.httpResponse = theResponse;
-//					if ( error == nil && ![theTask responseContainsError] ) {
-//						// upload completed successfully, notify Delight server
-//						[theTask processResponse];
-//					}
-//					// post video info to delight server
-//					DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
-//					postTask.recordingContext = aSession;
-//					theRequest = [postTask URLRequest];
-//					postTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
-//					if ( error == nil ) {
-//						[postTask processResponse];
-//					}
-//					[postTask release];
-//				}
-//				[theTask release];
-//			}
-//			// we need to upload session info to server no matter what.
-//			DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
-//			sessTask.recordingContext = aSession;
-//			theRequest = [sessTask URLRequest];
-//			sessTask.receivedData = (NSMutableData *)[NSURLConnection sendSynchronousRequest:theRequest returningResponse:&theResponse error:&error];
-//			sessTask.httpResponse = theResponse;
-//			if ( error == nil ) {
-//				[sessTask processResponse];
-//			}
-//			[sessTask release];
-//			// end the task
-//			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-//		});
 	}
 }
 

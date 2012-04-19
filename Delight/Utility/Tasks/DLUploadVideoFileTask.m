@@ -7,6 +7,8 @@
 //
 
 #import "DLUploadVideoFileTask.h"
+#import "DLPostVideoTask.h"
+#import "DLTaskController.h"
 
 @implementation DLUploadVideoFileTask
 
@@ -26,11 +28,22 @@
 }
 
 - (void)processResponse {
-//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-//	NSLog(@"received data: %@", str);
-//	[str release];
+	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"uploaded video file: %@", str);
+	[str release];
 	// create Post Video task
+	DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
+	UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+		// task expires. clean it up if it has not finished yet
+		[postTask cancel];
+		[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+	}];
+	postTask.backgroundTaskIdentifier = bgIdf;
+	postTask.recordingContext = self.recordingContext;
+	[self.taskController.queue addOperation:postTask];
+	[postTask release];
 	
+	[self.recordingContext setTaskFinished:DLFinishedUploadVideoFile];
 	[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 	self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
 }

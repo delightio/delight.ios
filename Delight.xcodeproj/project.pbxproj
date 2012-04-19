@@ -187,6 +187,7 @@
 		A9A9A3DD15371E6A00B6E4AB /* Tasks */ = {
 			isa = PBXGroup;
 			children = (
+				A9508D311537E99B001853A0 /* DLTaskHeader.h */,
 				A9A9A3DE15371E7E00B6E4AB /* DLTask.h */,
 				A9A9A3DF15371E7E00B6E4AB /* DLTask.m */,
 				A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */,
@@ -195,7 +196,6 @@
 				A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */,
 				A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */,
 				A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */,
-				A9508D311537E99B001853A0 /* DLTaskHeader.h */,
 				A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */,
 				A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */,
 			);

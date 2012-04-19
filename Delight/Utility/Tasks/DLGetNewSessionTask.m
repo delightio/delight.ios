@@ -11,9 +11,9 @@
 
 NSString * const DLAppSessionElementName = @"app_session";
 NSString * const DLUploadURIElementName = @"upload_uris";
-NSString * const DLWifiOnlyElementName = @"wifi_transmission_only";
+NSString * const DLWifiOnlyElementName = @"uploading_on_wifi_only";
 NSString * const DLIDElementName = @"id";
-NSString * const DLRecordElementName = @"record";
+NSString * const DLRecordElementName = @"recording";
 
 @implementation DLGetNewSessionTask
 @synthesize appToken = _appToken;
@@ -46,7 +46,9 @@ NSString * const DLRecordElementName = @"record";
 	// parse the object into Cocoa objects
 	NSXMLParser * parser = [[NSXMLParser alloc] initWithData:self.receivedData];
 	[parser setDelegate:self];
-	[parser parse];
+	if ( ![parser parse] ) {
+		NSLog(@"error parsing xml: %@", [parser parserError]);
+	}
 }
 
 #pragma mark XML parsing delegate

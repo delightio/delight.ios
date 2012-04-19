@@ -20,10 +20,12 @@
 }
 
 - (void)processResponse {
-//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-//	NSLog(@"received data: %@", str);
-//	[str release];
+	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"updated session: %@", str);
+	[str release];
+	[self.recordingContext setTaskFinished:DLFinishedUpdateSession];
 	[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
+	self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
 }
 
 @end

@@ -73,11 +73,11 @@ NSString * const DL_APP_LOCALE = @"";
 	}
 }
 
-- (BOOL)isConcurrent {
-    // any thread
-    return YES;
-}
-
+//- (BOOL)isConcurrent {
+//    // any thread
+//    return YES;
+//}
+//
 - (BOOL)isExecuting {
     // any thread
     return _connection != nil;
@@ -110,7 +110,6 @@ NSString * const DL_APP_LOCALE = @"";
 		}];
 	}
 	self.connection = nil;
-	self.receivedData = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
