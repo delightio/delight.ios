@@ -60,7 +60,6 @@ static Delight *sharedInstance = nil;
     Delight *delight = [self sharedInstance];
     delight.appToken = appToken;
 	[delight tryCreateNewSession];
-//    [delight startRecording];
 }
 
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes
@@ -211,7 +210,7 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
-    if (recordingContext && videoEncoder.recording) {
+    if (videoEncoder.recording) {
         [videoEncoder stopRecording];
         recordingContext.endTime = [NSDate date];
     }
@@ -332,7 +331,12 @@ static Delight *sharedInstance = nil;
 #pragma mark - Session
 
 - (void)tryCreateNewSession {
+#if DL_OFFLINE_RECORDING
+    videoEncoder.outputPath = [NSString stringWithFormat:@"%@/output.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+    [self startRecording];
+#else
 	[taskController requestSessionID];
+#endif
 }
 
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
@@ -352,10 +356,15 @@ static Delight *sharedInstance = nil;
 
 - (void)handleDidEnterBackground:(NSNotification *)notification
 {
+#if DL_OFFLINE_RECORDING
+    [self stopRecording];
+#else
 	if ( recordingContext.shouldRecordVideo ) {
 		[self stopRecording];
 	}
 	[taskController uploadSession:recordingContext];
+#endif
+    
     appInBackground = YES;
 }
 
