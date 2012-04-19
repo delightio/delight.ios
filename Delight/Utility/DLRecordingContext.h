@@ -12,7 +12,7 @@
  Store file upload status variables. A video file will probably need some time to get fully uploaded. All upload related status variables should be persistent so that the library can resume upload when the app is launched next time.
  */
 
-@interface DLRecordingContext : NSObject
+@interface DLRecordingContext : NSObject <NSCoding>
 
 @property (nonatomic, retain) NSString * sessionID;
 @property (nonatomic, retain) NSString * uploadURLString;

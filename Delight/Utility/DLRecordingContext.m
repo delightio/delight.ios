@@ -15,10 +15,39 @@
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
-@synthesize chunkSize;
-@synthesize chunkOffset;
+@synthesize chunkSize = _chunkSize;
+@synthesize chunkOffset = _chunkOffset;
 @synthesize filePath = _filePath;
 @synthesize finishedTaskIndex = _finishedTaskIndex;
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+	self = [super init];
+	self.sessionID = [aDecoder decodeObjectForKey:@"sessionID"];
+	self.uploadURLString = [aDecoder decodeObjectForKey:@"uploadURLString"];
+	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
+	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
+	self.startTime = [aDecoder decodeObjectForKey:@"startTime"];
+	self.endTime = [aDecoder decodeObjectForKey:@"endTime"];
+	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
+	_chunkOffset = [aDecoder decodeIntegerForKey:@"chunkOffset"];
+	self.filePath = [aDecoder decodeObjectForKey:@"filePath"];
+	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
+	
+	return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+	[aCoder encodeObject:_sessionID forKey:@"sessionID"];
+	[aCoder encodeObject:_uploadURLString forKey:@"uploadURLString"];
+	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
+	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
+	[aCoder encodeObject:_startTime forKey:@"startTime"];
+	[aCoder encodeObject:_endTime forKey:@"endTime"];
+	[aCoder encodeInteger:_chunkSize forKey:@"chunkSize"];
+	[aCoder encodeInteger:_chunkOffset forKey:@"chunkOffset"];
+	[aCoder encodeObject:_filePath forKey:@"filePath"];
+	[aCoder encodeObject:_finishedTaskIndex forKey:@"finishedTaskIndex"];
+}
 
 - (void)dealloc {
 	[_sessionID release];
