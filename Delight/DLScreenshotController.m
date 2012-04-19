@@ -83,6 +83,9 @@
     CGContextScaleCTM(context, 1.0, -1.0);
     CGContextTranslateCTM(context, 0, -imageSize.height);
     
+    // Clear the status bar since we don't draw over it
+    CGContextClearRect(context, [[UIApplication sharedApplication] statusBarFrame]);
+    
     // Iterate over every window from back to front
     for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
         if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen]) {
