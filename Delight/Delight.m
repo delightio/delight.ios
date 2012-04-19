@@ -363,6 +363,8 @@ static Delight *sharedInstance = nil;
 #else
 	if ( recordingContext.shouldRecordVideo ) {
 		[self stopRecording];
+	} else {
+		recordingContext.endTime = [NSDate date];
 	}
 	[taskController uploadSession:recordingContext];
 #endif
