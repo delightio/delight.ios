@@ -27,6 +27,7 @@ static Delight *sharedInstance = nil;
 - (void)pause;
 - (void)resume;
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
+- (void)takeScreenshot;
 - (void)screenshotTimerFired;
 - (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 @end
@@ -296,6 +297,11 @@ static Delight *sharedInstance = nil;
         // We've exceeded the maximum recording duration
         [self stopRecording];
     }
+}
+
+- (void)takeScreenshot
+{
+    [self takeScreenshot:nil backingWidth:0 backingHeight:0];
 }
 
 - (void)screenshotTimerFired
