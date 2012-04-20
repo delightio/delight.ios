@@ -19,6 +19,8 @@
 @synthesize chunkOffset = _chunkOffset;
 @synthesize filePath = _filePath;
 @synthesize finishedTaskIndex = _finishedTaskIndex;
+@synthesize saved = _saved;
+@synthesize loadedFromArchive = _loadedFromArchive;
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super init];
@@ -32,6 +34,7 @@
 	_chunkOffset = [aDecoder decodeIntegerForKey:@"chunkOffset"];
 	self.filePath = [aDecoder decodeObjectForKey:@"filePath"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
+	_loadedFromArchive = YES;
 	
 	return self;
 }
@@ -59,17 +62,25 @@
 	[super dealloc];
 }
 
-- (BOOL)didFinishTask:(DLFinishedTaskIdentifier)idfr {
+- (BOOL)shouldCompleteTask:(DLFinishedTaskIdentifier)idfr {
+	// no lock needed. It's only called in main thread
 	BOOL flag;
-	@synchronized (self) {
-		flag = [self.finishedTaskIndex containsIndex:idfr];
-	}
+	// if it doesn't not contain the index, the task is done
+	flag = [self.finishedTaskIndex containsIndex:idfr];
 	return flag;
+}
+
+- (BOOL)allTasksFinished {
+	BOOL val;
+	@synchronized (self) {
+		val = [self.finishedTaskIndex count] == 0;
+	}
+	return val;
 }
 
 - (void)setTaskFinished:(DLFinishedTaskIdentifier)idfr {
 	@synchronized (self) {
-		[self.finishedTaskIndex addIndex:idfr];
+		[self.finishedTaskIndex removeIndex:idfr];
 	}
 }
 
@@ -77,6 +88,15 @@
 	if ( _finishedTaskIndex == nil ) {
 		// create the index set object
 		_finishedTaskIndex = [[NSMutableIndexSet alloc] init];
+		if ( _shouldRecordVideo ) {
+			// this is a recording session. need to fulfill 3 upload tasks
+			[_finishedTaskIndex addIndex:DLFinishedPostVideo];
+			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
+			[_finishedTaskIndex addIndex:DLFinishedUploadVideoFile];
+		} else {
+			// only upload the info
+			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
+		}
 	}
 	return _finishedTaskIndex;
 }

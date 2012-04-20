@@ -7,6 +7,7 @@
 //
 
 #import "DLUpdateSessionTask.h"
+#import "DLTaskController.h"
 
 @implementation DLUpdateSessionTask
 
@@ -24,8 +25,14 @@
 	NSLog(@"updated session: %@", str);
 	[str release];
 	[self.recordingContext setTaskFinished:DLFinishedUpdateSession];
-	[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
-	self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+	if ( self.backgroundTaskIdentifier != UIBackgroundTaskInvalid ) {
+		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
+		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+	}
+	if ( self.recordingContext.loadedFromArchive && [self.recordingContext allTasksFinished] ) {
+		// remove the task from incomplete array
+		[self.taskController removeRecordingContext:self.recordingContext];
+	}
 }
 
 @end

@@ -44,8 +44,14 @@
 	[postTask release];
 	
 	[self.recordingContext setTaskFinished:DLFinishedUploadVideoFile];
-	[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
-	self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+	if ( self.backgroundTaskIdentifier != UIBackgroundTaskInvalid ) {
+		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
+		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+	}
+	if ( self.recordingContext.loadedFromArchive && [self.recordingContext allTasksFinished] ) {
+		// remove the task from incomplete array
+		[self.taskController removeRecordingContext:self.recordingContext];
+	}
 }
 
 @end
