@@ -15,20 +15,20 @@
 @synthesize queue = _queue;
 @synthesize task = _task;
 @synthesize sessionDelegate = _sessionDelegate;
-@synthesize incompleteSessions = _incompleteSessions;
+@synthesize unfinishedContexts = _unfinishedContexts;
 @synthesize baseDirectory = _baseDirectory;
 @synthesize containsIncompleteSessions = _containsIncompleteSessions;
 
 - (id)init {
 	self = [super init];
-	_containsIncompleteSessions = [[NSFileManager defaultManager] fileExistsAtPath:[self incompleteSessionsArchiveFilePath]];
+	_containsIncompleteSessions = [[NSFileManager defaultManager] fileExistsAtPath:[self unfinishedRecordingContextsArchiveFilePath]];
 	return self;
 }
 
 - (void)dealloc {
 	[_queue cancelAllOperations];
 	[_queue release];
-	[_incompleteSessions release];
+	[_unfinishedContexts release];
 	[_task release];
 	[_baseDirectory release];
 	[super dealloc];
@@ -69,7 +69,7 @@
 			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 				// task expires. clean it up if it has not finished yet
 				[sessTask cancel];
-				[self saveIncompleteSession:aSession];
+				[self saveUnfinishedRecordingContext:aSession];
 				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 			}];
 			sessTask.taskController = self;
@@ -84,7 +84,7 @@
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 					// task expires. clean it up if it has not finished yet
 					[uploadTask cancel];
-					[self saveIncompleteSession:aSession];
+					[self saveUnfinishedRecordingContext:aSession];
 					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 				}];
 				uploadTask.taskController = self;
@@ -97,7 +97,7 @@
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 					// task expires. clean it up if it has not finished yet
 					[postTask cancel];
-					[self saveIncompleteSession:aSession];
+					[self saveUnfinishedRecordingContext:aSession];
 					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 				}];
 				postTask.taskController = self;
@@ -110,10 +110,20 @@
 	}
 }
 
-#pragma mark Other
+#pragma mark Session management
+- (NSString *)unfinishedRecordingContextsArchiveFilePath {
+	return [self.baseDirectory stringByAppendingPathComponent:@"UnfinishedRecordingContexts.archive"];
+}
 
-- (NSString *)incompleteSessionsArchiveFilePath {
-	return [self.baseDirectory stringByAppendingPathComponent:@"IncompleteSessions.archive"];
+- (void)removeRecordingContext:(DLRecordingContext *)ctx {
+	@synchronized(self) {
+		// remove the context
+		[_unfinishedContexts removeObject:ctx];
+		// if there's no more items, remove the archive file
+		if ( [_unfinishedContexts count] == 0 ) {
+			[[NSFileManager defaultManager] removeItemAtPath:[self unfinishedRecordingContextsArchiveFilePath] error:nil];
+		}
+	}
 }
 
 #pragma mark Task Management
@@ -122,15 +132,15 @@
 	self.task = nil;
 }
 
-- (void)saveIncompleteSession:(DLRecordingContext *)ctx {
+- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx {
 	if ( [ctx.finishedTaskIndex count] && !ctx.saved) {
 		// contains incomplete task and require saving
-		if ( _incompleteSessions == nil ) {
-			_incompleteSessions = [[NSMutableArray alloc] initWithCapacity:4];
+		if ( _unfinishedContexts == nil ) {
+			_unfinishedContexts = [[NSMutableArray alloc] initWithCapacity:4];
 		}
-		[self.incompleteSessions addObject:ctx];
-		NSString * sessFilePath = [self incompleteSessionsArchiveFilePath];
-		ctx.saved = [NSKeyedArchiver archiveRootObject:_incompleteSessions toFile:sessFilePath];
+		[self.unfinishedContexts addObject:ctx];
+		NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
+		ctx.saved = [NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
 		_containsIncompleteSessions = YES;
 	}
 }

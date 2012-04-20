@@ -31,8 +31,10 @@ typedef enum {
 @property (nonatomic, retain) NSString * filePath;
 @property (nonatomic, retain) NSMutableIndexSet * finishedTaskIndex;
 @property (nonatomic) BOOL saved;
+@property (nonatomic, readonly) BOOL loadedFromArchive;
 
 - (BOOL)shouldCompleteTask:(DLFinishedTaskIdentifier)idfr;
+- (BOOL)allTasksFinished;
 - (void)setTaskFinished:(DLFinishedTaskIdentifier)idfr;
 
 @end

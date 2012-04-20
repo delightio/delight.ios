@@ -20,6 +20,7 @@
 @synthesize filePath = _filePath;
 @synthesize finishedTaskIndex = _finishedTaskIndex;
 @synthesize saved = _saved;
+@synthesize loadedFromArchive = _loadedFromArchive;
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super init];
@@ -33,6 +34,7 @@
 	_chunkOffset = [aDecoder decodeIntegerForKey:@"chunkOffset"];
 	self.filePath = [aDecoder decodeObjectForKey:@"filePath"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
+	_loadedFromArchive = YES;
 	
 	return self;
 }
@@ -66,6 +68,14 @@
 	// if it doesn't not contain the index, the task is done
 	flag = [self.finishedTaskIndex containsIndex:idfr];
 	return flag;
+}
+
+- (BOOL)allTasksFinished {
+	BOOL val;
+	@synchronized (self) {
+		val = [self.finishedTaskIndex count] == 0;
+	}
+	return val;
 }
 
 - (void)setTaskFinished:(DLFinishedTaskIdentifier)idfr {
