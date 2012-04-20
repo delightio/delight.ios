@@ -17,6 +17,13 @@
 @synthesize sessionDelegate = _sessionDelegate;
 @synthesize incompleteSessions = _incompleteSessions;
 @synthesize baseDirectory = _baseDirectory;
+@synthesize containsIncompleteSessions = _containsIncompleteSessions;
+
+- (id)init {
+	self = [super init];
+	_containsIncompleteSessions = [[NSFileManager defaultManager] fileExistsAtPath:[self incompleteSessionsArchiveFilePath]];
+	return self;
+}
 
 - (void)dealloc {
 	[_queue cancelAllOperations];
@@ -103,6 +110,12 @@
 	}
 }
 
+#pragma mark Other
+
+- (NSString *)incompleteSessionsArchiveFilePath {
+	return [self.baseDirectory stringByAppendingPathComponent:@"IncompleteSessions.archive"];
+}
+
 #pragma mark Task Management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
 	[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
@@ -112,7 +125,13 @@
 - (void)saveIncompleteSession:(DLRecordingContext *)ctx {
 	if ( [ctx.finishedTaskIndex count] && !ctx.saved) {
 		// contains incomplete task and require saving
-		
+		if ( _incompleteSessions == nil ) {
+			_incompleteSessions = [[NSMutableArray alloc] initWithCapacity:4];
+		}
+		[self.incompleteSessions addObject:ctx];
+		NSString * sessFilePath = [self incompleteSessionsArchiveFilePath];
+		ctx.saved = [NSKeyedArchiver archiveRootObject:_incompleteSessions toFile:sessFilePath];
+		_containsIncompleteSessions = YES;
 	}
 }
 

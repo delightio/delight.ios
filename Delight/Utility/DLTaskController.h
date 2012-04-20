@@ -28,10 +28,12 @@
 @property (nonatomic, assign) id<DLRecordingSessionDelegate> sessionDelegate;
 @property (nonatomic, retain) NSMutableArray * incompleteSessions;
 @property (nonatomic, retain) NSString * baseDirectory;
+@property (nonatomic) BOOL containsIncompleteSessions;
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)uploadSession:(DLRecordingContext *)aSession;
 
+- (NSString *)incompleteSessionsArchiveFilePath;
 // task management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;
 - (void)saveIncompleteSession:(DLRecordingContext *)ctx;
