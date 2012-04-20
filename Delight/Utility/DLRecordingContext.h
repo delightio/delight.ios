@@ -30,8 +30,9 @@ typedef enum {
 @property (nonatomic) NSInteger chunkOffset;
 @property (nonatomic, retain) NSString * filePath;
 @property (nonatomic, retain) NSMutableIndexSet * finishedTaskIndex;
+@property (nonatomic) BOOL saved;
 
-- (BOOL)didFinishTask:(DLFinishedTaskIdentifier)idfr;
+- (BOOL)shouldCompleteTask:(DLFinishedTaskIdentifier)idfr;
 - (void)setTaskFinished:(DLFinishedTaskIdentifier)idfr;
 
 @end

@@ -26,11 +26,14 @@
 @property (nonatomic, retain) NSOperationQueue * queue;
 @property (nonatomic, retain) DLTask * task;
 @property (nonatomic, assign) id<DLRecordingSessionDelegate> sessionDelegate;
+@property (nonatomic, retain) NSMutableArray * incompleteSessions;
+@property (nonatomic, retain) NSString * baseDirectory;
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)uploadSession:(DLRecordingContext *)aSession;
 
 // task management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;
+- (void)saveIncompleteSession:(DLRecordingContext *)ctx;
 
 @end
