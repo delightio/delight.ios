@@ -8,16 +8,29 @@
 
 #import "DLTaskController.h"
 #import "Delight.h"
+#import "DLRecordingContext.h"
 #import <UIKit/UIKit.h>
 
 @implementation DLTaskController
 @synthesize queue = _queue;
 @synthesize task = _task;
 @synthesize sessionDelegate = _sessionDelegate;
+@synthesize unfinishedContexts = _unfinishedContexts;
+@synthesize baseDirectory = _baseDirectory;
+@synthesize containsIncompleteSessions = _containsIncompleteSessions;
+
+- (id)init {
+	self = [super init];
+	_containsIncompleteSessions = [[NSFileManager defaultManager] fileExistsAtPath:[self unfinishedRecordingContextsArchiveFilePath]];
+	return self;
+}
 
 - (void)dealloc {
 	[_queue cancelAllOperations];
 	[_queue release];
+	[_unfinishedContexts release];
+	[_task release];
+	[_baseDirectory release];
 	[super dealloc];
 }
 
@@ -50,12 +63,13 @@
 		return;
 	} else {
 		// upload in the background
-		UIBackgroundTaskIdentifier bgIdf;
-		if ( ![aSession didFinishTask:DLFinishedUpdateSession] ) {
+		UIBackgroundTaskIdentifier bgIdf = UIBackgroundTaskInvalid;
+		if ( [aSession shouldCompleteTask:DLFinishedUpdateSession] ) {
 			DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
 			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 				// task expires. clean it up if it has not finished yet
 				[sessTask cancel];
+				[self saveUnfinishedRecordingContext:aSession];
 				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 			}];
 			sessTask.taskController = self;
@@ -65,11 +79,12 @@
 			[sessTask release];
 		}
 		if ( aSession.shouldRecordVideo ) {
-			if ( ![aSession didFinishTask:DLFinishedUploadVideoFile] ) {
+			if ( [aSession shouldCompleteTask:DLFinishedUploadVideoFile] ) {
 				DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 					// task expires. clean it up if it has not finished yet
 					[uploadTask cancel];
+					[self saveUnfinishedRecordingContext:aSession];
 					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 				}];
 				uploadTask.taskController = self;
@@ -77,11 +92,12 @@
 				uploadTask.recordingContext = aSession;
 				[self.queue addOperation:uploadTask];
 				[uploadTask release];
-			} else if ( ![aSession didFinishTask:DLFinishedPostVideo] ) {
+			} else if ( [aSession shouldCompleteTask:DLFinishedPostVideo] ) {
 				DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 					// task expires. clean it up if it has not finished yet
 					[postTask cancel];
+					[self saveUnfinishedRecordingContext:aSession];
 					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 				}];
 				postTask.taskController = self;
@@ -94,37 +110,41 @@
 	}
 }
 
+#pragma mark Session management
+- (NSString *)unfinishedRecordingContextsArchiveFilePath {
+	return [self.baseDirectory stringByAppendingPathComponent:@"UnfinishedRecordingContexts.archive"];
+}
+
+- (void)removeRecordingContext:(DLRecordingContext *)ctx {
+	@synchronized(self) {
+		// remove the context
+		[_unfinishedContexts removeObject:ctx];
+		// if there's no more items, remove the archive file
+		if ( [_unfinishedContexts count] == 0 ) {
+			[[NSFileManager defaultManager] removeItemAtPath:[self unfinishedRecordingContextsArchiveFilePath] error:nil];
+		}
+	}
+}
+
 #pragma mark Task Management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
 	[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	self.task = nil;
 }
 
-//#pragma mark NSURLConnection delegate methods
-//- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-//	_task.httpResponse = (NSHTTPURLResponse *)response;
-//}
-//
-//- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-//	[_task.receivedData appendData:data];
-//}
-//
-//- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-//	// check if there's error
-////	NSString * str = [[NSString alloc] initWithData:_task.receivedData encoding:NSUTF8StringEncoding];
-////	NSLog(@"%@", str);
-////	[str release];
-//	if ( ![_task responseContainsError] ) {
-//		// process the data
-//		[_queue addOperationWithBlock:^{
-//			[_task processResponse];
-//		}];
-//	}
-//	self.controlConnection = nil;
-//}
-//
-//- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-//	NSLog(@"error: %@", error);
-//}
+- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx {
+	if ( [ctx.finishedTaskIndex count] && !ctx.saved) {
+		// contains incomplete task and require saving
+		if ( _unfinishedContexts == nil ) {
+			_unfinishedContexts = [[NSMutableArray alloc] initWithCapacity:4];
+		}
+		[self.unfinishedContexts addObject:ctx];
+		NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
+		ctx.saved = [NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
+		_containsIncompleteSessions = YES;
+	}
+}
+
+
 
 @end

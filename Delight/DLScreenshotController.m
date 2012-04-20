@@ -8,6 +8,9 @@
 
 #import "DLScreenshotController.h"
 #import <QuartzCore/QuartzCore.h>
+#import </usr/include/objc/objc-runtime.h>
+
+#define kDLDescriptionKey "DLDescription"
 
 @interface DLScreenshotController ()
 - (UIWindow *)keyboardWindow;
@@ -27,6 +30,7 @@
 @synthesize writesToPNG;
 @synthesize previousScreenshot;
 @synthesize imageSize;
+@synthesize privateViews;
 
 - (id)init
 {
@@ -36,8 +40,8 @@
         privateViews = [[NSMutableSet alloc] init];
         self.scaleFactor = 1.0f;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillShowNotification:) name:UIKeyboardWillShowNotification object:nil];    
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardWillHideNotification:) name:UIKeyboardWillHideNotification object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardDidShowNotification:) name:UIKeyboardDidShowNotification object:nil];    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardDidHideNotification:) name:UIKeyboardDidHideNotification object:nil];    
     }
     return self;
 }
@@ -78,6 +82,9 @@
     // Flip the y-axis since Core Graphics starts with 0 at the bottom
     CGContextScaleCTM(context, 1.0, -1.0);
     CGContextTranslateCTM(context, 0, -imageSize.height);
+    
+    // Clear the status bar since we don't draw over it
+    CGContextClearRect(context, [[UIApplication sharedApplication] statusBarFrame]);
     
     // Iterate over every window from back to front
     for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
@@ -232,22 +239,19 @@
 
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description
 {
-    [privateViews addObject:[NSDictionary dictionaryWithObjectsAndKeys:view, @"view", 
-                             description, @"description", nil]];
+    if (![privateViews containsObject:view]) {
+        objc_setAssociatedObject(view, kDLDescriptionKey, description, OBJC_ASSOCIATION_RETAIN);
+        [privateViews addObject:view];
+        DLDebugLog(@"Registered private view: %@", [view class]);
+    }
 }
 
 - (void)unregisterPrivateView:(UIView *)view
 {
-    NSDictionary *dictionaryToRemove = nil;
-    for (NSDictionary *dictionary in privateViews) {
-        if ([dictionary objectForKey:@"view"] == view) {
-            dictionaryToRemove = dictionary;
-            break;
-        }
-    }
-    
-    if (dictionaryToRemove) {
-        [privateViews removeObject:dictionaryToRemove];
+    if ([privateViews containsObject:view]) {
+        objc_setAssociatedObject(view, kDLDescriptionKey, nil, OBJC_ASSOCIATION_RETAIN);
+        [privateViews removeObject:view];
+        DLDebugLog(@"Unregistered private view: %@", [view class]);
     }
 }
 
@@ -335,54 +339,61 @@
 - (void)hidePrivateViewsForWindow:(UIWindow *)window inContext:(CGContextRef)context
 {
     // Black out private views
-    for (NSDictionary *dictionary in privateViews) {
-        UIView *view = [dictionary objectForKey:@"view"];
-        NSString *description = [dictionary objectForKey:@"description"];
-        
+    for (UIView *view in privateViews) {
+        NSString *description = objc_getAssociatedObject(view, kDLDescriptionKey);
+
         if ([view window] == window) {
-            CGRect frameInWindow = [view convertRect:view.frame toView:window];
+            CGRect frameInWindow = [view convertRect:view.bounds toView:window];
             CGContextSetGrayFillColor(context, 0.1, 1.0);
             CGContextFillRect(context, frameInWindow);
             UIView *windowRootView = ([window.subviews count] > 0 ? [window.subviews objectAtIndex:0] : nil);
             
-            [self drawLabelCenteredAt:CGPointMake(CGRectGetMidX(frameInWindow), CGRectGetMidY(frameInWindow))
-                             inWindow:window
-                            inContext:context 
-                                 text:description 
-                            textColor:[UIColor whiteColor] 
-                      backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
-                             fontSize:24.0
-                            transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
+            if ((NSNull *)description != [NSNull null]) {
+                [self drawLabelCenteredAt:CGPointMake(CGRectGetMidX(frameInWindow), CGRectGetMidY(frameInWindow))
+                                 inWindow:window
+                                inContext:context 
+                                     text:description 
+                                textColor:[UIColor whiteColor] 
+                          backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
+                                 fontSize:18.0*scaleFactor
+                                transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
+            }
         }
     }
 }
 
 - (BOOL)locationIsInPrivateView:(CGPoint)location
 {
-    for (NSDictionary *dictionary in privateViews) {
-        UIView *view = [dictionary objectForKey:@"view"];
-        CGRect frameInWindow = [view convertRect:view.frame toView:view.window];
+    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+    
+    for (UIView *view in privateViews) {
+        CGRect frameInWindow = [view convertRect:view.bounds toView:keyWindow];
             
         if (CGRectContainsPoint(frameInWindow, location)) {
             return YES;
         }
     }
-    
+
+    if (keyboardWindow && hidesKeyboard) {
+        if (CGRectContainsPoint(keyboardFrame, location)) {
+            return YES;
+        }
+    }
+
     return NO;
 }
 
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context
 {
+    if (!window) return;
+    
     CGContextSaveGState(context);
     
-    // Flip the y-axis since Core Graphics starts with 0 at the bottom
-    CGContextScaleCTM(context, 1.0, -1.0);
-    CGContextTranslateCTM(context, 0, -window.frame.size.height * scaleFactor);
-    
-    CGRect scaledKeyboardFrame = CGRectMake(keyboardFrame.origin.x * scaleFactor,
-                                            keyboardFrame.origin.y * scaleFactor,
-                                            keyboardFrame.size.width * scaleFactor,
-                                            keyboardFrame.size.height * scaleFactor);
+    CGFloat contentScale = [[UIScreen mainScreen] scale];
+    CGRect scaledKeyboardFrame = CGRectMake(keyboardFrame.origin.x * scaleFactor * contentScale,
+                                            keyboardFrame.origin.y * scaleFactor * contentScale,
+                                            keyboardFrame.size.width * scaleFactor * contentScale,
+                                            keyboardFrame.size.height * scaleFactor * contentScale);
     
     CGContextSetGrayFillColor(context, 0.7, 1.0);
     CGContextFillRect(context, scaledKeyboardFrame);
@@ -393,7 +404,7 @@
                          text:@"Keyboard is hidden"
                     textColor:[UIColor blackColor]
               backgroundColor:[UIColor colorWithWhite:0.7 alpha:1.0]
-                     fontSize:24.0*scaleFactor
+                     fontSize:24.0*scaleFactor*contentScale
                     transform:CGAffineTransformMake(window.transform.a, window.transform.b, window.transform.c, window.transform.d, 0, 0)]; // Only take into account scale/rotation
     
     CGContextRestoreGState(context);
@@ -408,13 +419,13 @@
 
 #pragma mark - Notifications
 
-- (void)handleKeyboardWillShowNotification:(NSNotification *)notification
+- (void)handleKeyboardDidShowNotification:(NSNotification *)notification
 {
     keyboardWindow = [[self keyboardWindow] retain];
     keyboardFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 }
 
-- (void)handleKeyboardWillHideNotification:(NSNotification *)notification
+- (void)handleKeyboardDidHideNotification:(NSNotification *)notification
 {
     [keyboardWindow release];
     keyboardWindow = nil;

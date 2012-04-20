@@ -148,6 +148,11 @@ static Delight *sharedInstance = nil;
     [[self sharedInstance].screenshotController unregisterPrivateView:view];
 }
 
++ (NSSet *)privateViews
+{
+    return [self sharedInstance].screenshotController.privateViews;
+}
+
 #pragma mark -
 
 - (id)init
@@ -173,6 +178,7 @@ static Delight *sharedInstance = nil;
 		// create task controller
 		taskController = [[DLTaskController alloc] init];
 		taskController.sessionDelegate = self;
+		taskController.baseDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     }
     return self;
 }
