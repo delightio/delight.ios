@@ -9,6 +9,7 @@
 #import "DLTaskController.h"
 #import "Delight.h"
 #import "DLRecordingContext.h"
+#import "DLReachability.h"
 #import <UIKit/UIKit.h>
 
 @implementation DLTaskController
@@ -17,11 +18,17 @@
 @synthesize sessionDelegate = _sessionDelegate;
 @synthesize unfinishedContexts = _unfinishedContexts;
 @synthesize baseDirectory = _baseDirectory;
+@synthesize wifiReachability = _wifiReachability;
 @synthesize containsIncompleteSessions = _containsIncompleteSessions;
+@synthesize wifiConnected = _wifiConnected;
+@synthesize internetConnected = _internetConnected;
 
 - (id)init {
 	self = [super init];
 	_containsIncompleteSessions = [[NSFileManager defaultManager] fileExistsAtPath:[self unfinishedRecordingContextsArchiveFilePath]];
+	self.wifiReachability = [DLReachability reachabilityWithHostName:@"aws.amazon.com"];
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(handleReachabilityChangedNotification:) name:kReachabilityChangedNotification object: nil];
+	[_wifiReachability startNotifier];
 	return self;
 }
 
@@ -151,6 +158,19 @@
 	}
 }
 
-
+#pragma mark Notification
+- (void)handleReachabilityChangedNotification:(NSNotification *)aNotification {
+    NetworkStatus netStatus = [_wifiReachability currentReachabilityStatus];
+//    BOOL connectionRequired = [_wifiReachability connectionRequired];
+//	if ( !connectionRequired ) {
+		if ( netStatus == ReachableViaWiFi ) {
+			// we can upload video file
+			NSLog(@"reachable through Wi-Fi");
+		} else {
+			NSLog(@"not wifi reachable");
+		}
+//	}
+	//	NSLog(@"########## wifi reachable %d ###########", NM_WIFI_REACHABLE);
+}
 
 @end

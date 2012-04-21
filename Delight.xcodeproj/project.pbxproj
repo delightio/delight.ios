@@ -30,6 +30,9 @@
 		A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2B15338CC500003862 /* DLVideoEncoder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */; };
 		A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */; };
+		A98094571542A732002B2BCE /* DLReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = A98094551542A732002B2BCE /* DLReachability.h */; };
+		A98094581542A732002B2BCE /* DLReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A98094561542A732002B2BCE /* DLReachability.m */; };
+		A980945F1542B221002B2BCE /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A980945E1542B221002B2BCE /* SystemConfiguration.framework */; };
 		A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */; };
 		A9A9A3D11536EBBA00B6E4AB /* DLTaskController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */; };
 		A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A9A3D715371A3E00B6E4AB /* UIKit.framework */; };
@@ -73,6 +76,9 @@
 		A9508D311537E99B001853A0 /* DLTaskHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DLTaskHeader.h; sourceTree = "<group>"; };
 		A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLPostVideoTask.h; sourceTree = "<group>"; };
 		A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLPostVideoTask.m; sourceTree = "<group>"; };
+		A98094551542A732002B2BCE /* DLReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLReachability.h; sourceTree = "<group>"; };
+		A98094561542A732002B2BCE /* DLReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLReachability.m; sourceTree = "<group>"; };
+		A980945E1542B221002B2BCE /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTaskController.h; sourceTree = "<group>"; };
 		A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTaskController.m; sourceTree = "<group>"; };
 		A9A9A3D715371A3E00B6E4AB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -93,6 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A980945F1542B221002B2BCE /* SystemConfiguration.framework in Frameworks */,
 				A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */,
 				83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */,
 				83B896AF14EAEFBF006D93C2 /* AssetsLibrary.framework in Frameworks */,
@@ -128,6 +135,7 @@
 		83B8968414EAEC68006D93C2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A980945E1542B221002B2BCE /* SystemConfiguration.framework */,
 				A9A9A3D715371A3E00B6E4AB /* UIKit.framework */,
 				83B896B614EAF090006D93C2 /* OpenGLES.framework */,
 				83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */,
@@ -176,6 +184,8 @@
 			isa = PBXGroup;
 			children = (
 				A9A9A3DD15371E6A00B6E4AB /* Tasks */,
+				A98094551542A732002B2BCE /* DLReachability.h */,
+				A98094561542A732002B2BCE /* DLReachability.m */,
 				A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */,
 				A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */,
 				A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */,
@@ -222,6 +232,7 @@
 				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
+				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,6 +358,7 @@
 				839162701537C21000549347 /* DLGestureTracker.m in Sources */,
 				83827A561538BD82002EA080 /* DLGesture.m in Sources */,
 				A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */,
+				A98094581542A732002B2BCE /* DLReachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
