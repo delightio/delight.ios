@@ -13,7 +13,7 @@
 #import "UIWindow+DLInterceptEvents.h"
 #import "DLTaskController.h"
 
-#define kDLDefaultScaleFactor 1.0f
+#define kDLDefaultScaleFactor 0.5f
 #define kDLDefaultMaximumFrameRate 30.0f
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
 #define kDLStartingFrameRate 5.0f
