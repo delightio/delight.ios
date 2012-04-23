@@ -22,6 +22,12 @@
 static Delight *sharedInstance = nil;
 
 @interface Delight ()
+// OpenGL ES beta methods
++ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
++ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
+
++ (Delight *)sharedInstance;
 - (void)startRecording;
 - (void)stopRecording;
 - (void)pause;
