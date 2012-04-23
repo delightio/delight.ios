@@ -32,7 +32,6 @@
 @property (nonatomic, retain) DLReachability * wifiReachability;
 @property (nonatomic) BOOL containsIncompleteSessions;
 @property (nonatomic) BOOL wifiConnected;
-@property (nonatomic) BOOL internetConnected;
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)uploadSession:(DLRecordingContext *)aSession;

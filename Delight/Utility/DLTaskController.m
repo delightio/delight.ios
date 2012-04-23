@@ -21,7 +21,6 @@
 @synthesize wifiReachability = _wifiReachability;
 @synthesize containsIncompleteSessions = _containsIncompleteSessions;
 @synthesize wifiConnected = _wifiConnected;
-@synthesize internetConnected = _internetConnected;
 
 - (id)init {
 	self = [super init];
@@ -85,7 +84,7 @@
 			[self.queue addOperation:sessTask];
 			[sessTask release];
 		}
-		if ( aSession.shouldRecordVideo ) {
+		if ( aSession.shouldRecordVideo && (!aSession.wifiUploadOnly || (_wifiConnected && aSession.wifiUploadOnly)) ) {
 			if ( [aSession shouldCompleteTask:DLFinishedUploadVideoFile] ) {
 				DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
@@ -165,9 +164,9 @@
 //	if ( !connectionRequired ) {
 		if ( netStatus == ReachableViaWiFi ) {
 			// we can upload video file
-			NSLog(@"reachable through Wi-Fi");
+			_wifiConnected = YES;
 		} else {
-			NSLog(@"not wifi reachable");
+			_wifiConnected = NO;
 		}
 //	}
 	//	NSLog(@"########## wifi reachable %d ###########", NM_WIFI_REACHABLE);
