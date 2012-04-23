@@ -12,6 +12,16 @@
 #import "DLReachability.h"
 #import <UIKit/UIKit.h>
 
+@interface DLTaskController (PrivateMethods)
+
+- (void)createUploadTasksForSession:(DLRecordingContext *)ctx priority:(NSOperationQueuePriority)aPriority;
+/*!
+ S3 pre-signed URL has an expiry date. If the pre-signed URL has been expired, we should get a new pre-signed URL
+ */
+- (void)renewUploadURLForSession:(DLRecordingContext *)ctx;
+
+@end
+
 @implementation DLTaskController
 @synthesize queue = _queue;
 @synthesize task = _task;
@@ -70,56 +80,13 @@
 		// upload next time when the app is launched
 		return;
 	} else {
-		// upload in the background
-		UIBackgroundTaskIdentifier bgIdf = UIBackgroundTaskInvalid;
-		if ( [aSession shouldCompleteTask:DLFinishedUpdateSession] ) {
-			DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
-			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-				// task expires. clean it up if it has not finished yet
-				[sessTask cancel];
-				[self saveUnfinishedRecordingContext:aSession];
-				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-			}];
-			sessTask.taskController = self;
-			sessTask.backgroundTaskIdentifier = bgIdf;
-			sessTask.recordingContext = aSession;
-			[self.queue addOperation:sessTask];
-			[sessTask release];
-		}
-		if ( aSession.shouldRecordVideo && (!aSession.wifiUploadOnly || (_wifiConnected && aSession.wifiUploadOnly)) ) {
-			if ( [aSession shouldCompleteTask:DLFinishedUploadVideoFile] ) {
-				// check if the link has expired
-				if ( [aSession.uploadURLExpiryDate timeIntervalSinceNow] > 5.0 ) {
-					// uplaod URL is still valid. Continue to upload
-					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
-					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-						// task expires. clean it up if it has not finished yet
-						[uploadTask cancel];
-						[self saveUnfinishedRecordingContext:aSession];
-						[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-					}];
-					uploadTask.taskController = self;
-					uploadTask.backgroundTaskIdentifier = bgIdf;
-					uploadTask.recordingContext = aSession;
-					[self.queue addOperation:uploadTask];
-					[uploadTask release];
-				} else {
-					// renew the upload URL
-					[self renewUploadURL];
-				}
-			} else if ( [aSession shouldCompleteTask:DLFinishedPostVideo] ) {
-				DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
-				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-					// task expires. clean it up if it has not finished yet
-					[postTask cancel];
-					[self saveUnfinishedRecordingContext:aSession];
-					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-				}];
-				postTask.taskController = self;
-				postTask.backgroundTaskIdentifier = bgIdf;
-				postTask.recordingContext = aSession;
-				[self.queue addOperation:postTask];
-				[postTask release];
+		// give priority to upload the current session
+		[self createUploadTasksForSession:aSession priority:NSOperationQueuePriorityHigh];
+		if ( _containsIncompleteSessions ) {
+			// unarchive the file
+			self.unfinishedContexts = [NSKeyedUnarchiver unarchiveObjectWithFile:[self unfinishedRecordingContextsArchiveFilePath]];
+			for (DLRecordingContext * ctx in _unfinishedContexts) {
+				[self createUploadTasksForSession:ctx priority:NSOperationQueuePriorityNormal];
 			}
 		}
 	}
@@ -141,7 +108,64 @@
 	}
 }
 
-- (void)renewUploadURL {
+#pragma mark Private Methods
+
+- (void)createUploadTasksForSession:(DLRecordingContext *)ctx priority:(NSOperationQueuePriority)aPriority {
+	// upload in the background
+	UIBackgroundTaskIdentifier bgIdf = UIBackgroundTaskInvalid;
+	if ( [ctx shouldCompleteTask:DLFinishedUpdateSession] ) {
+		DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
+		bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+			// task expires. clean it up if it has not finished yet
+			[sessTask cancel];
+			[self saveUnfinishedRecordingContext:ctx];
+			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+		}];
+		sessTask.taskController = self;
+		sessTask.backgroundTaskIdentifier = bgIdf;
+		sessTask.recordingContext = ctx;
+		[self.queue addOperation:sessTask];
+		[sessTask release];
+	}
+	if ( ctx.shouldRecordVideo && (!ctx.wifiUploadOnly || (_wifiConnected && ctx.wifiUploadOnly)) ) {
+		if ( [ctx shouldCompleteTask:DLFinishedUploadVideoFile] ) {
+			// check if the link has expired
+			if ( [ctx.uploadURLExpiryDate timeIntervalSinceNow] > 5.0 ) {
+				// uplaod URL is still valid. Continue to upload
+				DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
+				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+					// task expires. clean it up if it has not finished yet
+					[uploadTask cancel];
+					[self saveUnfinishedRecordingContext:ctx];
+					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+				}];
+				uploadTask.taskController = self;
+				uploadTask.backgroundTaskIdentifier = bgIdf;
+				uploadTask.recordingContext = ctx;
+				[self.queue addOperation:uploadTask];
+				[uploadTask release];
+			} else {
+				// renew the upload URL
+				[self renewUploadURLForSession:ctx];
+			}
+		} else if ( [ctx shouldCompleteTask:DLFinishedPostVideo] ) {
+			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
+			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+				// task expires. clean it up if it has not finished yet
+				[postTask cancel];
+				[self saveUnfinishedRecordingContext:ctx];
+				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+			}];
+			postTask.taskController = self;
+			postTask.backgroundTaskIdentifier = bgIdf;
+			postTask.recordingContext = ctx;
+			[self.queue addOperation:postTask];
+			[postTask release];
+		}
+	}
+}
+
+- (void)renewUploadURLForSession:(DLRecordingContext *)ctx {
 	
 }
 
@@ -158,7 +182,7 @@
 }
 
 - (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx {
-	if ( [ctx.finishedTaskIndex count] && !ctx.saved) {
+	if ( !ctx.loadedFromArchive && [ctx.finishedTaskIndex count] && !ctx.saved) {
 		// contains incomplete task and require saving
 		if ( _unfinishedContexts == nil ) {
 			_unfinishedContexts = [[NSMutableArray alloc] initWithCapacity:4];
