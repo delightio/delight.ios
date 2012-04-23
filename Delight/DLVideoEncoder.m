@@ -7,6 +7,7 @@
 //
 
 #import "DLVideoEncoder.h"
+#include <sys/xattr.h>
 
 #define kDLDefaultBitRate 500.0*1024.0
 
@@ -14,6 +15,7 @@
 - (BOOL)setupWriter;
 - (void)cleanupWriter;
 - (NSURL *)tempFileURL;
+- (BOOL)addSkipBackupAttributeToItemAtURL:(NSURL *)URL;
 @end
 
 @implementation DLVideoEncoder
@@ -213,13 +215,16 @@
     
     @synchronized(self) {
         BOOL success = [videoWriter finishWriting];
-        if (!success) {
+        if (success) {
+            NSURL *outputURL = [NSURL fileURLWithPath:outputPath];
+            [self addSkipBackupAttributeToItemAtURL:outputURL];
+
+            DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
+        } else {
             DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
         }
         
-        [self cleanupWriter];
-        
-        DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
+        [self cleanupWriter];        
     }
     
     [pool drain];
@@ -248,6 +253,17 @@
     }
     
     return [outputURL autorelease];
+}
+
+- (BOOL)addSkipBackupAttributeToItemAtURL:(NSURL *)URL
+{
+    const char* filePath = [[URL path] fileSystemRepresentation];
+    
+    const char* attrName = "com.apple.MobileBackup";
+    u_int8_t attrValue = 1;
+    
+    int result = setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
+    return result == 0;
 }
 
 @end

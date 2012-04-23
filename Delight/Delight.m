@@ -200,6 +200,9 @@ static Delight *sharedInstance = nil;
 - (void)startRecording
 {
     if (!videoEncoder.recording) {
+        NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", documentsPath, (recordingContext ? recordingContext.sessionID : @"output")];
+        
         [videoEncoder startNewRecording];
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
@@ -339,7 +342,6 @@ static Delight *sharedInstance = nil;
 
 - (void)tryCreateNewSession {
 #ifdef DL_OFFLINE_RECORDING
-    videoEncoder.outputPath = [NSString stringWithFormat:@"%@/output.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
     [self startRecording];
 #else
 	[taskController requestSessionIDWithAppToken:self.appToken];
@@ -351,8 +353,6 @@ static Delight *sharedInstance = nil;
 	recordingContext = [ctx retain];
 	if ( recordingContext.shouldRecordVideo ) {
 		// start recording
-		videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], ctx.sessionID];
-		
 		[self startRecording];
 	} else {
 		// there's no need to record the session. Clean up video encoder?
