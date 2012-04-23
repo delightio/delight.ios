@@ -44,6 +44,12 @@
 	[postTask release];
 	
 	[self.recordingContext setTaskFinished:DLFinishedUploadVideoFile];
+	// delete video file
+	NSError * err = nil;
+	if ( ![[NSFileManager defaultManager] removeItemAtPath:self.recordingContext.filePath error:&err] ) {
+		// can't remove the file successfully
+		NSLog(@"can't delete uploaded video file: %@", self.recordingContext.filePath);
+	}
 	if ( [self.recordingContext allTasksFinished] ) {
 		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
