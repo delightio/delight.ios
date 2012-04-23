@@ -11,6 +11,7 @@ Basic Setup
     * CoreVideo
     * OpenGLES
     * QuartzCore
+    * SystemConfiguration
 
 2. In your build settings, add `-ObjC` to "Other Linker Flags".
 
