@@ -22,6 +22,7 @@ typedef enum {
 
 @property (nonatomic, retain) NSString * sessionID;
 @property (nonatomic, retain) NSString * uploadURLString;
+@property (nonatomic, retain) NSDate * uploadURLExpiryDate;
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic, retain) NSDate * startTime;

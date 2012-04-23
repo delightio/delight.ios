@@ -10,6 +10,7 @@
 #import "DLTaskHeader.h"
 
 @class DLTaskController;
+@class DLReachability;
 
 @protocol DLRecordingSessionDelegate;
 //@protocol DLRecordingSessionDelegate <NSObject>
@@ -28,7 +29,9 @@
 @property (nonatomic, assign) id<DLRecordingSessionDelegate> sessionDelegate;
 @property (nonatomic, retain) NSMutableArray * unfinishedContexts;
 @property (nonatomic, retain) NSString * baseDirectory;
+@property (nonatomic, retain) DLReachability * wifiReachability;
 @property (nonatomic) BOOL containsIncompleteSessions;
+@property (nonatomic) BOOL wifiConnected;
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)uploadSession:(DLRecordingContext *)aSession;
