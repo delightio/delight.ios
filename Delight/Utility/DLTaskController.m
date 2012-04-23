@@ -88,18 +88,25 @@
 		}
 		if ( aSession.shouldRecordVideo && (!aSession.wifiUploadOnly || (_wifiConnected && aSession.wifiUploadOnly)) ) {
 			if ( [aSession shouldCompleteTask:DLFinishedUploadVideoFile] ) {
-				DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
-				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-					// task expires. clean it up if it has not finished yet
-					[uploadTask cancel];
-					[self saveUnfinishedRecordingContext:aSession];
-					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-				}];
-				uploadTask.taskController = self;
-				uploadTask.backgroundTaskIdentifier = bgIdf;
-				uploadTask.recordingContext = aSession;
-				[self.queue addOperation:uploadTask];
-				[uploadTask release];
+				// check if the link has expired
+				if ( [aSession.uploadURLExpiryDate timeIntervalSinceNow] > 5.0 ) {
+					// uplaod URL is still valid. Continue to upload
+					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
+					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+						// task expires. clean it up if it has not finished yet
+						[uploadTask cancel];
+						[self saveUnfinishedRecordingContext:aSession];
+						[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+					}];
+					uploadTask.taskController = self;
+					uploadTask.backgroundTaskIdentifier = bgIdf;
+					uploadTask.recordingContext = aSession;
+					[self.queue addOperation:uploadTask];
+					[uploadTask release];
+				} else {
+					// renew the upload URL
+					[self renewUploadURL];
+				}
 			} else if ( [aSession shouldCompleteTask:DLFinishedPostVideo] ) {
 				DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
@@ -132,6 +139,10 @@
 			[[NSFileManager defaultManager] removeItemAtPath:[self unfinishedRecordingContextsArchiveFilePath] error:nil];
 		}
 	}
+}
+
+- (void)renewUploadURL {
+	
 }
 
 #pragma mark Task Management

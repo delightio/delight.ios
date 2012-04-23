@@ -58,7 +58,15 @@ NSString * const DLRecordElementName = @"recording";
 		self.recordingContext = [[[DLRecordingContext alloc] init] autorelease];
 	} else if ( [elementName isEqualToString:DLUploadURIElementName] ) {
 		// we can get the URI directly from the attribute
-		self.recordingContext.uploadURLString = [attributeDict objectForKey:@"screen"];
+		NSString * strURL = [attributeDict objectForKey:@"screen"];
+		self.recordingContext.uploadURLString = strURL;
+		// get expiry timestamp
+		NSRange firstRange = [strURL rangeOfString:@"Expires="];
+		NSRange nextRange = [strURL rangeOfString:@"&" options:0 range:NSMakeRange(firstRange.length + firstRange.location, [strURL length] - firstRange.length - firstRange.location)];
+		NSString * dateStr = [strURL substringWithRange:NSMakeRange(firstRange.length + firstRange.location, nextRange.location - firstRange.length - firstRange.location)];
+		if ( dateStr ) {
+			self.recordingContext.uploadURLExpiryDate = [NSDate dateWithTimeIntervalSince1970:[dateStr doubleValue]];
+		}
 	} else {
 		// prepare the string buffer
 		_contentOfCurrentProperty = [[NSMutableString alloc] initWithCapacity:16];

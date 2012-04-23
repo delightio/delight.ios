@@ -39,6 +39,7 @@
 // session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath;
 - (void)removeRecordingContext:(DLRecordingContext *)ctx;
+- (void)renewUploadURL;
 // task management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;
 - (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx;
