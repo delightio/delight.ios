@@ -32,6 +32,8 @@
 }
 
 - (void)dealloc {
+	[_wifiReachability stopNotifier];
+	[_wifiReachability release];
 	[_queue cancelAllOperations];
 	[_queue release];
 	[_unfinishedContexts release];
