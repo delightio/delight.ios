@@ -23,6 +23,7 @@
 @synthesize recording;
 @synthesize paused;
 @synthesize encodesRawGLBytes;
+@synthesize savesToPhotoAlbum;
 @synthesize outputPath;
 @synthesize videoSize;
 @synthesize averageBitRate;
@@ -63,7 +64,9 @@
         recording = NO;
         [self completeRecordingSession];
         
-        UISaveVideoAtPathToSavedPhotosAlbum([self outputPath], nil, nil, nil);
+        if (savesToPhotoAlbum) {
+            UISaveVideoAtPathToSavedPhotosAlbum([self outputPath], nil, nil, nil);
+        }
     }
 }
 

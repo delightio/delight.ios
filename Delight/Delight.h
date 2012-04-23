@@ -89,6 +89,10 @@
 + (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate;
 + (NSUInteger)maximumFrameRate;
 
+// Set whether recordings are copied to the user's photo album
++ (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
++ (BOOL)savesToPhotoAlbum;
+
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;
 + (BOOL)hidesKeyboardInRecording;

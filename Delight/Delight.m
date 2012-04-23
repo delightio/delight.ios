@@ -128,6 +128,16 @@ static Delight *sharedInstance = nil;
     [self sharedInstance].maximumFrameRate = maximumFrameRate;
 }
 
++ (BOOL)savesToPhotoAlbum
+{
+    return [self sharedInstance].videoEncoder.savesToPhotoAlbum;
+}
+
++ (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum
+{
+    [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
+}
+
 + (BOOL)hidesKeyboardInRecording
 {
     return [self sharedInstance].screenshotController.hidesKeyboard;

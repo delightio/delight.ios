@@ -29,6 +29,7 @@
 @property (nonatomic, readonly, getter=isRecording) BOOL recording;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, assign) BOOL encodesRawGLBytes;
+@property (nonatomic, assign) BOOL savesToPhotoAlbum;
 @property (nonatomic, retain) NSString *outputPath;
 @property (nonatomic, assign) CGSize videoSize;
 @property (nonatomic, assign) double averageBitRate;
