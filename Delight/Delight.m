@@ -13,7 +13,11 @@
 #import "UIWindow+DLInterceptEvents.h"
 #import "DLTaskController.h"
 
-#define kDLDefaultScaleFactor 0.5f
+#define kDLDefaultScaleFactor_iPad2x   0.25f
+#define kDLDefaultScaleFactor_iPad     0.5f
+#define kDLDefaultScaleFactor_iPhone2x 0.5f
+#define kDLDefaultScaleFactor_iPhone   0.5f
+
 #define kDLDefaultMaximumFrameRate 30.0f
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
 #define kDLStartingFrameRate 5.0f
@@ -180,7 +184,20 @@ static Delight *sharedInstance = nil;
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
         
-        self.scaleFactor = kDLDefaultScaleFactor;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+            if ([UIScreen mainScreen].scale == 1.0) {
+                self.scaleFactor = kDLDefaultScaleFactor_iPad;
+            } else {
+                self.scaleFactor = kDLDefaultScaleFactor_iPad2x;                
+            }
+        } else {
+            if ([UIScreen mainScreen].scale == 1.0) {
+                self.scaleFactor = kDLDefaultScaleFactor_iPhone;
+            } else {
+                self.scaleFactor = kDLDefaultScaleFactor_iPhone2x;                
+            }
+        }
+        
         self.maximumFrameRate = kDLDefaultMaximumFrameRate;
         self.maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
