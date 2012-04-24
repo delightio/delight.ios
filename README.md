@@ -26,7 +26,7 @@ By default, recordings will be at 50% scale for iPhones and non-Retina iPads, an
 
 ### Frame Rate ###
 
-The frame rate will auto-adjust to become as high as possible. This may use up a lot of CPU, so you may want to reduce the frame rate to limit the effect on your app. To do so, call `[Delight setMaximumFrameRate:]` with the new maximum frame rate. You may need to experiment to find the right value. By default, the maximum frame rate is 30.
+The frame rate will auto-adjust to become as high as possible. This may use up a lot of CPU, so you may want to reduce the frame rate to limit the effect on your app. To do so, call `[Delight setMaximumFrameRate:]` with the new maximum frame rate (in frames per second). You may need to experiment to find the right value. By default the maximum frame rate is 30 fps.
 
 ### Recording Control ###
 
