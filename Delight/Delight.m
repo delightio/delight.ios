@@ -218,13 +218,12 @@ static Delight *sharedInstance = nil;
     if (!videoEncoder.recording) {
         // Identify and create the cache directory if it doesn't already exist
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *bundleName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
-        NSString *cachePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:bundleName];
-        cachePath = [cachePath stringByAppendingPathComponent:@"Delight"];
+        NSString *cachePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"com.pipely.delight"];
+        cachePath = [cachePath stringByAppendingPathComponent:@"Videos"];
         BOOL isDir = NO;
         NSError *error;
-        if (! [[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && !isDir) {
-            [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:&error];
+        if (![[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && !isDir) {
+            [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:YES attributes:nil error:&error];
         }
         
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
