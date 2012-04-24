@@ -15,7 +15,6 @@
 - (BOOL)setupWriter;
 - (void)cleanupWriter;
 - (NSURL *)tempFileURL;
-- (BOOL)addSkipBackupAttributeToItemAtURL:(NSURL *)URL;
 @end
 
 @implementation DLVideoEncoder
@@ -219,9 +218,6 @@
     @synchronized(self) {
         BOOL success = [videoWriter finishWriting];
         if (success) {
-            NSURL *outputURL = [NSURL fileURLWithPath:outputPath];
-            [self addSkipBackupAttributeToItemAtURL:outputURL];
-
             DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
         } else {
             DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
@@ -256,17 +252,6 @@
     }
     
     return [outputURL autorelease];
-}
-
-- (BOOL)addSkipBackupAttributeToItemAtURL:(NSURL *)URL
-{
-    const char* filePath = [[URL path] fileSystemRepresentation];
-    
-    const char* attrName = "com.apple.MobileBackup";
-    u_int8_t attrValue = 1;
-    
-    int result = setxattr(filePath, attrName, &attrValue, sizeof(attrValue), 0, 0);
-    return result == 0;
 }
 
 @end
