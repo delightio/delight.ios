@@ -74,7 +74,13 @@
     if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
         DLDebugLog(@"Not ready for video data");
     } else {
-        float millisElapsed = ([[NSDate date] timeIntervalSince1970] - recordingStartTime - totalPauseDuration) * 1000.0;
+        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+        if (recordingStartTime < 0) {
+            // This is the first frame
+            recordingStartTime = now;
+        }
+        
+        float millisElapsed = (now - recordingStartTime - totalPauseDuration) * 1000.0;
         CMTime time = CMTimeMake((int)millisElapsed, 1000);
         
         @synchronized (self) {
@@ -127,7 +133,12 @@
     }
     
     // May need to add a check here, because if two consecutive times with the same value are added to the movie, it aborts recording
-    float millisElapsed = ([[NSDate date] timeIntervalSince1970] - recordingStartTime - totalPauseDuration) * 1000.0;
+    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    if (recordingStartTime < 0) {
+        // This is the first frame
+        recordingStartTime = now;
+    }
+    float millisElapsed = (now - recordingStartTime - totalPauseDuration) * 1000.0;
     CMTime time = CMTimeMake((int)millisElapsed, 1000);
     
     if (![avAdaptor appendPixelBuffer:pixel_buffer withPresentationTime:time]){
@@ -184,7 +195,7 @@
     [videoWriter startWriting];
     [videoWriter startSessionAtSourceTime:CMTimeMake(0, 1000)];
     
-    recordingStartTime = [[NSDate date] timeIntervalSince1970];
+    recordingStartTime = -1;
     totalPauseDuration = 0.0f;
     
     // Create our own pixel buffer, since when encoding raw bytes we need the buffer to be at least 1 byte larger
