@@ -93,11 +93,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context
 {    
     // Draw touch points
-    CGContextSetRGBStrokeColor(context, 0, 0, 1, 0.7);
-    CGContextSetLineWidth(context, 5.0);
-    CGContextSetLineJoin(context, kCGLineJoinRound);
     CGFloat scale = [UIScreen mainScreen].scale;
+    CGContextSetRGBStrokeColor(context, 0, 0, 1, 0.7);
+    CGContextSetLineJoin(context, kCGLineJoinRound);
+    CGContextSetLineWidth(context, 5 * scaleFactor * scale);
     CGFloat tapCircleRadius = 7 * scaleFactor * scale;
+    CGFloat arrowSize = 50 * scaleFactor * scale;
     
     NSMutableSet *allGestures = [[NSMutableSet alloc] init];
     @synchronized(self) {
@@ -145,8 +146,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                         
                         CGContextSetRGBFillColor(context, 0, 0, 1, 1.0); 
                         CGContextMoveToPoint(context, scaledLocation.x, scaledLocation.y);
-                        CGContextAddLineToPoint(context, scaledLocation.x + 50*cos(angle + M_PI + M_PI/8), scaledLocation.y + 50*sin(angle + M_PI + M_PI/8));
-                        CGContextAddLineToPoint(context, scaledLocation.x + 50*cos(angle + M_PI - M_PI/8), scaledLocation.y + 50*sin(angle + M_PI - M_PI/8));
+                        CGContextAddLineToPoint(context, scaledLocation.x + arrowSize*cos(angle + M_PI + M_PI/8), scaledLocation.y + arrowSize*sin(angle + M_PI + M_PI/8));
+                        CGContextAddLineToPoint(context, scaledLocation.x + arrowSize*cos(angle + M_PI - M_PI/8), scaledLocation.y + arrowSize*sin(angle + M_PI - M_PI/8));
                         CGContextAddLineToPoint(context, scaledLocation.x, scaledLocation.y);
                         CGContextFillPath(context);
                     }

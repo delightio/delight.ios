@@ -254,7 +254,7 @@ static Delight *sharedInstance = nil;
                 frameRate = maximumFrameRate;
             }
             
-            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+            [self screenshotTimerFired];
         }
     }
 }
