@@ -211,7 +211,7 @@ static Delight *sharedInstance = nil;
 		// create task controller
 		taskController = [[DLTaskController alloc] init];
 		taskController.sessionDelegate = self;
-		taskController.baseDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+		taskController.baseDirectory = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"com.pipely.delight"];
     }
     return self;
 }
