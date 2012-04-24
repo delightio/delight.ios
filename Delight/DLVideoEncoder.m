@@ -7,6 +7,7 @@
 //
 
 #import "DLVideoEncoder.h"
+#include <sys/xattr.h>
 
 #define kDLDefaultBitRate 500.0*1024.0
 
@@ -21,6 +22,7 @@
 @synthesize recording;
 @synthesize paused;
 @synthesize encodesRawGLBytes;
+@synthesize savesToPhotoAlbum;
 @synthesize outputPath;
 @synthesize videoSize;
 @synthesize averageBitRate;
@@ -61,7 +63,9 @@
         recording = NO;
         [self completeRecordingSession];
         
-        UISaveVideoAtPathToSavedPhotosAlbum([self outputPath], nil, nil, nil);
+        if (savesToPhotoAlbum) {
+            UISaveVideoAtPathToSavedPhotosAlbum([self outputPath], nil, nil, nil);
+        }
     }
 }
 
@@ -213,13 +217,13 @@
     
     @synchronized(self) {
         BOOL success = [videoWriter finishWriting];
-        if (!success) {
+        if (success) {
+            DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
+        } else {
             DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
         }
         
-        [self cleanupWriter];
-        
-        DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
+        [self cleanupWriter];        
     }
     
     [pool drain];

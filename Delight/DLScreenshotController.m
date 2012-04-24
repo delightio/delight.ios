@@ -355,7 +355,7 @@
                                      text:description 
                                 textColor:[UIColor whiteColor] 
                           backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
-                                 fontSize:18.0*scaleFactor
+                                 fontSize:18.0
                                 transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
             }
         }

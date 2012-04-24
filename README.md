@@ -11,6 +11,7 @@ Basic Setup
     * CoreVideo
     * OpenGLES
     * QuartzCore
+    * SystemConfiguration
 
 2. In your build settings, add `-ObjC` to "Other Linker Flags".
 
@@ -23,12 +24,6 @@ Advanced Setup
 
 By default, it will record at a scale factor of 1 (full size) at as many frames per second as possible. This may use up a lot of CPU, so you may want to scale down the video or limit the frame rate. To do so, call `[Delight setScaleFactor:]` and/or `[Delight setMaximumFrameRate:]` before `[Delight startWithAppToken:]`.
 
-### OpenGL ES Support ###
-
-OpenGL ES screen capturing requires some extra work. You must call `[Delight startOpenGLWithAppToken:encodeRawBytes:]` rather than `[Delight startWithAppToken:]`. The encodesRawBytes parameter is used to toggle a performance boost; when enabled, capturing is faster, but gestures are not shown and the scale factor cannot be changed.
-
-Additionally, you must call `[Delight takeOpenGLScreenshot:colorRenderBuffer:]` with your EAGLView and renderbuffer before calling `presentRenderbuffer:` in your rendering loop. If you are using a GLKView and don't have access to the renderbuffer, you can call `[Delight takeOpenGLScreenshot:backingWidth:backingHeight:]` instead and pass your GLKView along with its renderWidth and renderHeight.
-
 ### Pause/Resume ###
 
 Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To stop recording altogether, call `[Delight stop]`.
@@ -40,6 +35,11 @@ You may not want to record certain views, such as password prompts. Call `[Delig
 ### Hiding the Keyboard ###
 
 To prevent the keyboard from being recorded, call `[Delight setHidesKeyboardInRecording:YES]`.
+
+OpenGL ES Support
+-----------------
+
+Currently delight.io only supports UIKit apps. OpenGL ES support is in the works, however, and interested parties should email us at [opengl@delight.io](mailto:opengl@delight.io) to sign up for the beta.
 
 Troubleshooting
 ---------------

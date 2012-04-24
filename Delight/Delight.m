@@ -22,6 +22,12 @@
 static Delight *sharedInstance = nil;
 
 @interface Delight ()
+// OpenGL ES beta methods
++ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
++ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
+
++ (Delight *)sharedInstance;
 - (void)startRecording;
 - (void)stopRecording;
 - (void)pause;
@@ -128,6 +134,16 @@ static Delight *sharedInstance = nil;
     [self sharedInstance].maximumFrameRate = maximumFrameRate;
 }
 
++ (BOOL)savesToPhotoAlbum
+{
+    return [self sharedInstance].videoEncoder.savesToPhotoAlbum;
+}
+
++ (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum
+{
+    [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
+}
+
 + (BOOL)hidesKeyboardInRecording
 {
     return [self sharedInstance].screenshotController.hidesKeyboard;
@@ -200,6 +216,19 @@ static Delight *sharedInstance = nil;
 - (void)startRecording
 {
     if (!videoEncoder.recording) {
+        // Identify and create the cache directory if it doesn't already exist
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *bundleName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+        NSString *cachePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:bundleName];
+        cachePath = [cachePath stringByAppendingPathComponent:@"Delight"];
+        BOOL isDir = NO;
+        NSError *error;
+        if (! [[NSFileManager defaultManager] fileExistsAtPath:cachePath isDirectory:&isDir] && !isDir) {
+            [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:NO attributes:nil error:&error];
+        }
+        
+        videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
+        
         [videoEncoder startNewRecording];
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
@@ -339,7 +368,6 @@ static Delight *sharedInstance = nil;
 
 - (void)tryCreateNewSession {
 #ifdef DL_OFFLINE_RECORDING
-    videoEncoder.outputPath = [NSString stringWithFormat:@"%@/output.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
     [self startRecording];
 #else
 	[taskController requestSessionIDWithAppToken:self.appToken];
@@ -351,8 +379,6 @@ static Delight *sharedInstance = nil;
 	recordingContext = [ctx retain];
 	if ( recordingContext.shouldRecordVideo ) {
 		// start recording
-		videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0], ctx.sessionID];
-		
 		[self startRecording];
 	} else {
 		// there's no need to record the session. Clean up video encoder?

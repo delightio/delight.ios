@@ -25,13 +25,14 @@
 	NSLog(@"updated session: %@", str);
 	[str release];
 	[self.recordingContext setTaskFinished:DLFinishedUpdateSession];
-	if ( self.backgroundTaskIdentifier != UIBackgroundTaskInvalid ) {
+	if ( [self.recordingContext allTasksFinished] ) {
+		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
-	}
-	if ( self.recordingContext.loadedFromArchive && [self.recordingContext allTasksFinished] ) {
-		// remove the task from incomplete array
-		[self.taskController removeRecordingContext:self.recordingContext];
+		if ( self.recordingContext.loadedFromArchive ) {
+			// remove the task from incomplete array
+			[self.taskController removeRecordingContext:self.recordingContext];
+		}
 	}
 }
 

@@ -11,6 +11,7 @@
 @implementation DLRecordingContext
 @synthesize sessionID = _sessionID;
 @synthesize uploadURLString = _uploadURLString;
+@synthesize uploadURLExpiryDate = _uploadURLExpiryDate;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize startTime = _startTime;
@@ -26,6 +27,7 @@
 	self = [super init];
 	self.sessionID = [aDecoder decodeObjectForKey:@"sessionID"];
 	self.uploadURLString = [aDecoder decodeObjectForKey:@"uploadURLString"];
+	self.uploadURLExpiryDate = [aDecoder decodeObjectForKey:@"uploadURLExpiryDate"];
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
 	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
 	self.startTime = [aDecoder decodeObjectForKey:@"startTime"];
@@ -42,6 +44,7 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder {
 	[aCoder encodeObject:_sessionID forKey:@"sessionID"];
 	[aCoder encodeObject:_uploadURLString forKey:@"uploadURLString"];
+	[aCoder encodeObject:_uploadURLExpiryDate forKey:@"uploadURLExpiryDate"];
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
 	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
 	[aCoder encodeObject:_startTime forKey:@"startTime"];
@@ -55,6 +58,7 @@
 - (void)dealloc {
 	[_sessionID release];
 	[_uploadURLString release];
+	[_uploadURLExpiryDate release];
 	[_startTime release];
 	[_endTime release];
 	[_filePath release];

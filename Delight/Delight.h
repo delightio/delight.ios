@@ -47,35 +47,19 @@
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
 @property (nonatomic, readonly) DLGestureTracker *gestureTracker;
 
-/**************
- * UIKit apps *
- **************/
-
-// Start recording
-+ (void)startWithAppToken:(NSString *)appToken;
-
-// Manually trigger a screen capture. Doesn't need to be called, but can be used if you want to ensure
-// that a screenshot is taken at a particular time.
-+ (void)takeScreenshot;
-
-/******************
- * OpenGL ES apps *
- ******************/
-
-// Start recording
-+ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
-
-// Either of these must be called at the end of your render loop
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
-+ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-
 /*********************
  * Recording control *
  *********************/
 
+// Start/stop/pause/resume recording
++ (void)startWithAppToken:(NSString *)appToken;
 + (void)stop;
 + (void)pause;
 + (void)resume;
+
+// Manually trigger a screen capture. Doesn't need to be called, but can be used if you want to ensure
+// that a screenshot is taken at a particular time.
++ (void)takeScreenshot;
 
 /*****************
  * Configuration *
@@ -88,6 +72,10 @@
 // Set the maximum frame rate
 + (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate;
 + (NSUInteger)maximumFrameRate;
+
+// Set whether recordings are copied to the user's photo album
++ (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
++ (BOOL)savesToPhotoAlbum;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;
