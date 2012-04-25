@@ -20,6 +20,10 @@
 }
 
 @property (nonatomic, assign) CGFloat scaleFactor;
+@property (nonatomic, assign) BOOL drawsGestures;
+@property (nonatomic, retain) NSMutableArray *touches;
+@property (nonatomic, retain) NSMutableArray *orientationChanges;
+@property (nonatomic, assign) NSTimeInterval startTime; // t=0 as system uptime
 @property (nonatomic, assign) id<DLGestureTrackerDelegate> delegate;
 
 - (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image;

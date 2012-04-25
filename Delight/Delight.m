@@ -180,8 +180,12 @@ static Delight *sharedInstance = nil;
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];        
+        
         videoEncoder = [[DLVideoEncoder alloc] init];
+        videoEncoder.delegate = self;
+        
         gestureTracker = [[DLGestureTracker alloc] init];
+        gestureTracker.drawsGestures = NO;
         gestureTracker.delegate = self;
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -306,13 +310,13 @@ static Delight *sharedInstance = nil;
 
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {
-    if (paused || processing || (glView && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime < 1.0f / maximumFrameRate)) return;
+    if (paused || processing || (glView && [[NSProcessInfo processInfo] systemUptime] - lastScreenshotTime < 1.0f / maximumFrameRate)) return;
         
     processing = YES;
     
     @synchronized(self) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
+        NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
 
         if (videoEncoder.encodesRawGLBytes && glView) {
             [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
@@ -331,7 +335,7 @@ static Delight *sharedInstance = nil;
             }
         }
         
-        NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
+        NSTimeInterval end = [[NSProcessInfo processInfo] systemUptime];
         
         frameCount++;
         elapsedTime += (end - start);
@@ -429,7 +433,7 @@ static Delight *sharedInstance = nil;
 {
     // In iOS 4, locking the screen does not trigger didEnterBackground: notification. Check if we've been inactive for a long time.
     if (resignActiveTime > 0 && !appInBackground && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
-        NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
+        NSTimeInterval inactiveTime = [[NSProcessInfo processInfo] systemUptime] - resignActiveTime;
         if (inactiveTime > kDLMaximumSessionInactiveTime) {
             // We've been inactive for a long time, stop the previous recording and create a new session
             if (recordingContext.shouldRecordVideo) {
@@ -447,7 +451,7 @@ static Delight *sharedInstance = nil;
 
 - (void)handleWillResignActive:(NSNotification *)notification
 {
-    resignActiveTime = [[NSDate date] timeIntervalSince1970];
+    resignActiveTime = [[NSProcessInfo processInfo] systemUptime];
 }
 
 #pragma mark - DLGestureTrackerDelegate
@@ -455,6 +459,19 @@ static Delight *sharedInstance = nil;
 - (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location
 {
     return [screenshotController locationIsInPrivateView:location];
+}
+
+#pragma mark - DLVideoEncoderDelegate
+
+- (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
+{
+    [gestureTracker setStartTime:startTime];
+}
+
+- (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder
+{
+    NSLog(@"Touches: %@", gestureTracker.touches);
+    NSLog(@"Orientation changes: %@", gestureTracker.orientationChanges);
 }
 
 @end

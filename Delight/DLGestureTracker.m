@@ -8,6 +8,8 @@
 
 #import "DLGestureTracker.h"
 #import "DLGesture.h"
+#import "DLOrientationChange.h"
+#import "DLTouch.h"
 #import </usr/include/objc/objc-class.h>
 
 static void Swizzle(Class c, SEL orig, SEL new) {
@@ -22,11 +24,17 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @interface DLGestureTracker ()
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
 - (CGContextRef)createBitmapContextOfSize:(CGSize)size;
+- (void)updateGesturesForEvent:(UIEvent *)event;
+- (void)handleDeviceOrientationDidChangeNotification:(NSNotification *)notification;
 @end
 
 @implementation DLGestureTracker
 
 @synthesize scaleFactor;
+@synthesize drawsGestures;
+@synthesize touches;
+@synthesize orientationChanges;
+@synthesize startTime;
 @synthesize delegate;
 
 - (id)init
@@ -35,9 +43,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (self) {
         gesturesInProgress = [[NSMutableSet alloc] init];
         gesturesCompleted = [[NSMutableSet alloc] init];
+        touches = [[NSMutableArray alloc] init];
+        orientationChanges = [[NSMutableArray alloc] init];
         
         scaleFactor = 1.0f;
         bitmapData = NULL;
+        startTime = -1;
+        drawsGestures = YES;
         
         // Method swizzling to intercept events
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
@@ -45,8 +57,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             [window DLsetDelegate:self];
         }
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWindowDidBecomeHiddenNotification:) name:UIWindowDidBecomeHiddenNotification object:nil];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self selector:@selector(handleWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(handleWindowDidBecomeHiddenNotification:) name:UIWindowDidBecomeHiddenNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(handleDeviceOrientationDidChangeNotification:) name:UIDeviceOrientationDidChangeNotification object:nil];
     }
     return self;
 }
@@ -57,6 +71,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     [gesturesInProgress release];
     [gesturesCompleted release];
+    [touches release];
+    [orientationChanges release];
     
     if (bitmapData != NULL) {
         free(bitmapData);
@@ -68,7 +84,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image
 {
-    if (![gesturesInProgress count] && ![gesturesCompleted count]) {
+    if (!drawsGestures || (![gesturesInProgress count] && ![gesturesCompleted count])) {
         // If no gestures to draw, just return the original image
         return image;
     }
@@ -86,6 +102,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     CGContextRelease(context);
     
     return touchMarkImage;
+}
+
+- (void)setStartTime:(NSTimeInterval)aStartTime
+{
+    startTime = aStartTime;
+    [touches removeAllObjects];
+    [orientationChanges removeAllObjects];
+    
+    // Set the initial orientation
+    [self handleDeviceOrientationDidChangeNotification:nil];
 }
 
 #pragma mark - Private methods
@@ -200,23 +226,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return context;
 }
 
-#pragma mark - Notifications
-
-- (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
-{
-    UIWindow *window = [notification object];
-    [window DLsetDelegate:self];
-}
-
-- (void)handleWindowDidBecomeHiddenNotification:(NSNotification *)notification
-{
-    UIWindow *window = [notification object];
-    [window DLsetDelegate:nil];    
-}
-
-#pragma mark - DLWindowDelegate
-
-- (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
+- (void)updateGesturesForEvent:(UIEvent *)event
 {
     NSMutableSet *gesturesJustCompleted = [[NSMutableSet alloc] initWithSet:gesturesInProgress];
     UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
@@ -260,6 +270,58 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [gesturesInProgress minusSet:gesturesJustCompleted];
     
     [gesturesJustCompleted release];
+}
+
+#pragma mark - Notifications
+
+- (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
+{
+    UIWindow *window = [notification object];
+    [window DLsetDelegate:self];
+}
+
+- (void)handleWindowDidBecomeHiddenNotification:(NSNotification *)notification
+{
+    UIWindow *window = [notification object];
+    [window DLsetDelegate:nil];    
+}
+
+- (void)handleDeviceOrientationDidChangeNotification:(NSNotification *)notification
+{
+    if (startTime < 0) return;
+    
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    NSTimeInterval timeInSession = [[NSProcessInfo processInfo] systemUptime] - startTime;
+    
+    DLOrientationChange *orientationChange = [[DLOrientationChange alloc] initWithDeviceOrientation:deviceOrientation
+                                                                               interfaceOrientation:interfaceOrientation
+                                                                                      timeInSession:timeInSession];
+    [orientationChanges addObject:orientationChange];
+    [orientationChange release];
+}
+
+#pragma mark - DLWindowDelegate
+
+- (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
+{
+    if (startTime < 0) return;
+    
+    if (drawsGestures) {
+        [self updateGesturesForEvent:event];
+    } else {
+        UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+        
+        for (UITouch *touch in [event allTouches]) {
+            if (touch.timestamp > 0) {
+                CGPoint location = [touch locationInView:keyWindow];
+                
+                DLTouch *ourTouch = [[DLTouch alloc] initWithLocation:location timeInSession:touch.timestamp - startTime];
+                [touches addObject:ourTouch];
+                [ourTouch release];
+            }
+        }
+    }
 }
 
 @end

@@ -24,7 +24,7 @@
 
 @end
 
-@interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate> {
+@interface Delight : NSObject <DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLRecordingSessionDelegate> {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;

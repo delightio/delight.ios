@@ -15,6 +15,7 @@
 - (BOOL)setupWriter;
 - (void)cleanupWriter;
 - (NSURL *)tempFileURL;
+- (CMTime)currentFrameTime;
 @end
 
 @implementation DLVideoEncoder
@@ -26,6 +27,7 @@
 @synthesize outputPath;
 @synthesize videoSize;
 @synthesize averageBitRate;
+@synthesize delegate;
 
 - (id)init
 {
@@ -74,14 +76,7 @@
     if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
         DLDebugLog(@"Not ready for video data");
     } else {
-        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-        if (recordingStartTime < 0) {
-            // This is the first frame
-            recordingStartTime = now;
-        }
-        
-        float millisElapsed = (now - recordingStartTime - totalPauseDuration) * 1000.0;
-        CMTime time = CMTimeMake((int)millisElapsed, 1000);
+        CMTime time = [self currentFrameTime];
         
         @synchronized (self) {
             CVPixelBufferRef pixelBuffer = NULL;
@@ -132,15 +127,7 @@
         glReadPixels(0, 0, videoSize.width, videoSize.height, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData + 1);  // + 1 to convert RGBA->ARGB
     }
     
-    // May need to add a check here, because if two consecutive times with the same value are added to the movie, it aborts recording
-    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-    if (recordingStartTime < 0) {
-        // This is the first frame
-        recordingStartTime = now;
-    }
-    float millisElapsed = (now - recordingStartTime - totalPauseDuration) * 1000.0;
-    CMTime time = CMTimeMake((int)millisElapsed, 1000);
-    
+    CMTime time = [self currentFrameTime];
     if (![avAdaptor appendPixelBuffer:pixel_buffer withPresentationTime:time]){
         NSLog(@"Problem appending pixel buffer at time: %lld", time.value);
     } 
@@ -153,7 +140,7 @@
 {
     if (!paused) {
         paused = YES;
-        pauseStartTime = [[NSDate date] timeIntervalSince1970];
+        pauseStartTime = [[NSProcessInfo processInfo] systemUptime];
     }
 }
 
@@ -161,7 +148,7 @@
 {
     if (paused) {
         paused = NO;
-        totalPauseDuration += [[NSDate date] timeIntervalSince1970] - pauseStartTime;
+        totalPauseDuration += [[NSProcessInfo processInfo] systemUptime] - pauseStartTime;
     }
 }
 
@@ -230,8 +217,14 @@
         BOOL success = [videoWriter finishWriting];
         if (success) {
             DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
+            if ([delegate respondsToSelector:@selector(videoEncoderDidFinishRecording:)]) {
+                [delegate videoEncoderDidFinishRecording:self];
+            }
         } else {
             DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
+            if ([delegate respondsToSelector:@selector(videoEncoder:didFailRecordingWithError:)]) {
+                [delegate videoEncoder:self didFailRecordingWithError:[videoWriter error]];
+            }
         }
         
         [self cleanupWriter];        
@@ -263,6 +256,24 @@
     }
     
     return [outputURL autorelease];
+}
+
+- (CMTime)currentFrameTime
+{
+    NSTimeInterval now = [[NSProcessInfo processInfo] systemUptime];
+    if (recordingStartTime < 0) {
+        // This is the first frame
+        recordingStartTime = now;
+        
+        if ([delegate respondsToSelector:@selector(videoEncoder:didBeginRecordingAtTime:)]) {
+            [delegate videoEncoder:self didBeginRecordingAtTime:recordingStartTime];
+        }
+    }
+    
+    float millisElapsed = (now - recordingStartTime - totalPauseDuration) * 1000.0;
+    CMTime time = CMTimeMake((int)millisElapsed, 1000);
+    
+    return time;
 }
 
 @end
