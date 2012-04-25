@@ -49,6 +49,7 @@ NSString * const DLRecordElementName = @"recording";
 	if ( ![parser parse] ) {
 		NSLog(@"error parsing xml: %@", [parser parserError]);
 	}
+	[parser release];
 }
 
 #pragma mark XML parsing delegate
