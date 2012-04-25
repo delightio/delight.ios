@@ -34,7 +34,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize drawsGestures;
 @synthesize touches;
 @synthesize orientationChanges;
-@synthesize startTime;
 @synthesize delegate;
 
 - (id)init
@@ -104,7 +103,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return touchMarkImage;
 }
 
-- (void)setStartTime:(NSTimeInterval)aStartTime
+- (void)startRecordingGesturesWithStartUptime:(NSTimeInterval)aStartTime
 {
     startTime = aStartTime;
     [touches removeAllObjects];
@@ -112,6 +111,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     // Set the initial orientation
     [self handleDeviceOrientationDidChangeNotification:nil];
+}
+
+- (void)stopRecordingGestures
+{
+    startTime = -1;
 }
 
 #pragma mark - Private methods

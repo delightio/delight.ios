@@ -465,13 +465,15 @@ static Delight *sharedInstance = nil;
 
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
 {
-    [gestureTracker setStartTime:startTime];
+    [gestureTracker startRecordingGesturesWithStartUptime:startTime];
 }
 
 - (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder
 {
     NSLog(@"Touches: %@", gestureTracker.touches);
     NSLog(@"Orientation changes: %@", gestureTracker.orientationChanges);
+    
+    [gestureTracker stopRecordingGestures];
 }
 
 @end
