@@ -119,7 +119,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                 CGContextFillEllipseInRect(context, CGRectMake(scaledLocation.x - tapCircleRadius, scaledLocation.y - tapCircleRadius, 2 * tapCircleRadius + 1, 2 * tapCircleRadius + 1));
             } else {
                 // Swipe: draw a line from start to finish with an arrowhead
-                CGPoint startLocation;
                 NSInteger strokeCount = 0;
                 CGPoint lastLocations[4];
 
@@ -128,7 +127,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                     CGPoint scaledLocation = CGPointMake(location.x * scaleFactor * scale, location.y * scaleFactor * scale);
 
                     if (i == 0) {
-                        startLocation = scaledLocation;
                         CGContextMoveToPoint(context, scaledLocation.x, scaledLocation.y);
                     } else if (i < [gesture.locations count] - 1) {
                         for (NSInteger i = 0; i < 3; i++) {
@@ -138,9 +136,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                         strokeCount++;
                         
                         CGContextAddLineToPoint(context, scaledLocation.x, scaledLocation.y);
-                    } else {
+                    } else if (strokeCount > 0) {
                         CGContextStrokePath(context);
                         
+                        // Draw the arrowhead
                         CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
                         double angle = atan2(scaledLocation.y - lastLocation.y, scaledLocation.x - lastLocation.x);
                         
@@ -172,7 +171,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     bitmapBytesPerRow   = (size.width * 4);
     bitmapByteCount     = (bitmapBytesPerRow * size.height);
-    colorSpace = CGColorSpaceCreateDeviceRGB();
     if (bitmapData != NULL) {
         free(bitmapData);
     }
@@ -181,7 +179,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         fprintf (stderr, "Memory not allocated!");
         return NULL;
     }
-    
+
+    colorSpace = CGColorSpaceCreateDeviceRGB();
     context = CGBitmapContextCreate (bitmapData,
                                      size.width,
                                      size.height,
