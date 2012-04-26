@@ -21,9 +21,9 @@
 }
 
 - (void)processResponse {
-	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"updated session: %@", str);
-	[str release];
+//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+//	NSLog(@"updated session: %@", str);
+//	[str release];
 	[self.recordingContext setTaskFinished:DLFinishedUpdateSession];
 	if ( [self.recordingContext allTasksFinished] ) {
 		// all tasks are done. end the background task

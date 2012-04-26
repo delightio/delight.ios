@@ -32,7 +32,7 @@ NSString * const DLRecordElementName = @"recording";
 	if ( buildVer == nil ) buildVer = @"";
 	else buildVer = [self stringByAddingPercentEscapes:buildVer];
 	NSString * dotVer = [dict objectForKey:@"CFBundleShortVersionString"];
-	if ( dotVer == nil ) dotVer = @"";
+	if ( dotVer == nil ) dotVer = buildVer;
 	else dotVer = [self stringByAddingPercentEscapes:dotVer];
 	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[locale]=%@&app_session[delight_version]=1", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier]];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
