@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2615337E5C00003862 /* DLScreenshotController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
+		836ABF2B1548D47400926A71 /* AVCamCaptureManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF251548D47400926A71 /* AVCamCaptureManager.h */; };
+		836ABF2C1548D47400926A71 /* AVCamCaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF261548D47400926A71 /* AVCamCaptureManager.m */; };
+		836ABF2D1548D47400926A71 /* AVCamRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF271548D47400926A71 /* AVCamRecorder.h */; };
+		836ABF2E1548D47400926A71 /* AVCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* AVCamRecorder.m */; };
+		836ABF2F1548D47400926A71 /* AVCamUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF291548D47400926A71 /* AVCamUtilities.h */; };
+		836ABF301548D47400926A71 /* AVCamUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF2A1548D47400926A71 /* AVCamUtilities.m */; };
 		83827A551538BD82002EA080 /* DLGesture.h in Headers */ = {isa = PBXBuildFile; fileRef = 83827A531538BD81002EA080 /* DLGesture.h */; };
 		83827A561538BD82002EA080 /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
 		8391626F1537C21000549347 /* DLGestureTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8391626D1537C21000549347 /* DLGestureTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -53,6 +59,12 @@
 		83149B2715337E5C00003862 /* DLScreenshotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLScreenshotController.m; sourceTree = "<group>"; };
 		83149B2B15338CC500003862 /* DLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLVideoEncoder.h; sourceTree = "<group>"; };
 		83149B2C15338CC500003862 /* DLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLVideoEncoder.m; sourceTree = "<group>"; };
+		836ABF251548D47400926A71 /* AVCamCaptureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVCamCaptureManager.h; sourceTree = "<group>"; };
+		836ABF261548D47400926A71 /* AVCamCaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVCamCaptureManager.m; sourceTree = "<group>"; };
+		836ABF271548D47400926A71 /* AVCamRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVCamRecorder.h; sourceTree = "<group>"; };
+		836ABF281548D47400926A71 /* AVCamRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVCamRecorder.m; sourceTree = "<group>"; };
+		836ABF291548D47400926A71 /* AVCamUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVCamUtilities.h; sourceTree = "<group>"; };
+		836ABF2A1548D47400926A71 /* AVCamUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVCamUtilities.m; sourceTree = "<group>"; };
 		83827A531538BD81002EA080 /* DLGesture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGesture.h; sourceTree = "<group>"; };
 		83827A541538BD82002EA080 /* DLGesture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGesture.m; sourceTree = "<group>"; };
 		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGestureTracker.h; sourceTree = "<group>"; };
@@ -115,6 +127,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		836ABF241548D47400926A71 /* AVCam */ = {
+			isa = PBXGroup;
+			children = (
+				836ABF251548D47400926A71 /* AVCamCaptureManager.h */,
+				836ABF261548D47400926A71 /* AVCamCaptureManager.m */,
+				836ABF271548D47400926A71 /* AVCamRecorder.h */,
+				836ABF281548D47400926A71 /* AVCamRecorder.m */,
+				836ABF291548D47400926A71 /* AVCamUtilities.h */,
+				836ABF2A1548D47400926A71 /* AVCamUtilities.m */,
+			);
+			path = AVCam;
+			sourceTree = "<group>";
+		};
 		83B8967314EAEC68006D93C2 = {
 			isa = PBXGroup;
 			children = (
@@ -152,6 +177,7 @@
 		83B8968714EAEC68006D93C2 /* Delight */ = {
 			isa = PBXGroup;
 			children = (
+				836ABF241548D47400926A71 /* AVCam */,
 				A9A9A3CC1536EA3600B6E4AB /* Utility */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
@@ -233,6 +259,9 @@
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
 				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
+				836ABF2B1548D47400926A71 /* AVCamCaptureManager.h in Headers */,
+				836ABF2D1548D47400926A71 /* AVCamRecorder.h in Headers */,
+				836ABF2F1548D47400926A71 /* AVCamUtilities.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,6 +388,9 @@
 				83827A561538BD82002EA080 /* DLGesture.m in Sources */,
 				A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */,
 				A98094581542A732002B2BCE /* DLReachability.m in Sources */,
+				836ABF2C1548D47400926A71 /* AVCamCaptureManager.m in Sources */,
+				836ABF2E1548D47400926A71 /* AVCamRecorder.m in Sources */,
+				836ABF301548D47400926A71 /* AVCamUtilities.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

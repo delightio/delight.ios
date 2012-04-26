@@ -11,6 +11,7 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIWindow+DLInterceptEvents.h"
+#import "AVCamCaptureManager.h"
 #import "DLTaskController.h"
 
 #define kDLDefaultScaleFactor_iPad2x   0.25f
@@ -184,6 +185,15 @@ static Delight *sharedInstance = nil;
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
         
+//        captureManager = [[AVCamCaptureManager alloc] init];
+        captureManager.delegate = self;
+        [captureManager setupSession];
+        [captureManager toggleCamera];
+        // Start the session. This is done asychronously since -startRunning doesn't return until the session is running.
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [[captureManager session] startRunning];
+        });
+        
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             if ([UIScreen mainScreen].scale == 1.0) {
                 self.scaleFactor = kDLDefaultScaleFactor_iPad;
@@ -226,12 +236,13 @@ static Delight *sharedInstance = nil;
     [gestureTracker release];
 	
 	[taskController release];
+    [captureManager release];
     
     [super dealloc];
 }
 
 - (void)startRecording
-{
+{    
     if (!videoEncoder.recording) {
         // Identify and create the cache directory if it doesn't already exist
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -246,6 +257,8 @@ static Delight *sharedInstance = nil;
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         
         [videoEncoder startNewRecording];
+        [captureManager startRecording];
+
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
         
@@ -261,6 +274,8 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
+    [captureManager stopRecording];
+    
     if (videoEncoder.recording) {
         [videoEncoder stopRecording];
         recordingContext.endTime = [NSDate date];
@@ -414,7 +429,7 @@ static Delight *sharedInstance = nil;
 	} else {
 		recordingContext.endTime = [NSDate date];
 	}
-	[taskController uploadSession:recordingContext];
+///	[taskController uploadSession:recordingContext];
 #endif
     
     appInBackground = YES;
@@ -456,5 +471,33 @@ static Delight *sharedInstance = nil;
 {
     return [screenshotController locationIsInPrivateView:location];
 }
+
+#pragma mark - AVCamCaptureManagerDelegate
+
+- (void)captureManager:(AVCamCaptureManager *)captureManager didFailWithError:(NSError *)error
+{
+    NSLog(@"didFailWithError: %@", [error localizedDescription]);
+}
+
+- (void)captureManagerRecordingBegan:(AVCamCaptureManager *)captureManager
+{
+    NSLog(@"recording began");
+}
+
+- (void)captureManagerRecordingFinished:(AVCamCaptureManager *)captureManager
+{
+    NSLog(@"recording finished");
+}
+
+- (void)captureManagerStillImageCaptured:(AVCamCaptureManager *)captureManager
+{
+    NSLog(@"still image captured");
+}
+
+- (void)captureManagerDeviceConfigurationChanged:(AVCamCaptureManager *)captureManager
+{
+    NSLog(@"device configuration changed");
+}
+
 
 @end

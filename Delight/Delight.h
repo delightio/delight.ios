@@ -16,6 +16,8 @@
 
 @class DLTaskController;
 @class DLRecordingContext;
+@class AVCamCaptureManager;
+@protocol AVCamCaptureManagerDelegate;
 
 @protocol DLRecordingSessionDelegate <NSObject>
 
@@ -24,7 +26,7 @@
 
 @end
 
-@interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate> {
+@interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate, AVCamCaptureManagerDelegate> {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
@@ -34,6 +36,7 @@
     
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
+    AVCamCaptureManager * captureManager;
 }
 
 @property (nonatomic, retain) NSString *appToken;
