@@ -135,7 +135,7 @@ didFinishRecordingToOutputFileAtURL:(NSURL *)anOutputFileURL
                     fromConnections:(NSArray *)connections
                               error:(NSError *)error
 {
-    NSLog(@"didFinishRecordingToOutputFileAtURL %@ error: %@", anOutputFileURL, [error localizedFailureReason]);
+    NSLog(@"didFinishRecordingToOutputFileAtURL %@ error: %@", anOutputFileURL, [error localizedDescription]);
     if ([[self delegate] respondsToSelector:@selector(recorder:recordingDidFinishToOutputFileURL:error:)]) {
         [[self delegate] recorder:self recordingDidFinishToOutputFileURL:anOutputFileURL error:error];
     }

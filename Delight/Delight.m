@@ -11,8 +11,8 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIWindow+DLInterceptEvents.h"
-#import "AVCamCaptureManager.h"
 #import "DLTaskController.h"
+#import "AVCamCaptureManager.h"
 
 #define kDLDefaultScaleFactor_iPad2x   0.25f
 #define kDLDefaultScaleFactor_iPad     0.5f
@@ -26,7 +26,7 @@
 
 static Delight *sharedInstance = nil;
 
-@interface Delight ()
+@interface Delight () <AVCamCaptureManagerDelegate>
 // OpenGL ES beta methods
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
@@ -52,6 +52,7 @@ static Delight *sharedInstance = nil;
 @synthesize maximumRecordingDuration;
 @synthesize paused;
 @synthesize autoCaptureEnabled;
+@synthesize recordsCamera;
 @synthesize screenshotController;
 @synthesize videoEncoder;
 @synthesize gestureTracker;
@@ -149,6 +150,16 @@ static Delight *sharedInstance = nil;
     [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
 }
 
++ (BOOL)recordsCamera
+{
+    return [self sharedInstance].recordsCamera;
+}
+
++ (void)setRecordsCamera:(BOOL)recordsCamera
+{
+    [self sharedInstance].recordsCamera = recordsCamera;
+}
+
 + (BOOL)hidesKeyboardInRecording
 {
     return [self sharedInstance].screenshotController.hidesKeyboard;
@@ -181,19 +192,12 @@ static Delight *sharedInstance = nil;
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];        
+        
         videoEncoder = [[DLVideoEncoder alloc] init];
+
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
-        
-//        captureManager = [[AVCamCaptureManager alloc] init];
-        captureManager.delegate = self;
-        [captureManager setupSession];
-        [captureManager toggleCamera];
-        // Start the session. This is done asychronously since -startRunning doesn't return until the session is running.
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [[captureManager session] startRunning];
-        });
-        
+                
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             if ([UIScreen mainScreen].scale == 1.0) {
                 self.scaleFactor = kDLDefaultScaleFactor_iPad;
@@ -234,9 +238,9 @@ static Delight *sharedInstance = nil;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
-	
+    [cameraManager release];
+
 	[taskController release];
-    [captureManager release];
     
     [super dealloc];
 }
@@ -257,7 +261,7 @@ static Delight *sharedInstance = nil;
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         
         [videoEncoder startNewRecording];
-        [captureManager startRecording];
+        [cameraManager startRecording];
 
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
@@ -274,7 +278,7 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
-    [captureManager stopRecording];
+    [cameraManager stopRecording];
     
     if (videoEncoder.recording) {
         [videoEncoder stopRecording];
@@ -316,6 +320,21 @@ static Delight *sharedInstance = nil;
     
     if (autoCaptureEnabled && videoEncoder.recording) {
         [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+    }
+}
+
+- (void)setRecordsCamera:(BOOL)aRecordsCamera
+{
+    if (recordsCamera != aRecordsCamera) {
+        recordsCamera = aRecordsCamera;
+        
+        if (recordsCamera) {
+            cameraManager = [[AVCamCaptureManager alloc] init];
+            cameraManager.delegate = self;
+        } else {
+            [cameraManager release];
+            cameraManager = nil;
+        }
     }
 }
 
@@ -429,7 +448,7 @@ static Delight *sharedInstance = nil;
 	} else {
 		recordingContext.endTime = [NSDate date];
 	}
-///	[taskController uploadSession:recordingContext];
+	[taskController uploadSession:recordingContext];
 #endif
     
     appInBackground = YES;
@@ -471,33 +490,5 @@ static Delight *sharedInstance = nil;
 {
     return [screenshotController locationIsInPrivateView:location];
 }
-
-#pragma mark - AVCamCaptureManagerDelegate
-
-- (void)captureManager:(AVCamCaptureManager *)captureManager didFailWithError:(NSError *)error
-{
-    NSLog(@"didFailWithError: %@", [error localizedDescription]);
-}
-
-- (void)captureManagerRecordingBegan:(AVCamCaptureManager *)captureManager
-{
-    NSLog(@"recording began");
-}
-
-- (void)captureManagerRecordingFinished:(AVCamCaptureManager *)captureManager
-{
-    NSLog(@"recording finished");
-}
-
-- (void)captureManagerStillImageCaptured:(AVCamCaptureManager *)captureManager
-{
-    NSLog(@"still image captured");
-}
-
-- (void)captureManagerDeviceConfigurationChanged:(AVCamCaptureManager *)captureManager
-{
-    NSLog(@"device configuration changed");
-}
-
 
 @end

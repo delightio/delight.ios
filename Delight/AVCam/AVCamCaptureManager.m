@@ -141,6 +141,8 @@
 		[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 		[notificationCenter addObserver:self selector:@selector(deviceOrientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
 		orientation = AVCaptureVideoOrientationPortrait;
+        
+        [self setupSession];
     }
     
     return self;
@@ -165,9 +167,7 @@
 }
 
 - (BOOL) setupSession
-{
-    BOOL success = NO;
-    
+{    
 	// Set torch and flash mode to auto
 	if ([[self backFacingCamera] hasFlash]) {
 		if ([[self backFacingCamera] lockForConfiguration:nil]) {
@@ -187,7 +187,7 @@
 	}
 	
     // Init the device inputs
-    AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backFacingCamera] error:nil];
+    AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontFacingCamera] error:nil];
     AVCaptureDeviceInput *newAudioInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self audioDevice] error:nil];
     
 	
@@ -247,13 +247,16 @@
 	[self setRecorder:newRecorder];
     [newRecorder release];
 	
-    success = YES;
+    // Start the session. This is done asychronously since -startRunning doesn't return until the session is running.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [session startRunning];
+    });
     
-    return success;
+    return YES;
 }
 
 - (void) startRecording
-{
+{    
     if ([[UIDevice currentDevice] isMultitaskingSupported]) {
         // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until AVCam returns
 		// to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library

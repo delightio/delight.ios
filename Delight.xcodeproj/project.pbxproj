@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2615337E5C00003862 /* DLScreenshotController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
-		836ABF2B1548D47400926A71 /* AVCamCaptureManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF251548D47400926A71 /* AVCamCaptureManager.h */; };
+		836ABF2B1548D47400926A71 /* AVCamCaptureManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF251548D47400926A71 /* AVCamCaptureManager.h */; settings = {ATTRIBUTES = (); }; };
 		836ABF2C1548D47400926A71 /* AVCamCaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF261548D47400926A71 /* AVCamCaptureManager.m */; };
 		836ABF2D1548D47400926A71 /* AVCamRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF271548D47400926A71 /* AVCamRecorder.h */; };
 		836ABF2E1548D47400926A71 /* AVCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* AVCamRecorder.m */; };
@@ -248,18 +248,18 @@
 				83B8969914EAECD6006D93C2 /* Delight.h in Headers */,
 				83B8969B14EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h in Headers */,
 				83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */,
+				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */,
 				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
 				A9A9A3DB15371AE500B6E4AB /* DLRecordingContext.h in Headers */,
 				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
 				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
 				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
+				836ABF2B1548D47400926A71 /* AVCamCaptureManager.h in Headers */,
 				A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */,
-				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
 				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
-				836ABF2B1548D47400926A71 /* AVCamCaptureManager.h in Headers */,
 				836ABF2D1548D47400926A71 /* AVCamRecorder.h in Headers */,
 				836ABF2F1548D47400926A71 /* AVCamUtilities.h in Headers */,
 			);

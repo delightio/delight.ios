@@ -17,7 +17,6 @@
 @class DLTaskController;
 @class DLRecordingContext;
 @class AVCamCaptureManager;
-@protocol AVCamCaptureManagerDelegate;
 
 @protocol DLRecordingSessionDelegate <NSObject>
 
@@ -26,7 +25,7 @@
 
 @end
 
-@interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate, AVCamCaptureManagerDelegate> {
+@interface Delight : NSObject <DLGestureTrackerDelegate, DLRecordingSessionDelegate> {
     BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
@@ -36,7 +35,7 @@
     
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
-    AVCamCaptureManager * captureManager;
+    AVCamCaptureManager * cameraManager;
 }
 
 @property (nonatomic, retain) NSString *appToken;
@@ -45,6 +44,7 @@
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
 @property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
+@property (nonatomic, assign) BOOL recordsCamera;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
@@ -79,6 +79,10 @@
 // Set whether recordings are copied to the user's photo album
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
 + (BOOL)savesToPhotoAlbum;
+
+// Set whether the user is recorded on camera
++ (void)setRecordsCamera:(BOOL)recordsCamera;
++ (BOOL)recordsCamera;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;
