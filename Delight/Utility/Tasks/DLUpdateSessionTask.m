@@ -15,6 +15,7 @@
 	NSString * urlStr = [NSString stringWithFormat:@"http://%@/app_sessions/%@.xml", DL_BASE_URL, self.recordingContext.sessionID];
 	NSString * paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime]];
 	// the param needs to be put in query string. Not sure why. But, if not, it doesn't work
+	// check here: http://stackoverflow.com/questions/3469061/nsurlrequest-cannot-handle-http-body-when-method-is-not-post
 	NSString * fstr = [NSString stringWithFormat:@"%@?%@", urlStr, paramStr];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:fstr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
@@ -23,9 +24,9 @@
 }
 
 - (void)processResponse {
-	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"updated session: %@", str);
-	[str release];
+//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+//	NSLog(@"updated session: %@", str);
+//	[str release];
 	[self.recordingContext setTaskFinished:DLFinishedUpdateSession];
 	if ( [self.recordingContext allTasksFinished] ) {
 		// all tasks are done. end the background task
