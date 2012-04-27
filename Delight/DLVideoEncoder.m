@@ -117,8 +117,13 @@
 - (void)encodeRawBytesForGLView:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {
     if (!videoWriter) {
-        self.videoSize = CGSizeMake(backingWidth, backingHeight);
-        [self setupWriter];
+        if (outputPath) {
+            self.videoSize = CGSizeMake(backingWidth, backingHeight);
+            [self setupWriter];
+        } else {
+            // We don't have a session yet
+            return;
+        }
     }
     
     CVPixelBufferRef pixel_buffer = NULL;

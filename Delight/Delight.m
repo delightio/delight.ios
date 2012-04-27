@@ -10,8 +10,11 @@
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "UIWindow+DLInterceptEvents.h"
 #import "DLTaskController.h"
+#import "DLScreenshotController.h"
+#import "DLVideoEncoder.h"
+#import "DLGestureTracker.h"
+#import "UIWindow+DLInterceptEvents.h"
 
 #define kDLDefaultScaleFactor_iPad2x   0.25f
 #define kDLDefaultScaleFactor_iPad     0.5f
@@ -25,7 +28,7 @@
 
 static Delight *sharedInstance = nil;
 
-@interface Delight ()
+@interface Delight () <DLGestureTrackerDelegate>
 // OpenGL ES beta methods
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
