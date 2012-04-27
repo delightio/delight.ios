@@ -47,7 +47,6 @@
 
 #import "AVCamCaptureManager.h"
 #import "AVCamRecorder.h"
-#import "AVCamUtilities.h"
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <ImageIO/CGImageProperties.h>
@@ -58,9 +57,9 @@
 
 #pragma mark -
 @interface AVCamCaptureManager (InternalUtilityMethods)
+- (BOOL) setupSession;
 - (AVCaptureDevice *) cameraWithPosition:(AVCaptureDevicePosition)position;
 - (AVCaptureDevice *) frontFacingCamera;
-- (AVCaptureDevice *) backFacingCamera;
 - (AVCaptureDevice *) audioDevice;
 - (NSURL *) tempFileURL;
 - (void) removeFile:(NSURL *)outputFileURL;
@@ -75,7 +74,6 @@
 @synthesize orientation;
 @synthesize videoInput;
 @synthesize audioInput;
-@synthesize stillImageOutput;
 @synthesize recorder;
 @synthesize deviceConnectedObserver;
 @synthesize deviceDisconnectedObserver;
@@ -160,45 +158,53 @@
     [session release];
     [videoInput release];
     [audioInput release];
-    [stillImageOutput release];
     [recorder release];
     
     [super dealloc];
 }
 
+- (void) startRecording
+{    
+    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+        // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until AVCam returns
+		// to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library
+		// when AVCam is backgrounded. To conclude this background execution, -endBackgroundTask is called in -recorder:recordingDidFinishToOutputFileURL:error:
+		// after the recorded file has been saved.
+        [self setBackgroundRecordingID:[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}]];
+    }
+    
+    [self removeFile:[[self recorder] outputFileURL]];
+    [[self recorder] startRecordingWithOrientation:orientation];
+}
+
+- (void) stopRecording
+{
+    [[self recorder] stopRecording];
+}
+
+#pragma mark Device Counts
+- (NSUInteger) cameraCount
+{
+    return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
+}
+
+- (NSUInteger) micCount
+{
+    return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio] count];
+}
+
+@end
+
+
+#pragma mark -
+@implementation AVCamCaptureManager (InternalUtilityMethods)
+
+
 - (BOOL) setupSession
 {    
-	// Set torch and flash mode to auto
-	if ([[self backFacingCamera] hasFlash]) {
-		if ([[self backFacingCamera] lockForConfiguration:nil]) {
-			if ([[self backFacingCamera] isFlashModeSupported:AVCaptureFlashModeAuto]) {
-				[[self backFacingCamera] setFlashMode:AVCaptureFlashModeAuto];
-			}
-			[[self backFacingCamera] unlockForConfiguration];
-		}
-	}
-	if ([[self backFacingCamera] hasTorch]) {
-		if ([[self backFacingCamera] lockForConfiguration:nil]) {
-			if ([[self backFacingCamera] isTorchModeSupported:AVCaptureTorchModeAuto]) {
-				[[self backFacingCamera] setTorchMode:AVCaptureTorchModeAuto];
-			}
-			[[self backFacingCamera] unlockForConfiguration];
-		}
-	}
-	
     // Init the device inputs
     AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontFacingCamera] error:nil];
     AVCaptureDeviceInput *newAudioInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self audioDevice] error:nil];
-    
-	
-    // Setup the still image file output
-    AVCaptureStillImageOutput *newStillImageOutput = [[AVCaptureStillImageOutput alloc] init];
-    NSDictionary *outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                    AVVideoCodecJPEG, AVVideoCodecKey,
-                                    nil];
-    [newStillImageOutput setOutputSettings:outputSettings];
-    [outputSettings release];
-    
     
     // Create session (use default AVCaptureSessionPresetHigh)
     AVCaptureSession *newCaptureSession = [[AVCaptureSession alloc] init];
@@ -211,16 +217,11 @@
     if ([newCaptureSession canAddInput:newAudioInput]) {
         [newCaptureSession addInput:newAudioInput];
     }
-    if ([newCaptureSession canAddOutput:newStillImageOutput]) {
-        [newCaptureSession addOutput:newStillImageOutput];
-    }
     
-    [self setStillImageOutput:newStillImageOutput];
     [self setVideoInput:newVideoInput];
     [self setAudioInput:newAudioInput];
     [self setSession:newCaptureSession];
     
-    [newStillImageOutput release];
     [newVideoInput release];
     [newAudioInput release];
     [newCaptureSession release];
@@ -254,160 +255,6 @@
     
     return YES;
 }
-
-- (void) startRecording
-{    
-    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-        // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until AVCam returns
-		// to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library
-		// when AVCam is backgrounded. To conclude this background execution, -endBackgroundTask is called in -recorder:recordingDidFinishToOutputFileURL:error:
-		// after the recorded file has been saved.
-        [self setBackgroundRecordingID:[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}]];
-    }
-    
-    [self removeFile:[[self recorder] outputFileURL]];
-    [[self recorder] startRecordingWithOrientation:orientation];
-}
-
-- (void) stopRecording
-{
-    [[self recorder] stopRecording];
-}
-
-- (void) captureStillImage
-{
-    AVCaptureConnection *stillImageConnection = [AVCamUtilities connectionWithMediaType:AVMediaTypeVideo fromConnections:[[self stillImageOutput] connections]];
-    if ([stillImageConnection isVideoOrientationSupported])
-        [stillImageConnection setVideoOrientation:orientation];
-    
-    [[self stillImageOutput] captureStillImageAsynchronouslyFromConnection:stillImageConnection
-                                                         completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-															 
-															 ALAssetsLibraryWriteImageCompletionBlock completionBlock = ^(NSURL *assetURL, NSError *error) {
-																 if (error) {
-                                                                     if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-                                                                         [[self delegate] captureManager:self didFailWithError:error];
-                                                                         }
-																 }
-															 };
-															 
-															 if (imageDataSampleBuffer != NULL) {
-																 NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-																 ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-																 
-                                                                 UIImage *image = [[UIImage alloc] initWithData:imageData];
-																 [library writeImageToSavedPhotosAlbum:[image CGImage]
-																						   orientation:(ALAssetOrientation)[image imageOrientation]
-																					   completionBlock:completionBlock];
-																 [image release];
-																 
-																 [library release];
-															 }
-															 else
-																 completionBlock(nil, error);
-															 
-															 if ([[self delegate] respondsToSelector:@selector(captureManagerStillImageCaptured:)]) {
-																 [[self delegate] captureManagerStillImageCaptured:self];
-															 }
-                                                         }];
-}
-
-// Toggle between the front and back camera, if both are present.
-- (BOOL) toggleCamera
-{
-    BOOL success = NO;
-    
-    if ([self cameraCount] > 1) {
-        NSError *error;
-        AVCaptureDeviceInput *newVideoInput;
-        AVCaptureDevicePosition position = [[videoInput device] position];
-        
-        if (position == AVCaptureDevicePositionBack)
-            newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontFacingCamera] error:&error];
-        else if (position == AVCaptureDevicePositionFront)
-            newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self backFacingCamera] error:&error];
-        else
-            goto bail;
-        
-        if (newVideoInput != nil) {
-            [[self session] beginConfiguration];
-            [[self session] removeInput:[self videoInput]];
-            if ([[self session] canAddInput:newVideoInput]) {
-                [[self session] addInput:newVideoInput];
-                [self setVideoInput:newVideoInput];
-            } else {
-                [[self session] addInput:[self videoInput]];
-            }
-            [[self session] commitConfiguration];
-            success = YES;
-            [newVideoInput release];
-        } else if (error) {
-            if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-                [[self delegate] captureManager:self didFailWithError:error];
-            }
-        }
-    }
-    
-bail:
-    return success;
-}
-
-
-#pragma mark Device Counts
-- (NSUInteger) cameraCount
-{
-    return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
-}
-
-- (NSUInteger) micCount
-{
-    return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio] count];
-}
-
-
-#pragma mark Camera Properties
-// Perform an auto focus at the specified point. The focus mode will automatically change to locked once the auto focus is complete.
-- (void) autoFocusAtPoint:(CGPoint)point
-{
-    AVCaptureDevice *device = [[self videoInput] device];
-    if ([device isFocusPointOfInterestSupported] && [device isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
-        NSError *error;
-        if ([device lockForConfiguration:&error]) {
-            [device setFocusPointOfInterest:point];
-            [device setFocusMode:AVCaptureFocusModeAutoFocus];
-            [device unlockForConfiguration];
-        } else {
-            if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-                [[self delegate] captureManager:self didFailWithError:error];
-            }
-        }        
-    }
-}
-
-// Switch to continuous auto focus mode at the specified point
-- (void) continuousFocusAtPoint:(CGPoint)point
-{
-    AVCaptureDevice *device = [[self videoInput] device];
-	
-    if ([device isFocusPointOfInterestSupported] && [device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
-		NSError *error;
-		if ([device lockForConfiguration:&error]) {
-			[device setFocusPointOfInterest:point];
-			[device setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
-			[device unlockForConfiguration];
-		} else {
-			if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-                [[self delegate] captureManager:self didFailWithError:error];
-			}
-		}
-	}
-}
-
-@end
-
-
-#pragma mark -
-@implementation AVCamCaptureManager (InternalUtilityMethods)
 
 // Keep track of current device orientation so it can be applied to movie recordings and still image captures
 - (void)deviceOrientationDidChange
@@ -444,12 +291,6 @@ bail:
 - (AVCaptureDevice *) frontFacingCamera
 {
     return [self cameraWithPosition:AVCaptureDevicePositionFront];
-}
-
-// Find a back facing camera, returning nil if one is not found
-- (AVCaptureDevice *) backFacingCamera
-{
-    return [self cameraWithPosition:AVCaptureDevicePositionBack];
 }
 
 // Find and return an audio device, returning nil if one is not found

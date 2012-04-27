@@ -47,10 +47,10 @@
  */
 
 #import "AVCamRecorder.h"
-#import "AVCamUtilities.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface AVCamRecorder (FileOutputDelegate) <AVCaptureFileOutputRecordingDelegate>
+@interface AVCamRecorder () <AVCaptureFileOutputRecordingDelegate>
++ (AVCaptureConnection *)connectionWithMediaType:(NSString *)mediaType fromConnections:(NSArray *)connections;
 @end
 
 @implementation AVCamRecorder
@@ -59,6 +59,18 @@
 @synthesize movieFileOutput;
 @synthesize outputFileURL;
 @synthesize delegate;
+
++ (AVCaptureConnection *)connectionWithMediaType:(NSString *)mediaType fromConnections:(NSArray *)connections
+{
+	for ( AVCaptureConnection *connection in connections ) {
+		for ( AVCaptureInputPort *port in [connection inputPorts] ) {
+			if ( [[port mediaType] isEqual:mediaType] ) {
+				return connection;
+			}
+		}
+	}
+	return nil;
+}
 
 - (id) initWithSession:(AVCaptureSession *)aSession outputFileURL:(NSURL *)anOutputFileURL
 {
@@ -88,13 +100,13 @@
 
 -(BOOL)recordsVideo
 {
-	AVCaptureConnection *videoConnection = [AVCamUtilities connectionWithMediaType:AVMediaTypeVideo fromConnections:[[self movieFileOutput] connections]];
+	AVCaptureConnection *videoConnection = [AVCamRecorder connectionWithMediaType:AVMediaTypeVideo fromConnections:[[self movieFileOutput] connections]];
 	return [videoConnection isActive];
 }
 
 -(BOOL)recordsAudio
 {
-	AVCaptureConnection *audioConnection = [AVCamUtilities connectionWithMediaType:AVMediaTypeAudio fromConnections:[[self movieFileOutput] connections]];
+	AVCaptureConnection *audioConnection = [AVCamRecorder connectionWithMediaType:AVMediaTypeAudio fromConnections:[[self movieFileOutput] connections]];
 	return [audioConnection isActive];
 }
 
@@ -105,7 +117,7 @@
 
 -(void)startRecordingWithOrientation:(AVCaptureVideoOrientation)videoOrientation;
 {
-    AVCaptureConnection *videoConnection = [AVCamUtilities connectionWithMediaType:AVMediaTypeVideo fromConnections:[[self movieFileOutput] connections]];
+    AVCaptureConnection *videoConnection = [AVCamRecorder connectionWithMediaType:AVMediaTypeVideo fromConnections:[[self movieFileOutput] connections]];
     if ([videoConnection isVideoOrientationSupported])
         [videoConnection setVideoOrientation:videoOrientation];
     
@@ -117,9 +129,7 @@
     [[self movieFileOutput] stopRecording];
 }
 
-@end
-
-@implementation AVCamRecorder (FileOutputDelegate)
+#pragma mark - AVCaptureFileOutputRecordingDelegate
 
 - (void)             captureOutput:(AVCaptureFileOutput *)captureOutput
 didStartRecordingToOutputFileAtURL:(NSURL *)fileURL
@@ -135,7 +145,6 @@ didFinishRecordingToOutputFileAtURL:(NSURL *)anOutputFileURL
                     fromConnections:(NSArray *)connections
                               error:(NSError *)error
 {
-    NSLog(@"didFinishRecordingToOutputFileAtURL %@ error: %@", anOutputFileURL, [error localizedDescription]);
     if ([[self delegate] respondsToSelector:@selector(recorder:recordingDidFinishToOutputFileURL:error:)]) {
         [[self delegate] recorder:self recordingDidFinishToOutputFileURL:anOutputFileURL error:error];
     }
