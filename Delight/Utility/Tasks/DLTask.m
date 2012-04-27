@@ -100,9 +100,9 @@ NSString * const DL_APP_LOCALE = @"";
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	// check if there's error
-	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"debug: %@", str);
-	[str release];
+//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+//	NSLog(@"debug: %@", str);
+//	[str release];
 	if ( ![self responseContainsError] ) {
 		// process the data
 		[self.taskController.queue addOperationWithBlock:^{
