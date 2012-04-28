@@ -363,22 +363,24 @@ static Delight *sharedInstance = nil;
 
 - (void)screenshotTimerFired
 {
-    if (!paused && videoEncoder.recording) {
-        if (!processing) {
-            [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
-            if (frameRate + 1 <= maximumFrameRate) {
-                frameRate++;
-            }
-        } else {
-            // Frame rate too high to keep up
-            if (frameRate - 1 > 0) {
-                frameRate--;
+    if (videoEncoder.recording) {
+        if (!paused) {
+            if (!processing) {
+                [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
+                if (frameRate + 1 <= maximumFrameRate) {
+                    frameRate++;
+                }
+            } else {
+                // Frame rate too high to keep up
+                if (frameRate - 1 > 0) {
+                    frameRate--;
+                }
             }
         }
-    }
-    
-    if (autoCaptureEnabled) {
-        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        
+        if (autoCaptureEnabled) {
+            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        }
     }
 }
 
