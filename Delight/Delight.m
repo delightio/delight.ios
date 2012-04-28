@@ -299,10 +299,12 @@ static Delight *sharedInstance = nil;
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
 {
-    autoCaptureEnabled = isAutoCaptureEnabled;
-    
-    if (autoCaptureEnabled && videoEncoder.recording) {
-        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+    if (autoCaptureEnabled != isAutoCaptureEnabled) {
+        autoCaptureEnabled = isAutoCaptureEnabled;
+        
+        if (autoCaptureEnabled && videoEncoder.recording) {
+            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        }
     }
 }
 
