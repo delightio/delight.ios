@@ -15,7 +15,7 @@
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
 #import "UIWindow+DLInterceptEvents.h"
-#import "AVCamCaptureManager.h"
+#import "DLCamCaptureManager.h"
 
 #define kDLDefaultScaleFactor_iPad2x   0.25f
 #define kDLDefaultScaleFactor_iPad     0.5f
@@ -29,7 +29,7 @@
 
 static Delight *sharedInstance = nil;
 
-@interface Delight () <DLGestureTrackerDelegate, AVCamCaptureManagerDelegate>
+@interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate>
 // OpenGL ES beta methods
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
@@ -333,7 +333,7 @@ static Delight *sharedInstance = nil;
         recordsCamera = aRecordsCamera;
         
         if (recordsCamera) {
-            cameraManager = [[AVCamCaptureManager alloc] init];
+            cameraManager = [[DLCamCaptureManager alloc] init];
             cameraManager.delegate = self;
         } else {
             [cameraManager release];

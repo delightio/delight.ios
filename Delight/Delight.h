@@ -16,7 +16,7 @@
 @class DLScreenshotController;
 @class DLVideoEncoder;
 @class DLGestureTracker;
-@class AVCamCaptureManager;
+@class DLCamCaptureManager;
 
 @protocol DLRecordingSessionDelegate <NSObject>
 
@@ -36,7 +36,7 @@
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
 	NSLock * lock;
-	AVCamCaptureManager * cameraManager;
+	DLCamCaptureManager * cameraManager;
 }
 
 @property (nonatomic, retain) NSString *appToken;
