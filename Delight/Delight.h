@@ -34,6 +34,7 @@
     
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
+    NSLock * lock;
 }
 
 @property (nonatomic, retain) NSString *appToken;

@@ -17,6 +17,7 @@
     
     NSMutableSet *gesturesInProgress;
     NSMutableSet *gesturesCompleted;
+    NSLock *lock;
 }
 
 @property (nonatomic, assign) CGFloat scaleFactor;
