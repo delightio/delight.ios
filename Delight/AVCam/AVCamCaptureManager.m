@@ -63,7 +63,6 @@
 - (AVCaptureDevice *) audioDevice;
 - (NSURL *) tempFileURL;
 - (void) removeFile:(NSURL *)outputFileURL;
-- (void) copyFileToDocuments:(NSURL *)fileURL;
 @end
 
 
@@ -165,6 +164,8 @@
 
 - (void) startRecording
 {    
+    if (!session) return;
+    
     if ([[UIDevice currentDevice] isMultitaskingSupported]) {
         // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until AVCam returns
 		// to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library
@@ -183,6 +184,7 @@
 }
 
 #pragma mark Device Counts
+
 - (NSUInteger) cameraCount
 {
     return [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo] count];
@@ -195,15 +197,20 @@
 
 @end
 
-
 #pragma mark -
-@implementation AVCamCaptureManager (InternalUtilityMethods)
 
+@implementation AVCamCaptureManager (InternalUtilityMethods)
 
 - (BOOL) setupSession
 {    
+    AVCaptureDevice *cameraDevice = [self frontFacingCamera];
+    if (!cameraDevice) {
+        DLDebugLog(@"Front-facing camera not available. Camera will not be captured.");
+        return NO;
+    }
+    
     // Init the device inputs
-    AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontFacingCamera] error:nil];
+    AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:cameraDevice error:nil];
     AVCaptureDeviceInput *newAudioInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self audioDevice] error:nil];
     
     // Create session
@@ -322,21 +329,6 @@
     }
 }
 
-- (void) copyFileToDocuments:(NSURL *)fileURL
-{
-	NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-	[dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
-	NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/output_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
-	[dateFormatter release];
-	NSError	*error;
-	if (![[NSFileManager defaultManager] copyItemAtURL:fileURL toURL:[NSURL fileURLWithPath:destinationPath] error:&error]) {
-		if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-			[[self delegate] captureManager:self didFailWithError:error];
-		}
-	}
-}	
-
 @end
 
 
@@ -352,40 +344,24 @@
 
 -(void)recorder:(AVCamRecorder *)recorder recordingDidFinishToOutputFileURL:(NSURL *)outputFileURL error:(NSError *)error
 {
-	if ([[self recorder] recordsAudio] && ![[self recorder] recordsVideo]) {
-		// If the file was created on a device that doesn't support video recording, it can't be saved to the assets 
-		// library. Instead, save it in the app's Documents directory, whence it can be copied from the device via
-		// iTunes file sharing.
-		[self copyFileToDocuments:outputFileURL];
-
-		if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-			[[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
-		}		
-
-		if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
-			[[self delegate] captureManagerRecordingFinished:self];
-		}
-	}
-	else {	
-		ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-		[library writeVideoAtPathToSavedPhotosAlbum:outputFileURL
-									completionBlock:^(NSURL *assetURL, NSError *error) {
-										if (error) {
-											if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-												[[self delegate] captureManager:self didFailWithError:error];
-											}											
-										}
-										
-										if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-											[[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
-										}
-										
-										if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
-											[[self delegate] captureManagerRecordingFinished:self];
-										}
-									}];
-		[library release];
-	}
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    [library writeVideoAtPathToSavedPhotosAlbum:outputFileURL
+                                completionBlock:^(NSURL *assetURL, NSError *error) {
+                                    if (error) {
+                                        if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
+                                            [[self delegate] captureManager:self didFailWithError:error];
+                                        }											
+                                    }
+                                    
+                                    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+                                        [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
+                                    }
+                                    
+                                    if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
+                                        [[self delegate] captureManagerRecordingFinished:self];
+                                    }
+                                }];
+    [library release];
 }
 
 @end
