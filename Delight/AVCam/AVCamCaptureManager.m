@@ -206,9 +206,9 @@
     AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self frontFacingCamera] error:nil];
     AVCaptureDeviceInput *newAudioInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self audioDevice] error:nil];
     
-    // Create session (use default AVCaptureSessionPresetHigh)
+    // Create session
     AVCaptureSession *newCaptureSession = [[AVCaptureSession alloc] init];
-    
+    newCaptureSession.sessionPreset = AVCaptureSessionPresetLow;
     
     // Add inputs and output to the capture session
     if ([newCaptureSession canAddInput:newVideoInput]) {
