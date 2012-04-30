@@ -200,7 +200,7 @@ static Delight *sharedInstance = nil;
 
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
-                
+        lock = [[NSLock alloc] init];
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             if ([UIScreen mainScreen].scale == 1.0) {
                 self.scaleFactor = kDLDefaultScaleFactor_iPad;
@@ -241,8 +241,8 @@ static Delight *sharedInstance = nil;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
-    [cameraManager release];
-
+	[lock release];
+    [cameraManager release];	
 	[taskController release];
     
     [super dealloc];
@@ -285,7 +285,6 @@ static Delight *sharedInstance = nil;
     
     if (videoEncoder.recording) {
         [videoEncoder stopRecording];
-        recordingContext.endTime = [NSDate date];
     }
 }
 
@@ -319,10 +318,12 @@ static Delight *sharedInstance = nil;
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
 {
-    autoCaptureEnabled = isAutoCaptureEnabled;
-    
-    if (autoCaptureEnabled && videoEncoder.recording) {
-        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+    if (autoCaptureEnabled != isAutoCaptureEnabled) {
+        autoCaptureEnabled = isAutoCaptureEnabled;
+        
+        if (autoCaptureEnabled && videoEncoder.recording) {
+            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        }
     }
 }
 
@@ -347,41 +348,41 @@ static Delight *sharedInstance = nil;
         
     processing = YES;
     
-    @synchronized(self) {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
+    [lock lock];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
 
-        if (videoEncoder.encodesRawGLBytes && glView) {
-            [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
+    if (videoEncoder.encodesRawGLBytes && glView) {
+        [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
+    } else {
+        UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
+        if (glView) {
+            [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
         } else {
-            UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
-            if (glView) {
-                [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
-            } else {
-                [screenshotController screenshot];
-            }
+            [screenshotController screenshot];
+        }
 
-            if (previousScreenshot) {
-                UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
-                [videoEncoder writeFrameImage:touchedUpScreenshot];
-                [previousScreenshot release];
-            }
+        if (previousScreenshot) {
+            UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
+            [videoEncoder writeFrameImage:touchedUpScreenshot];
+            [previousScreenshot release];
         }
-        
-        NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
-        
-        frameCount++;
-        elapsedTime += (end - start);
-        lastScreenshotTime = end;
-        
+    }
+    
+    NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
+    
+    frameCount++;
+    elapsedTime += (end - start);
+    lastScreenshotTime = end;
+    
 #ifdef DEBUG
-        if (frameCount % (int)(3 * ceil(frameRate)) == 0) {
-            DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, frameRate);
-        }
+    if (frameCount % (int)(3 * ceil(frameRate)) == 0) {
+        DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, frameRate);
+    }
 #endif
-        
-        [pool drain];
-    } 
+    
+    [pool drain];
+    [lock unlock];
     
     processing = NO;
     
@@ -398,22 +399,24 @@ static Delight *sharedInstance = nil;
 
 - (void)screenshotTimerFired
 {
-    if (!paused && videoEncoder.recording) {
-        if (!processing) {
-            [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
-            if (frameRate + 1 <= maximumFrameRate) {
-                frameRate++;
-            }
-        } else {
-            // Frame rate too high to keep up
-            if (frameRate - 1 > 0) {
-                frameRate--;
+    if (videoEncoder.recording) {
+        if (!paused) {
+            if (!processing) {
+                [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
+                if (frameRate + 1 <= maximumFrameRate) {
+                    frameRate++;
+                }
+            } else {
+                // Frame rate too high to keep up
+                if (frameRate - 1 > 0) {
+                    frameRate--;
+                }
             }
         }
-    }
-    
-    if (autoCaptureEnabled) {
-        [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        
+        if (autoCaptureEnabled) {
+            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        }
     }
 }
 
@@ -448,9 +451,8 @@ static Delight *sharedInstance = nil;
 #else
 	if ( recordingContext.shouldRecordVideo ) {
 		[self stopRecording];
-	} else {
-		recordingContext.endTime = [NSDate date];
 	}
+    recordingContext.endTime = [NSDate date];
 	[taskController uploadSession:recordingContext];
 #endif
     
@@ -471,9 +473,8 @@ static Delight *sharedInstance = nil;
             // We've been inactive for a long time, stop the previous recording and create a new session
             if (recordingContext.shouldRecordVideo) {
                 [self stopRecording];
-            } else {
-				recordingContext.endTime = [NSDate date];
-			}
+            }
+            recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
             [taskController uploadSession:recordingContext];
             [self tryCreateNewSession];
         }

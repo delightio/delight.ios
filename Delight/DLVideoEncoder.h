@@ -24,6 +24,8 @@
     NSTimeInterval recordingStartTime;
     NSTimeInterval pauseStartTime;
     NSTimeInterval totalPauseDuration;
+    
+    NSLock *lock;
 }
 
 @property (nonatomic, readonly, getter=isRecording) BOOL recording;

@@ -35,7 +35,8 @@
     
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
-    AVCamCaptureManager * cameraManager;
+	NSLock * lock;
+	AVCamCaptureManager * cameraManager;
 }
 
 @property (nonatomic, retain) NSString *appToken;
