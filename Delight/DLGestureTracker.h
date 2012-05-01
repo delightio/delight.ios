@@ -17,6 +17,7 @@
     
     NSMutableSet *gesturesInProgress;
     NSMutableSet *gesturesCompleted;
+    CGMutablePathRef arrowheadPath;
     NSLock *lock;
 }
 
