@@ -97,9 +97,7 @@
         [self setDeviceDisconnectedObserver:[notificationCenter addObserverForName:AVCaptureDeviceWasDisconnectedNotification object:nil queue:nil usingBlock:deviceDisconnectedBlock]];
 		[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 		[notificationCenter addObserver:self selector:@selector(deviceOrientationDidChange) name:UIDeviceOrientationDidChangeNotification object:nil];
-		orientation = AVCaptureVideoOrientationPortrait;
-        
-        [self setupSession];
+		orientation = AVCaptureVideoOrientationPortrait;        
     }
     
     return self;
@@ -124,23 +122,13 @@
 
 - (void) startRecording
 {    
-    if (!session) return;
-    
-    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-        // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until DLCam returns
-		// to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library
-		// when DLCam is backgrounded. To conclude this background execution, -endBackgroundTask is called in -recorder:recordingDidFinishToOutputFileURL:error:
-		// after the recorded file has been saved.
-        [self setBackgroundRecordingID:[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}]];
-    }
-    
-    [self removeFile:[[self recorder] outputFileURL]];
-    [[self recorder] startRecordingWithOrientation:orientation];
+    [self setupSession];    
 }
 
 - (void) stopRecording
 {
     [[self recorder] stopRecording];
+    [[self session] stopRunning];
 }
 
 #pragma mark Device Counts
@@ -218,6 +206,18 @@
     // Start the session. This is done asychronously since -startRunning doesn't return until the session is running.
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [session startRunning];
+        
+        if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+            // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until DLCam returns
+            // to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library
+            // when DLCam is backgrounded. To conclude this background execution, -endBackgroundTask is called in -recorder:recordingDidFinishToOutputFileURL:error:
+            // after the recorded file has been saved.
+            [self setBackgroundRecordingID:[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}]];
+        }
+        
+        // Remove old file and start recording
+        [self removeFile:[[self recorder] outputFileURL]];
+        [[self recorder] startRecordingWithOrientation:orientation];
     });
     
     return YES;
