@@ -23,7 +23,6 @@
 
 #define kDLDefaultMaximumFrameRate 30.0f
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
-#define kDLStartingFrameRate 5.0f
 #define kDLMaximumSessionInactiveTime 60.0f*5
 
 static Delight *sharedInstance = nil;
@@ -40,8 +39,7 @@ static Delight *sharedInstance = nil;
 - (void)pause;
 - (void)resume;
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-- (void)takeScreenshot;
-- (void)screenshotTimerFired;
+- (void)scheduleScreenshot;
 - (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 @end
 
@@ -49,7 +47,6 @@ static Delight *sharedInstance = nil;
 
 @synthesize appToken;
 @synthesize scaleFactor;
-@synthesize frameRate;
 @synthesize maximumFrameRate;
 @synthesize maximumRecordingDuration;
 @synthesize paused;
@@ -186,6 +183,10 @@ static Delight *sharedInstance = nil;
         videoEncoder = [[DLVideoEncoder alloc] init];
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
+        
+        screenshotQueue = [[NSOperationQueue alloc] init];
+        screenshotQueue.maxConcurrentOperationCount = 1;
+
         lock = [[NSLock alloc] init];
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -205,7 +206,6 @@ static Delight *sharedInstance = nil;
         self.maximumFrameRate = kDLDefaultMaximumFrameRate;
         self.maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
-        frameRate = kDLStartingFrameRate;
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -228,8 +228,9 @@ static Delight *sharedInstance = nil;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
-	[lock release];
+	[screenshotQueue release];
 	[taskController release];
+    [lock release];
     
     [super dealloc];
 }
@@ -254,11 +255,7 @@ static Delight *sharedInstance = nil;
         recordingContext.filePath = videoEncoder.outputPath;
         
         if (autoCaptureEnabled) {
-            if (frameRate > maximumFrameRate) {
-                frameRate = maximumFrameRate;
-            }
-            
-            [self screenshotTimerFired];
+            [self scheduleScreenshot];
         }
     }
 }
@@ -266,7 +263,9 @@ static Delight *sharedInstance = nil;
 - (void)stopRecording 
 {
     if (videoEncoder.recording) {
+        [lock lock];
         [videoEncoder stopRecording];
+        [lock unlock];
     }
 }
 
@@ -275,6 +274,7 @@ static Delight *sharedInstance = nil;
     if (!paused) {
         paused = YES;
         [videoEncoder pause];
+        [screenshotQueue setSuspended:YES];
     }
 }
 
@@ -283,6 +283,7 @@ static Delight *sharedInstance = nil;
     if (paused) {
         paused = NO;
         [videoEncoder resume];
+        [screenshotQueue setSuspended:NO];
     }
 }
 
@@ -303,88 +304,77 @@ static Delight *sharedInstance = nil;
     if (autoCaptureEnabled != isAutoCaptureEnabled) {
         autoCaptureEnabled = isAutoCaptureEnabled;
         
-        if (autoCaptureEnabled && videoEncoder.recording) {
-            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
+        if (autoCaptureEnabled && videoEncoder.recording && screenshotQueue.operationCount == 0) {
+            [self scheduleScreenshot];
         }
     }
 }
 
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
-{
-    if (paused || processing || (glView && [[NSDate date] timeIntervalSince1970] - lastScreenshotTime < 1.0f / maximumFrameRate)) return;
-        
-    processing = YES;
+{    
+    if (!videoEncoder.recording) return;
     
-    [lock lock];
+    // Need to set up an autorelease pool since this method gets called from a background thread
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
 
+    // Frame rate limiting
+    float targetFrameInterval = 1.0f / maximumFrameRate;
+    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    if (now - lastScreenshotTime < targetFrameInterval) {
+        [NSThread sleepForTimeInterval:targetFrameInterval - (now - lastScreenshotTime)];
+    }
+    
+    NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
+    lastScreenshotTime = start;
+        
     if (videoEncoder.encodesRawGLBytes && glView) {
+        // Encode GL bytes directly
         [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
     } else {
         UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
+
+        // Take new screenshot
         if (glView) {
             [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
         } else {
             [screenshotController screenshot];
         }
 
+        // Draw gestures onto the previous screenshot and send to encoder
         if (previousScreenshot) {
             UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
-            [videoEncoder writeFrameImage:touchedUpScreenshot];
+            [lock lock];
+            if (videoEncoder.recording) {
+                [videoEncoder writeFrameImage:touchedUpScreenshot];
+            }
+            [lock unlock];
             [previousScreenshot release];
         }
     }
-    
-    NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
-    
-    frameCount++;
-    elapsedTime += (end - start);
-    lastScreenshotTime = end;
+        
+    if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
+        // We've exceeded the maximum recording duration
+        [self stopRecording];
+    } else {
+        [self scheduleScreenshot];
+    }
     
 #ifdef DEBUG
-    if (frameCount % (int)(3 * ceil(frameRate)) == 0) {
-        DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, frameRate);
+    NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
+    elapsedTime += (end - start);
+    if (++frameCount % 20 == 0) {
+        DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, 1.0f / (end - now));
     }
 #endif
     
     [pool drain];
-    [lock unlock];
-    
-    processing = NO;
-    
-    if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
-        // We've exceeded the maximum recording duration
-        [self stopRecording];
-    }
 }
 
-- (void)takeScreenshot
+- (void)scheduleScreenshot
 {
-    [self takeScreenshot:nil backingWidth:0 backingHeight:0];
-}
-
-- (void)screenshotTimerFired
-{
-    if (videoEncoder.recording) {
-        if (!paused) {
-            if (!processing) {
-                [self performSelectorInBackground:@selector(takeScreenshot) withObject:nil];
-                if (frameRate + 1 <= maximumFrameRate) {
-                    frameRate++;
-                }
-            } else {
-                // Frame rate too high to keep up
-                if (frameRate - 1 > 0) {
-                    frameRate--;
-                }
-            }
-        }
-        
-        if (autoCaptureEnabled) {
-            [self performSelector:@selector(screenshotTimerFired) withObject:nil afterDelay:1.0f/frameRate];
-        }
-    }
+    [screenshotQueue addOperationWithBlock:^{
+        [self takeScreenshot:nil backingWidth:0 backingHeight:0];                                        
+    }];
 }
 
 #pragma mark - Session
