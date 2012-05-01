@@ -44,7 +44,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         gesturesCompleted = [[NSMutableSet alloc] init];
         touches = [[NSMutableArray alloc] init];
         orientationChanges = [[NSMutableArray alloc] init];
-        
+        lock = [[NSLock alloc] init];
+
         scaleFactor = 1.0f;
         bitmapData = NULL;
         startTime = -1;
@@ -72,6 +73,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [gesturesCompleted release];
     [touches release];
     [orientationChanges release];
+    [lock release];
     
     if (bitmapData != NULL) {
         free(bitmapData);
@@ -131,10 +133,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     CGFloat arrowSize = 50 * scaleFactor * scale;
     
     NSMutableSet *allGestures = [[NSMutableSet alloc] init];
-    @synchronized(self) {
-        [allGestures unionSet:gesturesInProgress];
-        [allGestures unionSet:gesturesCompleted];
-    }
+    [lock lock];
+    [allGestures unionSet:gesturesInProgress];
+    [allGestures unionSet:gesturesCompleted];
+    [lock unlock];
     
     for (DLGesture *gesture in allGestures) {
         BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue]];
@@ -149,7 +151,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                 CGContextFillEllipseInRect(context, CGRectMake(scaledLocation.x - tapCircleRadius, scaledLocation.y - tapCircleRadius, 2 * tapCircleRadius + 1, 2 * tapCircleRadius + 1));
             } else {
                 // Swipe: draw a line from start to finish with an arrowhead
-                CGPoint startLocation;
                 NSInteger strokeCount = 0;
                 CGPoint lastLocations[4];
 
@@ -158,7 +159,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                     CGPoint scaledLocation = CGPointMake(location.x * scaleFactor * scale, location.y * scaleFactor * scale);
 
                     if (i == 0) {
-                        startLocation = scaledLocation;
                         CGContextMoveToPoint(context, scaledLocation.x, scaledLocation.y);
                     } else if (i < [gesture.locations count] - 1) {
                         for (NSInteger i = 0; i < 3; i++) {
@@ -168,9 +168,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                         strokeCount++;
                         
                         CGContextAddLineToPoint(context, scaledLocation.x, scaledLocation.y);
-                    } else {
+                    } else if (strokeCount > 0) {
                         CGContextStrokePath(context);
                         
+                        // Draw the arrowhead
                         CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
                         double angle = atan2(scaledLocation.y - lastLocation.y, scaledLocation.x - lastLocation.x);
                         
@@ -188,9 +189,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     [allGestures release];
     
-    @synchronized(self) {
-        [gesturesCompleted removeAllObjects];
-    }
+    [lock lock];
+    [gesturesCompleted removeAllObjects];
+    [lock unlock];
 }
 
 - (CGContextRef)createBitmapContextOfSize:(CGSize)size
@@ -202,7 +203,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     bitmapBytesPerRow   = (size.width * 4);
     bitmapByteCount     = (bitmapBytesPerRow * size.height);
-    colorSpace = CGColorSpaceCreateDeviceRGB();
     if (bitmapData != NULL) {
         free(bitmapData);
     }
@@ -211,7 +211,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         fprintf (stderr, "Memory not allocated!");
         return NULL;
     }
-    
+
+    colorSpace = CGColorSpaceCreateDeviceRGB();
     context = CGBitmapContextCreate (bitmapData,
                                      size.width,
                                      size.height,
@@ -242,28 +243,28 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             BOOL existing = NO;
             if (touch.phase != UITouchPhaseBegan) {
                 // Check if this touch is part of an existing gesture
-                @synchronized(self) {
-                    for (DLGesture *gesture in gesturesInProgress) {
-                        if ([gesture locationBelongsToGesture:location]) {
-                            [gesture addLocation:location];
-                            
-                            if (touch.phase != UITouchPhaseEnded && touch.phase != UITouchPhaseCancelled) {
-                                // Still in progress
-                                [gesturesJustCompleted removeObject:gesture];
-                            }
-                            existing = YES;
-                            break;
+                [lock lock];
+                for (DLGesture *gesture in gesturesInProgress) {
+                    if ([gesture locationBelongsToGesture:location]) {
+                        [gesture addLocation:location];
+                        
+                        if (touch.phase != UITouchPhaseEnded && touch.phase != UITouchPhaseCancelled) {
+                            // Still in progress
+                            [gesturesJustCompleted removeObject:gesture];
                         }
+                        existing = YES;
+                        break;
                     }
                 }
+                [lock unlock];
             }
             
             if (!existing) {
                 // This is part of a new gesture
                 DLGesture *gesture = [[DLGesture alloc] initWithLocation:location];
-                @synchronized(self) {
-                    [gesturesInProgress addObject:gesture];
-                }
+                [lock lock];
+                [gesturesInProgress addObject:gesture];
+                [lock unlock];
                 [gesture release];
             }
         }

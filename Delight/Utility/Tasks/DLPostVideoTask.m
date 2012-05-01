@@ -22,9 +22,9 @@
 }
 
 - (void)processResponse {
-	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"posted video: %@", str);
-	[str release];
+//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+//	NSLog(@"posted video: %@", str);
+//	[str release];
 	[self.recordingContext setTaskFinished:DLFinishedPostVideo];
 	if ( [self.recordingContext allTasksFinished] ) {
 		// all tasks are done. end the background task

@@ -28,9 +28,9 @@
 }
 
 - (void)processResponse {
-	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"uploaded video file: %@", str);
-	[str release];
+//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+//	NSLog(@"uploaded video file: %@", str);
+//	[str release];
 	// create Post Video task
 	DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
 	UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
