@@ -15,7 +15,7 @@
 		8385CA80154768530057FC37 /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
 		8385CA831547688E0057FC37 /* DLOrientationChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA811547688D0057FC37 /* DLOrientationChange.h */; };
 		8385CA841547688E0057FC37 /* DLOrientationChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA821547688E0057FC37 /* DLOrientationChange.m */; };
-		8391626F1537C21000549347 /* DLGestureTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8391626D1537C21000549347 /* DLGestureTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8391626F1537C21000549347 /* DLGestureTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8391626D1537C21000549347 /* DLGestureTracker.h */; settings = {ATTRIBUTES = (); }; };
 		839162701537C21000549347 /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
@@ -244,13 +244,13 @@
 				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
 				83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */,
 				A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */,
-				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				A9A9A3DB15371AE500B6E4AB /* DLRecordingContext.h in Headers */,
 				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
 				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
 				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
 				A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
+				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
 				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
 				8385CA7F154768530057FC37 /* DLTouch.h in Headers */,

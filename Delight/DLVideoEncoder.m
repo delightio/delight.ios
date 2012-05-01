@@ -34,6 +34,7 @@
     self = [super init];
     if (self) {
         averageBitRate = kDLDefaultBitRate;
+        lock = [[NSLock alloc] init];
     }
     return self;
 }
@@ -43,6 +44,7 @@
     [self cleanupWriter];
 
     [outputPath release];
+    [lock release];
     
     [super dealloc];
 }
@@ -78,34 +80,36 @@
     } else {
         CMTime time = [self currentFrameTime];
         
-        @synchronized (self) {
-            CVPixelBufferRef pixelBuffer = NULL;
-            CGImageRef cgImage = CGImageCreateCopy([frameImage CGImage]);
-            CFDataRef image = CGDataProviderCopyData(CGImageGetDataProvider(cgImage));
+        [lock lock];
+        
+        CVPixelBufferRef pixelBuffer = NULL;
+        CGImageRef cgImage = CGImageCreateCopy([frameImage CGImage]);
+        CFDataRef image = CGDataProviderCopyData(CGImageGetDataProvider(cgImage));
+        
+        int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &pixelBuffer);
+        if(status != 0){
+            //could not get a buffer from the pool
+            DLDebugLog(@"Error creating pixel buffer:  status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+        } else {
+            // set image data into pixel buffer
+            CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+            uint8_t* destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
+            CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image)), destPixels);  //XXX:  will work if the pixel buffer is contiguous and has the same bytesPerRow as the input data
             
-            int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &pixelBuffer);
-            if(status != 0){
-                //could not get a buffer from the pool
-                DLDebugLog(@"Error creating pixel buffer:  status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
-            } else {
-                // set image data into pixel buffer
-                CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-                uint8_t* destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
-                CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image)), destPixels);  //XXX:  will work if the pixel buffer is contiguous and has the same bytesPerRow as the input data
-                
-                if(status == 0){
-                    BOOL success = [avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time];
-                    if (!success)
-                        DLDebugLog(@"Warning:  Unable to write buffer to video: %@", videoWriter.error);
-                }
-                
-                CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
-                CVPixelBufferRelease( pixelBuffer );
+            if(status == 0){
+                BOOL success = [avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time];
+                if (!success)
+                    DLDebugLog(@"Warning:  Unable to write buffer to video: %@", videoWriter.error);
             }
             
-            CFRelease(image);
-            CGImageRelease(cgImage);
+            CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
+            CVPixelBufferRelease( pixelBuffer );
         }
+        
+        CFRelease(image);
+        CGImageRelease(cgImage);
+        
+        [lock unlock];
     }
 }
     
@@ -218,22 +222,22 @@
         status = videoWriter.status;
     }
     
-    @synchronized(self) {
-        BOOL success = [videoWriter finishWriting];
-        if (success) {
-            DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
-            if ([delegate respondsToSelector:@selector(videoEncoderDidFinishRecording:)]) {
-                [delegate videoEncoderDidFinishRecording:self];
-            }
-        } else {
-            DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
-            if ([delegate respondsToSelector:@selector(videoEncoder:didFailRecordingWithError:)]) {
-                [delegate videoEncoder:self didFailRecordingWithError:[videoWriter error]];
-            }
+    [lock lock];
+    BOOL success = [videoWriter finishWriting];
+    if (success) {
+        DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
+        if ([delegate respondsToSelector:@selector(videoEncoderDidFinishRecording:)]) {
+            [delegate videoEncoderDidFinishRecording:self];
         }
-        
-        [self cleanupWriter];        
+    } else {
+        DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
+        if ([delegate respondsToSelector:@selector(videoEncoder:didFailRecordingWithError:)]) {
+            [delegate videoEncoder:self didFailRecordingWithError:[videoWriter error]];
+        }
     }
+        
+    [self cleanupWriter];        
+    [lock unlock];
     
     [pool drain];
 }

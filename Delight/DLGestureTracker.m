@@ -44,7 +44,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         gesturesCompleted = [[NSMutableSet alloc] init];
         touches = [[NSMutableArray alloc] init];
         orientationChanges = [[NSMutableArray alloc] init];
-        
+        lock = [[NSLock alloc] init];
+
         scaleFactor = 1.0f;
         bitmapData = NULL;
         startTime = -1;
@@ -72,6 +73,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [gesturesCompleted release];
     [touches release];
     [orientationChanges release];
+    [lock release];
     
     if (bitmapData != NULL) {
         free(bitmapData);
@@ -131,10 +133,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     CGFloat arrowSize = 50 * scaleFactor * scale;
     
     NSMutableSet *allGestures = [[NSMutableSet alloc] init];
-    @synchronized(self) {
-        [allGestures unionSet:gesturesInProgress];
-        [allGestures unionSet:gesturesCompleted];
-    }
+    [lock lock];
+    [allGestures unionSet:gesturesInProgress];
+    [allGestures unionSet:gesturesCompleted];
+    [lock unlock];
     
     for (DLGesture *gesture in allGestures) {
         BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue]];
@@ -187,9 +189,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     [allGestures release];
     
-    @synchronized(self) {
-        [gesturesCompleted removeAllObjects];
-    }
+    [lock lock];
+    [gesturesCompleted removeAllObjects];
+    [lock unlock];
 }
 
 - (CGContextRef)createBitmapContextOfSize:(CGSize)size
@@ -241,28 +243,28 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             BOOL existing = NO;
             if (touch.phase != UITouchPhaseBegan) {
                 // Check if this touch is part of an existing gesture
-                @synchronized(self) {
-                    for (DLGesture *gesture in gesturesInProgress) {
-                        if ([gesture locationBelongsToGesture:location]) {
-                            [gesture addLocation:location];
-                            
-                            if (touch.phase != UITouchPhaseEnded && touch.phase != UITouchPhaseCancelled) {
-                                // Still in progress
-                                [gesturesJustCompleted removeObject:gesture];
-                            }
-                            existing = YES;
-                            break;
+                [lock lock];
+                for (DLGesture *gesture in gesturesInProgress) {
+                    if ([gesture locationBelongsToGesture:location]) {
+                        [gesture addLocation:location];
+                        
+                        if (touch.phase != UITouchPhaseEnded && touch.phase != UITouchPhaseCancelled) {
+                            // Still in progress
+                            [gesturesJustCompleted removeObject:gesture];
                         }
+                        existing = YES;
+                        break;
                     }
                 }
+                [lock unlock];
             }
             
             if (!existing) {
                 // This is part of a new gesture
                 DLGesture *gesture = [[DLGesture alloc] initWithLocation:location];
-                @synchronized(self) {
-                    [gesturesInProgress addObject:gesture];
-                }
+                [lock lock];
+                [gesturesInProgress addObject:gesture];
+                [lock unlock];
                 [gesture release];
             }
         }

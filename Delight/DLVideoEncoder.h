@@ -26,6 +26,8 @@
     NSTimeInterval recordingStartTime;  // System uptime at recording start
     NSTimeInterval pauseStartTime;      // System uptime at pause start
     NSTimeInterval totalPauseDuration;
+    
+    NSLock *lock;
 }
 
 @property (nonatomic, readonly, getter=isRecording) BOOL recording;

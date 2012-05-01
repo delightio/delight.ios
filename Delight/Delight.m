@@ -190,6 +190,7 @@ static Delight *sharedInstance = nil;
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.drawsGestures = NO;
         gestureTracker.delegate = self;
+        lock = [[NSLock alloc] init];
         
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             if ([UIScreen mainScreen].scale == 1.0) {
@@ -231,7 +232,7 @@ static Delight *sharedInstance = nil;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
-	
+	[lock release];
 	[taskController release];
     
     [super dealloc];
@@ -318,41 +319,41 @@ static Delight *sharedInstance = nil;
         
     processing = YES;
     
-    @synchronized(self) {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
+    [lock lock];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
 
-        if (videoEncoder.encodesRawGLBytes && glView) {
-            [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
+    if (videoEncoder.encodesRawGLBytes && glView) {
+        [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
+    } else {
+        UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
+        if (glView) {
+            [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
         } else {
-            UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
-            if (glView) {
-                [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
-            } else {
-                [screenshotController screenshot];
-            }
+            [screenshotController screenshot];
+        }
 
-            if (previousScreenshot) {
-                UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
-                [videoEncoder writeFrameImage:touchedUpScreenshot];
-                [previousScreenshot release];
-            }
+        if (previousScreenshot) {
+            UIImage *touchedUpScreenshot = [gestureTracker drawPendingTouchMarksOnImage:previousScreenshot];
+            [videoEncoder writeFrameImage:touchedUpScreenshot];
+            [previousScreenshot release];
         }
-        
-        NSTimeInterval end = [[NSProcessInfo processInfo] systemUptime];
-        
-        frameCount++;
-        elapsedTime += (end - start);
-        lastScreenshotTime = end;
-        
+    }
+    
+    NSTimeInterval end = [[NSProcessInfo processInfo] systemUptime];
+    
+    frameCount++;
+    elapsedTime += (end - start);
+    lastScreenshotTime = end;
+    
 #ifdef DEBUG
-        if (frameCount % (int)(3 * ceil(frameRate)) == 0) {
-            DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, frameRate);
-        }
+    if (frameCount % (int)(3 * ceil(frameRate)) == 0) {
+        DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, frameRate);
+    }
 #endif
-        
-        [pool drain];
-    } 
+    
+    [pool drain];
+    [lock unlock];
     
     processing = NO;
     
