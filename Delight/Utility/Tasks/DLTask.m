@@ -113,7 +113,7 @@ NSString * const DL_APP_LOCALE = @"";
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	NSLog(@"error: %@", error);
+	DLDebugLog(@"error connecting to delight server: %@", error);
 	self.connection = nil;
 	self.receivedData = nil;
 }

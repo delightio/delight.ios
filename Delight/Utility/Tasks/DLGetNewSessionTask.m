@@ -39,6 +39,7 @@ NSString * const DLRecordElementName = @"recording";
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPMethod:@"POST"];
+	DLDebugLog(@"connecting to delight server");
 	return request;
 }
 
