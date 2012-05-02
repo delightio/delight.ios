@@ -50,7 +50,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         bitmapData = NULL;
         startTime = -1;
         drawsGestures = YES;
-        
+        arrowheadPath = NULL;
+
         // Method swizzling to intercept events
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
         for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
@@ -78,6 +79,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (bitmapData != NULL) {
         free(bitmapData);
         bitmapData = NULL;
+    }
+    
+    if (arrowheadPath != NULL) {
+        CGPathRelease(arrowheadPath);
     }
     
     [super dealloc];
@@ -130,7 +135,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     CGContextSetLineJoin(context, kCGLineJoinRound);
     CGContextSetLineWidth(context, 5 * scaleFactor * scale);
     CGFloat tapCircleRadius = 7 * scaleFactor * scale;
-    CGFloat arrowSize = 50 * scaleFactor * scale;
     
     NSMutableSet *allGestures = [[NSMutableSet alloc] init];
     [lock lock];
@@ -171,16 +175,29 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                     } else if (strokeCount > 0) {
                         CGContextStrokePath(context);
                         
+                        if (arrowheadPath == NULL) {
+                            // Create the arrowhead path and cache it for future use
+                            CGFloat arrowSize = 50 * scaleFactor * scale;
+
+                            arrowheadPath = CGPathCreateMutable();
+                            CGPathMoveToPoint(arrowheadPath, NULL, 0, 0);
+                            CGPathAddLineToPoint(arrowheadPath, NULL, arrowSize*cos(M_PI + M_PI/8), arrowSize*sin(M_PI + M_PI/8));
+                            CGPathAddLineToPoint(arrowheadPath, NULL, arrowSize*cos(M_PI - M_PI/8), arrowSize*sin(M_PI - M_PI/8));
+                            CGPathAddLineToPoint(arrowheadPath, NULL, 0, 0);
+                            CGPathCloseSubpath(arrowheadPath);
+                        }
+                        
                         // Draw the arrowhead
                         CGPoint lastLocation = (strokeCount < 4 ? lastLocations[4 - strokeCount] : lastLocations[0]);
                         double angle = atan2(scaledLocation.y - lastLocation.y, scaledLocation.x - lastLocation.x);
                         
                         CGContextSetRGBFillColor(context, 0, 0, 1, 1.0); 
-                        CGContextMoveToPoint(context, scaledLocation.x, scaledLocation.y);
-                        CGContextAddLineToPoint(context, scaledLocation.x + arrowSize*cos(angle + M_PI + M_PI/8), scaledLocation.y + arrowSize*sin(angle + M_PI + M_PI/8));
-                        CGContextAddLineToPoint(context, scaledLocation.x + arrowSize*cos(angle + M_PI - M_PI/8), scaledLocation.y + arrowSize*sin(angle + M_PI - M_PI/8));
-                        CGContextAddLineToPoint(context, scaledLocation.x, scaledLocation.y);
+                        CGContextSaveGState(context);
+                        CGContextTranslateCTM(context, scaledLocation.x, scaledLocation.y);
+                        CGContextRotateCTM(context, angle);
+                        CGContextAddPath(context, arrowheadPath);
                         CGContextFillPath(context);
+                        CGContextRestoreGState(context);
                     }
                 }                
             }

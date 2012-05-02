@@ -9,7 +9,7 @@
 #import "DLGesture.h"
 
 // The maximum difference in distance between two touches that can be considered to be part of the same gesture
-#define kDLGestureDistanceThreshold 40
+#define kDLGestureDistanceThreshold 50
 
 // The distance required before a tap becomes a swipe
 #define kDLMinimumSwipeDistance 40
