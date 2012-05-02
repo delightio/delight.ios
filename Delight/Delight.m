@@ -321,7 +321,12 @@ static Delight *sharedInstance = nil;
     float targetFrameInterval = 1.0f / maximumFrameRate;
     NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
     if (now - lastScreenshotTime < targetFrameInterval) {
-        [NSThread sleepForTimeInterval:targetFrameInterval - (now - lastScreenshotTime)];
+        if (glView) {
+            // We'll try again on a subsequent render loop iteration
+            return;
+        } else {
+            [NSThread sleepForTimeInterval:targetFrameInterval - (now - lastScreenshotTime)];
+        }
     }
     
     NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
@@ -355,7 +360,7 @@ static Delight *sharedInstance = nil;
     if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
         // We've exceeded the maximum recording duration
         [self stopRecording];
-    } else {
+    } else if (autoCaptureEnabled) {
         [self scheduleScreenshot];
     }
     
