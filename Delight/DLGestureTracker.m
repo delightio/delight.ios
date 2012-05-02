@@ -283,7 +283,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)windowAccelerometerDidShake:(UIWindow *)window
 {
-    NSLog(@"Did shake");
+    if ([delegate respondsToSelector:@selector(gestureTrackerDidShake:)]) {
+        [delegate gestureTrackerDidShake:self];
+    }
 }
 
 @end

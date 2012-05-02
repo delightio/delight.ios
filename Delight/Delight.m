@@ -28,7 +28,7 @@
 
 static Delight *sharedInstance = nil;
 
-@interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate>
+@interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // OpenGL ES beta methods
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
@@ -266,7 +266,6 @@ static Delight *sharedInstance = nil;
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         
         [videoEncoder startNewRecording];
-        [cameraManager startRecording];
 
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
@@ -484,6 +483,40 @@ static Delight *sharedInstance = nil;
 - (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location
 {
     return [screenshotController locationIsInPrivateView:location];
+}
+
+- (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker
+{
+    if (![cameraManager isRecording]) {
+        // Start usability test mode
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
+                                                            message:@"Start usability test?"
+                                                           delegate:self
+                                                  cancelButtonTitle:@"Cancel"
+                                                  otherButtonTitles:@"Start", nil];
+        [alertView show];
+        [alertView release];
+    } else {
+        // Stop usability test mode
+        [cameraManager stopRecording];
+        
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
+                                                            message:@"Usability test ended."
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+        [alertView show];
+        [alertView release];        
+    }
+}
+
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        [cameraManager startRecording];
+    }
 }
 
 @end

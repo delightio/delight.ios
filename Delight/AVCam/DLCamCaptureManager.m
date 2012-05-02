@@ -37,6 +37,7 @@
 @synthesize deviceConnectedObserver;
 @synthesize deviceDisconnectedObserver;
 @synthesize backgroundRecordingID;
+@synthesize recording;
 @synthesize delegate;
 
 - (id) init
@@ -129,6 +130,9 @@
 {
     [[self recorder] stopRecording];
     [[self session] stopRunning];
+    self.recorder = nil;
+    self.session = nil;
+    recording = NO;
 }
 
 #pragma mark Device Counts
@@ -218,6 +222,8 @@
         // Remove old file and start recording
         [self removeFile:[[self recorder] outputFileURL]];
         [[self recorder] startRecordingWithOrientation:orientation];
+        
+        recording = YES;
     });
     
     return YES;
