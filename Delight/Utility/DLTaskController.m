@@ -88,6 +88,8 @@
 			for (DLRecordingContext * ctx in _unfinishedContexts) {
 				[self createUploadTasksForSession:ctx priority:NSOperationQueuePriorityNormal];
 			}
+		} else {
+			self.unfinishedContexts = [NSMutableArray arrayWithObject:aSession];
 		}
 	}
 }
@@ -118,7 +120,7 @@
 		bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			// task expires. clean it up if it has not finished yet
 			[sessTask cancel];
-			[self saveUnfinishedRecordingContext:ctx];
+			[self saveRecordingContext];
 			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 		}];
 		sessTask.taskController = self;
@@ -136,7 +138,7 @@
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 					// task expires. clean it up if it has not finished yet
 					[uploadTask cancel];
-					[self saveUnfinishedRecordingContext:ctx];
+					[self saveRecordingContext];
 					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 				}];
 				uploadTask.taskController = self;
@@ -153,7 +155,7 @@
 			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 				// task expires. clean it up if it has not finished yet
 				[postTask cancel];
-				[self saveUnfinishedRecordingContext:ctx];
+				[self saveRecordingContext];
 				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 			}];
 			postTask.taskController = self;
@@ -172,6 +174,7 @@
 #pragma mark Task Management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
 	DLRecordingContext * ctx = aTask.recordingContext;
+	DLDebugLog(@"session created: %@", ctx.sessionID);
 	if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
 		// suppress recording flag if there's video files pending upload
 		ctx.shouldRecordVideo = NO;
@@ -181,17 +184,23 @@
 	self.task = nil;
 }
 
-- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx {
-	if ( !ctx.loadedFromArchive && [ctx.finishedTaskIndex count] && !ctx.saved) {
-		// contains incomplete task and require saving
-		if ( _unfinishedContexts == nil ) {
-			_unfinishedContexts = [[NSMutableArray alloc] initWithCapacity:4];
-		}
-		[self.unfinishedContexts addObject:ctx];
-		NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
-		ctx.saved = [NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
-		_containsIncompleteSessions = YES;
-	}
+//- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx {
+//	if ( !ctx.loadedFromArchive && [ctx.finishedTaskIndex count] && !ctx.saved) {
+//		// contains incomplete task and require saving
+//		if ( _unfinishedContexts == nil ) {
+//			_unfinishedContexts = [[NSMutableArray alloc] initWithCapacity:4];
+//		}
+//		[self.unfinishedContexts addObject:ctx];
+//		NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
+//		ctx.saved = [NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
+//		_containsIncompleteSessions = YES;
+//	}
+//}
+
+- (void)saveRecordingContext {
+	NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
+	[NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
+	_containsIncompleteSessions = YES;
 }
 
 #pragma mark Notification
