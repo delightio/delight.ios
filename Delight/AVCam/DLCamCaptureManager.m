@@ -38,6 +38,7 @@
 @synthesize deviceDisconnectedObserver;
 @synthesize backgroundRecordingID;
 @synthesize recording;
+@synthesize outputPath;
 @synthesize delegate;
 
 - (id) init
@@ -278,7 +279,7 @@
 
 - (NSURL *) tempFileURL
 {
-    return [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@%@", NSTemporaryDirectory(), @"output.mov"]];
+    return [NSURL fileURLWithPath:outputPath];
 }
 
 - (void) removeFile:(NSURL *)fileURL

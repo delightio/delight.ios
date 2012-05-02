@@ -86,8 +86,8 @@
 + (BOOL)recordsCamera;
 
 // Set whether usability test mode is enabled (recording starts/stops after shake)
-+ (BOOL)usabilityTestEnabled;
 + (void)setUsabilityTestEnabled:(BOOL)usabilityTestEnabled;
++ (BOOL)usabilityTestEnabled;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;

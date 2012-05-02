@@ -280,6 +280,7 @@ static Delight *sharedInstance = nil;
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         [videoEncoder startNewRecording];
         
+        cameraManager.outputPath = [NSString stringWithFormat:@"%@/%@_camera.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         [cameraManager startRecording];
         
         recordingContext.startTime = [NSDate date];
@@ -493,6 +494,23 @@ static Delight *sharedInstance = nil;
 - (void)handleWillResignActive:(NSNotification *)notification
 {
     resignActiveTime = [[NSDate date] timeIntervalSince1970];
+}
+
+#pragma mark - DLCamCaptureManagerDelegate
+
+- (void)captureManagerRecordingBegan:(DLCamCaptureManager *)captureManager
+{
+    DLDebugLog(@"Began camera recording");
+}
+
+- (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
+{
+    DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
+}
+
+- (void)captureManager:(DLCamCaptureManager *)captureManager didFailWithError:(NSError *)error
+{
+    DLDebugLog(@"Camera recording failed: %@", error);
 }
 
 #pragma mark - DLGestureTrackerDelegate

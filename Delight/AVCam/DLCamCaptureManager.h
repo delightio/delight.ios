@@ -23,6 +23,7 @@
 @property (nonatomic,assign) id deviceDisconnectedObserver;
 @property (nonatomic,assign) UIBackgroundTaskIdentifier backgroundRecordingID;
 @property (nonatomic,assign,getter=isRecording) BOOL recording;
+@property (nonatomic,retain) NSString *outputPath;
 @property (nonatomic,assign) id <DLCamCaptureManagerDelegate> delegate;
 
 - (void) startRecording;
