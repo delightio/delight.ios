@@ -26,6 +26,9 @@
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
 #define kDLMaximumSessionInactiveTime 60.0f*5
 
+#define kDLAlertViewTagStartUsabilityTest 1
+#define kDLAlertViewTagStopUsabilityTest 2
+
 static Delight *sharedInstance = nil;
 
 @interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
@@ -50,6 +53,7 @@ static Delight *sharedInstance = nil;
 @synthesize scaleFactor;
 @synthesize maximumFrameRate;
 @synthesize maximumRecordingDuration;
+@synthesize usabilityTestEnabled;
 @synthesize paused;
 @synthesize autoCaptureEnabled;
 @synthesize recordsCamera;
@@ -160,6 +164,16 @@ static Delight *sharedInstance = nil;
     [self sharedInstance].recordsCamera = recordsCamera;
 }
 
++ (BOOL)usabilityTestEnabled
+{
+    return [self sharedInstance].usabilityTestEnabled;
+}
+
++ (void)setUsabilityTestEnabled:(BOOL)usabilityTestEnabled
+{
+    [self sharedInstance].usabilityTestEnabled = usabilityTestEnabled;
+}
+
 + (BOOL)hidesKeyboardInRecording
 {
     return [self sharedInstance].screenshotController.hidesKeyboard;
@@ -264,9 +278,10 @@ static Delight *sharedInstance = nil;
         }
         
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
-        
         [videoEncoder startNewRecording];
-
+        
+        [cameraManager startRecording];
+        
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
         
@@ -278,7 +293,9 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
-    [cameraManager stopRecording];
+    if (cameraManager.recording) {
+        [cameraManager stopRecording];
+    }
     
     if (videoEncoder.recording) {
         [lock lock];
@@ -423,7 +440,7 @@ static Delight *sharedInstance = nil;
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
     [recordingContext release];
 	recordingContext = [ctx retain];
-	if ( recordingContext.shouldRecordVideo ) {
+	if (recordingContext.shouldRecordVideo && !usabilityTestEnabled) {
 		// start recording
 		[self startRecording];
 	} else {
@@ -487,26 +504,35 @@ static Delight *sharedInstance = nil;
 
 - (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker
 {
-    if (![cameraManager isRecording]) {
-        // Start usability test mode
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
-                                                            message:@"Start usability test?"
-                                                           delegate:self
-                                                  cancelButtonTitle:@"Cancel"
-                                                  otherButtonTitles:@"Start", nil];
-        [alertView show];
-        [alertView release];
-    } else {
-        // Stop usability test mode
-        [cameraManager stopRecording];
-        
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
-                                                            message:@"Usability test ended."
-                                                           delegate:nil
-                                                  cancelButtonTitle:@"OK"
-                                                  otherButtonTitles:nil];
-        [alertView show];
-        [alertView release];        
+    if (usabilityTestEnabled) {
+        if (![videoEncoder isRecording]) {
+            // Start usability test mode
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
+                                                                message:@"Start usability test?\n\n\n"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"Cancel"
+                                                      otherButtonTitles:@"Start", nil];
+            
+            UITextField *descriptionField = [[UITextField alloc] initWithFrame:CGRectMake(20.0, 80.0, 245.0, 25.0)];
+            descriptionField.backgroundColor = [UIColor whiteColor];
+            descriptionField.placeholder = @"Description (Optional)";
+            [alertView addSubview:descriptionField];
+            [descriptionField release];
+            
+            alertView.tag = kDLAlertViewTagStartUsabilityTest;        
+            [alertView show];
+            [alertView release];
+        } else {
+            // Stop usability test mode
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
+                                                                message:@"Stop usability test?"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"Cancel"
+                                                      otherButtonTitles:@"Stop", nil];
+            alertView.tag = kDLAlertViewTagStopUsabilityTest;
+            [alertView show];
+            [alertView release];        
+        }
     }
 }
 
@@ -514,8 +540,19 @@ static Delight *sharedInstance = nil;
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == 1) {
-        [cameraManager startRecording];
+    switch (alertView.tag) {
+        case kDLAlertViewTagStartUsabilityTest:
+            if (buttonIndex == 1) {
+                [self startRecording];
+            }
+            break;
+        case kDLAlertViewTagStopUsabilityTest:
+            if (buttonIndex == 1) {
+                [self stopRecording];
+            }
+            break;
+        default:
+            break;
     }
 }
 

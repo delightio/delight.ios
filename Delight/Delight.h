@@ -45,6 +45,7 @@
 @property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
 @property (nonatomic, assign) BOOL recordsCamera;
+@property (nonatomic, assign, getter=isUsabilityTestEnabled) BOOL usabilityTestEnabled;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
@@ -83,6 +84,10 @@
 // Set whether the user is recorded on camera
 + (void)setRecordsCamera:(BOOL)recordsCamera;
 + (BOOL)recordsCamera;
+
+// Set whether usability test mode is enabled (recording starts/stops after shake)
++ (BOOL)usabilityTestEnabled;
++ (void)setUsabilityTestEnabled:(BOOL)usabilityTestEnabled;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;
