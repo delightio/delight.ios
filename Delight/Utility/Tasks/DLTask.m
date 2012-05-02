@@ -9,7 +9,11 @@
 #import "DLTask.h"
 #import "DLTaskController.h"
 
+#ifdef DL_USE_STAGING_SERVER
+NSString * const DL_BASE_URL = @"delightweb-staging.herokuapp.com";
+#else
 NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
+#endif
 NSString * const DL_APP_LOCALE = @"";
 
 @implementation DLTask

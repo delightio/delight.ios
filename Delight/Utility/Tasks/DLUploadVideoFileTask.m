@@ -39,6 +39,7 @@
 		[postTask cancel];
 		[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 	}];
+	postTask.taskController = self.taskController;
 	postTask.backgroundTaskIdentifier = bgIdf;
 	postTask.recordingContext = self.recordingContext;
 	[self.taskController.queue addOperation:postTask];
@@ -56,10 +57,8 @@
 		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
-		if ( self.recordingContext.loadedFromArchive ) {
-			// remove the task from incomplete array
-			[self.taskController removeRecordingContext:self.recordingContext];
-		}
+		// remove the task from incomplete array
+		[self.taskController removeRecordingContext:self.recordingContext];
 	}
 }
 

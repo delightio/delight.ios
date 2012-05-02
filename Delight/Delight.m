@@ -211,6 +211,7 @@ static Delight *sharedInstance = nil;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
 
 		// create task controller
 		taskController = [[DLTaskController alloc] init];
@@ -448,6 +449,11 @@ static Delight *sharedInstance = nil;
 - (void)handleWillResignActive:(NSNotification *)notification
 {
     resignActiveTime = [[NSDate date] timeIntervalSince1970];
+}
+
+- (void)handleWillTerminate:(NSNotification *)notification
+{
+	[taskController saveRecordingContext];
 }
 
 #pragma mark - DLGestureTrackerDelegate

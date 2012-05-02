@@ -16,7 +16,9 @@
 	NSArray * urlComponents = [self.recordingContext.uploadURLString componentsSeparatedByString:@"?"];
 	NSString * paramStr = [NSString stringWithFormat:@"video[uri]=%@&video[app_session_id]=%@", [self stringByAddingPercentEscapes:[urlComponents objectAtIndex:0]], self.recordingContext.sessionID];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
-	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
+	NSData * theData = [paramStr dataUsingEncoding:NSUTF8StringEncoding];
+	[request setHTTPBody:theData];
+	[request setValue:[NSString stringWithFormat:@"%d", [theData length]] forHTTPHeaderField:@"Content-Length"];
 	[request setHTTPMethod:@"POST"];
 	return request;
 }
@@ -31,10 +33,8 @@
 		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
-		if ( self.recordingContext.loadedFromArchive ) {
-			// remove the task from incomplete array
-			[self.taskController removeRecordingContext:self.recordingContext];
-		}
+		// remove the task from incomplete array
+		[self.taskController removeRecordingContext:self.recordingContext];
 	}
 }
 
