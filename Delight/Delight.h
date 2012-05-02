@@ -26,7 +26,6 @@
 @end
 
 @interface Delight : NSObject <DLRecordingSessionDelegate> {
-    BOOL processing;
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
     NSTimeInterval lastScreenshotTime;
@@ -35,13 +34,13 @@
     
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
-	NSLock * lock;
+    NSOperationQueue * screenshotQueue;
+    NSLock * lock;
 	DLCamCaptureManager * cameraManager;
 }
 
 @property (nonatomic, retain) NSString *appToken;
 @property (nonatomic, assign) CGFloat scaleFactor;
-@property (nonatomic, readonly) float frameRate;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
 @property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
