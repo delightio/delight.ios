@@ -212,19 +212,21 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [session startRunning];
         
-        if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-            // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until DLCam returns
-            // to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library
-            // when DLCam is backgrounded. To conclude this background execution, -endBackgroundTask is called in -recorder:recordingDidFinishToOutputFileURL:error:
-            // after the recorded file has been saved.
-            [self setBackgroundRecordingID:[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}]];
-        }
-        
-        // Remove old file and start recording
-        [self removeFile:[[self recorder] outputFileURL]];
-        [[self recorder] startRecordingWithOrientation:orientation];
-        
-        recording = YES;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+                // Setup background task. This is needed because the captureOutput:didFinishRecordingToOutputFileAtURL: callback is not received until DLCam returns
+                // to the foreground unless you request background execution time. This also ensures that there will be time to write the file to the assets library
+                // when DLCam is backgrounded. To conclude this background execution, -endBackgroundTask is called in -recorder:recordingDidFinishToOutputFileURL:error:
+                // after the recorded file has been saved.
+                [self setBackgroundRecordingID:[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}]];
+            }
+            
+            // Remove old file and start recording
+            [self removeFile:[[self recorder] outputFileURL]];
+            [[self recorder] startRecordingWithOrientation:orientation];
+            
+            recording = YES;
+        });                       
     });
     
     return YES;
@@ -311,6 +313,13 @@
 
 -(void)recorder:(DLCamRecorder *)recorder recordingDidFinishToOutputFileURL:(NSURL *)outputFileURL error:(NSError *)error
 {
+    if (error && [error code] != -11818) {
+        // Not the regular "recording stopped" "error"
+        if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
+            [[self delegate] captureManager:self didFailWithError:error];
+        }
+    }
+    
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
     [library writeVideoAtPathToSavedPhotosAlbum:outputFileURL
                                 completionBlock:^(NSURL *assetURL, NSError *error) {
@@ -320,12 +329,12 @@
                                         }											
                                     }
                                     
-                                    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-                                        [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
-                                    }
-                                    
                                     if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
                                         [[self delegate] captureManagerRecordingFinished:self];
+                                    }
+                                    
+                                    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+                                        [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
                                     }
                                 }];
     [library release];
