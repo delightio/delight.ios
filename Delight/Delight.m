@@ -28,6 +28,7 @@
 
 #define kDLAlertViewTagStartUsabilityTest 1
 #define kDLAlertViewTagStopUsabilityTest 2
+#define kDLAlertViewTextFieldTag 101
 
 static Delight *sharedInstance = nil;
 
@@ -280,8 +281,11 @@ static Delight *sharedInstance = nil;
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         [videoEncoder startNewRecording];
         
-        cameraManager.outputPath = [NSString stringWithFormat:@"%@/%@_camera.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
-        [cameraManager startRecording];
+        if (recordsCamera) {
+            cameraManager.outputPath = [NSString stringWithFormat:@"%@/%@_camera.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
+            [cameraManager startRecording];
+            recordingContext.cameraFilePath = cameraManager.outputPath;
+        }
         
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
@@ -522,7 +526,7 @@ static Delight *sharedInstance = nil;
 
 - (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker
 {
-    if (usabilityTestEnabled) {
+    if (usabilityTestEnabled && recordingContext.shouldRecordVideo) {
         if (![videoEncoder isRecording]) {
             // Start usability test mode
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
@@ -534,6 +538,7 @@ static Delight *sharedInstance = nil;
             UITextField *descriptionField = [[UITextField alloc] initWithFrame:CGRectMake(20.0, 80.0, 245.0, 25.0)];
             descriptionField.backgroundColor = [UIColor whiteColor];
             descriptionField.placeholder = @"Description (Optional)";
+            descriptionField.tag = kDLAlertViewTextFieldTag;
             [alertView addSubview:descriptionField];
             [descriptionField release];
             
@@ -561,6 +566,8 @@ static Delight *sharedInstance = nil;
     switch (alertView.tag) {
         case kDLAlertViewTagStartUsabilityTest:
             if (buttonIndex == 1) {
+                UITextField *textField = (UITextField *)[alertView viewWithTag:kDLAlertViewTextFieldTag];
+                recordingContext.usabilityTestDescription = textField.text;
                 [self startRecording];
             }
             break;
