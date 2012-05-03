@@ -14,8 +14,9 @@
 @interface DLTouch : NSObject
 
 @property (nonatomic, assign) CGPoint location;
+@property (nonatomic, assign) UITouchPhase phase;
 @property (nonatomic, assign) NSTimeInterval timeInSession;
 
-- (id)initWithLocation:(CGPoint)location timeInSession:(NSTimeInterval)timeInSession;
+- (id)initWithLocation:(CGPoint)aLocation phase:(UITouchPhase)aPhase timeInSession:(NSTimeInterval)aTimeInSession;
 
 @end

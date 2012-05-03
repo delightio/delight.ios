@@ -338,7 +338,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             if (touch.timestamp > 0) {
                 CGPoint location = [touch locationInView:keyWindow];
                 
-                DLTouch *ourTouch = [[DLTouch alloc] initWithLocation:location timeInSession:touch.timestamp - startTime];
+                DLTouch *ourTouch = [[DLTouch alloc] initWithLocation:location phase:touch.phase timeInSession:touch.timestamp - startTime];
                 [touches addObject:ourTouch];
                 [ourTouch release];
             }

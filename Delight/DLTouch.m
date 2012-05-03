@@ -11,13 +11,15 @@
 @implementation DLTouch
 
 @synthesize location;
+@synthesize phase;
 @synthesize timeInSession;
 
-- (id)initWithLocation:(CGPoint)aLocation timeInSession:(NSTimeInterval)aTimeInSession
+- (id)initWithLocation:(CGPoint)aLocation phase:(UITouchPhase)aPhase timeInSession:(NSTimeInterval)aTimeInSession
 {
     self = [super init];
     if (self) {
         self.location = aLocation;
+        self.phase = aPhase;
         self.timeInSession = aTimeInSession;
     }
     return self;
@@ -25,7 +27,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Location: %@, time: %.3f", NSStringFromCGPoint(location), timeInSession];
+    return [NSString stringWithFormat:@"Location: %@, phase: %i, time: %.3f", NSStringFromCGPoint(location), phase, timeInSession];
 }
 
 @end
