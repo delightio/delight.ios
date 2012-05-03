@@ -58,6 +58,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             [window DLsetDelegate:self];
         }
         
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+
         NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
         [notificationCenter addObserver:self selector:@selector(handleWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
         [notificationCenter addObserver:self selector:@selector(handleWindowDidBecomeHiddenNotification:) name:UIWindowDidBecomeHiddenNotification object:nil];
@@ -69,7 +71,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+
     [gesturesInProgress release];
     [gesturesCompleted release];
     [touches release];
@@ -115,7 +118,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     startTime = aStartTime;
     [touches removeAllObjects];
     [orientationChanges removeAllObjects];
-    
+        
     // Set the initial orientation
     [self handleDeviceOrientationDidChangeNotification:nil];
 }
