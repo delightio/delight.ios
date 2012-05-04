@@ -30,6 +30,8 @@ typedef enum {
 @property (nonatomic) NSInteger chunkSize;
 @property (nonatomic) NSInteger chunkOffset;
 @property (nonatomic, retain) NSString * filePath;
+@property (nonatomic, retain) NSString * cameraFilePath;
+@property (nonatomic, retain) NSString * usabilityTestDescription;
 @property (nonatomic, retain) NSMutableIndexSet * finishedTaskIndex;
 @property (nonatomic) BOOL saved;
 @property (nonatomic, readonly) BOOL loadedFromArchive;
