@@ -9,9 +9,12 @@
 /* Begin PBXBuildFile section */
 		83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2615337E5C00003862 /* DLScreenshotController.h */; settings = {ATTRIBUTES = (); }; };
 		83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
+		836ABF2B1548D47400926A71 /* DLCamCaptureManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF251548D47400926A71 /* DLCamCaptureManager.h */; settings = {ATTRIBUTES = (); }; };
+		836ABF2C1548D47400926A71 /* DLCamCaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF261548D47400926A71 /* DLCamCaptureManager.m */; };
+		836ABF2D1548D47400926A71 /* DLCamRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF271548D47400926A71 /* DLCamRecorder.h */; };
+		836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* DLCamRecorder.m */; };
 		83827A551538BD82002EA080 /* DLGesture.h in Headers */ = {isa = PBXBuildFile; fileRef = 83827A531538BD81002EA080 /* DLGesture.h */; };
 		83827A561538BD82002EA080 /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
-		8391626F1537C21000549347 /* DLGestureTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8391626D1537C21000549347 /* DLGestureTracker.h */; settings = {ATTRIBUTES = (); }; };
 		839162701537C21000549347 /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
@@ -53,6 +56,10 @@
 		83149B2715337E5C00003862 /* DLScreenshotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLScreenshotController.m; sourceTree = "<group>"; };
 		83149B2B15338CC500003862 /* DLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLVideoEncoder.h; sourceTree = "<group>"; };
 		83149B2C15338CC500003862 /* DLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLVideoEncoder.m; sourceTree = "<group>"; };
+		836ABF251548D47400926A71 /* DLCamCaptureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamCaptureManager.h; sourceTree = "<group>"; };
+		836ABF261548D47400926A71 /* DLCamCaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamCaptureManager.m; sourceTree = "<group>"; };
+		836ABF271548D47400926A71 /* DLCamRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamRecorder.h; sourceTree = "<group>"; };
+		836ABF281548D47400926A71 /* DLCamRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamRecorder.m; sourceTree = "<group>"; };
 		83827A531538BD81002EA080 /* DLGesture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGesture.h; sourceTree = "<group>"; };
 		83827A541538BD82002EA080 /* DLGesture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGesture.m; sourceTree = "<group>"; };
 		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGestureTracker.h; sourceTree = "<group>"; };
@@ -115,6 +122,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		836ABF241548D47400926A71 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				836ABF251548D47400926A71 /* DLCamCaptureManager.h */,
+				836ABF261548D47400926A71 /* DLCamCaptureManager.m */,
+				836ABF271548D47400926A71 /* DLCamRecorder.h */,
+				836ABF281548D47400926A71 /* DLCamRecorder.m */,
+			);
+			name = Camera;
+			path = AVCam;
+			sourceTree = "<group>";
+		};
 		83B8967314EAEC68006D93C2 = {
 			isa = PBXGroup;
 			children = (
@@ -152,6 +171,7 @@
 		83B8968714EAEC68006D93C2 /* Delight */ = {
 			isa = PBXGroup;
 			children = (
+				836ABF241548D47400926A71 /* Camera */,
 				A9A9A3CC1536EA3600B6E4AB /* Utility */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
@@ -224,15 +244,16 @@
 				A9A9A3D01536EBBA00B6E4AB /* DLTaskController.h in Headers */,
 				83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */,
 				A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */,
-				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				A9A9A3DB15371AE500B6E4AB /* DLRecordingContext.h in Headers */,
 				A9A9A3E015371E7E00B6E4AB /* DLTask.h in Headers */,
 				A9A9A3E41537225F00B6E4AB /* DLGetNewSessionTask.h in Headers */,
 				A9A9A3E81537BE2F00B6E4AB /* DLUpdateSessionTask.h in Headers */,
+				836ABF2B1548D47400926A71 /* DLCamCaptureManager.h in Headers */,
 				A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
 				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
+				836ABF2D1548D47400926A71 /* DLCamRecorder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,6 +380,8 @@
 				83827A561538BD82002EA080 /* DLGesture.m in Sources */,
 				A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */,
 				A98094581542A732002B2BCE /* DLReachability.m in Sources */,
+				836ABF2C1548D47400926A71 /* DLCamCaptureManager.m in Sources */,
+				836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

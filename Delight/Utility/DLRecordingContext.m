@@ -19,6 +19,8 @@
 @synthesize chunkSize = _chunkSize;
 @synthesize chunkOffset = _chunkOffset;
 @synthesize filePath = _filePath;
+@synthesize cameraFilePath = _cameraFilePath;
+@synthesize usabilityTestDescription = _usabilityTestDescription;
 @synthesize finishedTaskIndex = _finishedTaskIndex;
 @synthesize saved = _saved;
 @synthesize loadedFromArchive = _loadedFromArchive;
@@ -35,6 +37,8 @@
 	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
 	_chunkOffset = [aDecoder decodeIntegerForKey:@"chunkOffset"];
 	self.filePath = [aDecoder decodeObjectForKey:@"filePath"];
+    self.cameraFilePath = [aDecoder decodeObjectForKey:@"cameraFilePath"];
+    self.usabilityTestDescription = [aDecoder decodeObjectForKey:@"usabilityTestDescription"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
 	_loadedFromArchive = YES;
 	
@@ -52,6 +56,8 @@
 	[aCoder encodeInteger:_chunkSize forKey:@"chunkSize"];
 	[aCoder encodeInteger:_chunkOffset forKey:@"chunkOffset"];
 	[aCoder encodeObject:_filePath forKey:@"filePath"];
+    [aCoder encodeObject:_cameraFilePath forKey:@"cameraFilePath"];
+    [aCoder encodeObject:_usabilityTestDescription forKey:@"usabilityTestDescription"];
 	[aCoder encodeObject:_finishedTaskIndex forKey:@"finishedTaskIndex"];
 }
 
@@ -62,6 +68,8 @@
 	[_startTime release];
 	[_endTime release];
 	[_filePath release];
+    [_cameraFilePath release];
+    [_usabilityTestDescription release];
 	[_finishedTaskIndex release];
 	[super dealloc];
 }

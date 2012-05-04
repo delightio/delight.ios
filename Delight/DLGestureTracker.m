@@ -42,6 +42,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         // Method swizzling to intercept events
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
+        Swizzle([UIWindow class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));
+        Swizzle([UIApplication class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));        
         for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
             [window DLsetDelegate:self];
         }
@@ -277,6 +279,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [gesturesInProgress minusSet:gesturesJustCompleted];
     
     [gesturesJustCompleted release];
+}
+
+- (void)windowAccelerometerDidShake:(UIWindow *)window
+{
+    if ([delegate respondsToSelector:@selector(gestureTrackerDidShake:)]) {
+        [delegate gestureTrackerDidShake:self];
+    }
 }
 
 @end

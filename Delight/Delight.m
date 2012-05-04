@@ -15,6 +15,7 @@
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
 #import "UIWindow+DLInterceptEvents.h"
+#import "DLCamCaptureManager.h"
 
 #define kDLDefaultScaleFactor_iPad2x   0.25f
 #define kDLDefaultScaleFactor_iPad     0.5f
@@ -25,9 +26,13 @@
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
 #define kDLMaximumSessionInactiveTime 60.0f*5
 
+#define kDLAlertViewTagStartUsabilityTest 1
+#define kDLAlertViewTagStopUsabilityTest 2
+#define kDLAlertViewTextFieldTag 101
+
 static Delight *sharedInstance = nil;
 
-@interface Delight () <DLGestureTrackerDelegate>
+@interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // OpenGL ES beta methods
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
@@ -49,8 +54,10 @@ static Delight *sharedInstance = nil;
 @synthesize scaleFactor;
 @synthesize maximumFrameRate;
 @synthesize maximumRecordingDuration;
+@synthesize usabilityTestEnabled;
 @synthesize paused;
 @synthesize autoCaptureEnabled;
+@synthesize recordsCamera;
 @synthesize screenshotController;
 @synthesize videoEncoder;
 @synthesize gestureTracker;
@@ -148,6 +155,26 @@ static Delight *sharedInstance = nil;
     [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
 }
 
++ (BOOL)recordsCamera
+{
+    return [self sharedInstance].recordsCamera;
+}
+
++ (void)setRecordsCamera:(BOOL)recordsCamera
+{
+    [self sharedInstance].recordsCamera = recordsCamera;
+}
+
++ (BOOL)usabilityTestEnabled
+{
+    return [self sharedInstance].usabilityTestEnabled;
+}
+
++ (void)setUsabilityTestEnabled:(BOOL)usabilityTestEnabled
+{
+    [self sharedInstance].usabilityTestEnabled = usabilityTestEnabled;
+}
+
 + (BOOL)hidesKeyboardInRecording
 {
     return [self sharedInstance].screenshotController.hidesKeyboard;
@@ -180,7 +207,9 @@ static Delight *sharedInstance = nil;
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];        
+        
         videoEncoder = [[DLVideoEncoder alloc] init];
+
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.delegate = self;
         
@@ -188,7 +217,6 @@ static Delight *sharedInstance = nil;
         screenshotQueue.maxConcurrentOperationCount = 1;
 
         lock = [[NSLock alloc] init];
-        
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             if ([UIScreen mainScreen].scale == 1.0) {
                 self.scaleFactor = kDLDefaultScaleFactor_iPad;
@@ -229,7 +257,9 @@ static Delight *sharedInstance = nil;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
-	[screenshotQueue release];
+	[lock release];
+    [cameraManager release];
+	[screenshotQueue release];	
 	[taskController release];
     [lock release];
     
@@ -237,7 +267,7 @@ static Delight *sharedInstance = nil;
 }
 
 - (void)startRecording
-{
+{    
     if (!videoEncoder.recording) {
         // Identify and create the cache directory if it doesn't already exist
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -250,8 +280,14 @@ static Delight *sharedInstance = nil;
         }
         
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
-        
         [videoEncoder startNewRecording];
+        
+        if (recordsCamera) {
+            cameraManager.outputPath = [NSString stringWithFormat:@"%@/%@_camera.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
+            [cameraManager startRecording];
+            recordingContext.cameraFilePath = cameraManager.outputPath;
+        }
+        
         recordingContext.startTime = [NSDate date];
         recordingContext.filePath = videoEncoder.outputPath;
         
@@ -263,6 +299,10 @@ static Delight *sharedInstance = nil;
 
 - (void)stopRecording 
 {
+    if (cameraManager.recording) {
+        [cameraManager stopRecording];
+    }
+    
     if (videoEncoder.recording) {
         [lock lock];
         [videoEncoder stopRecording];
@@ -307,6 +347,21 @@ static Delight *sharedInstance = nil;
         
         if (autoCaptureEnabled && videoEncoder.recording && screenshotQueue.operationCount == 0) {
             [self scheduleScreenshot];
+        }
+    }
+}
+
+- (void)setRecordsCamera:(BOOL)aRecordsCamera
+{
+    if (recordsCamera != aRecordsCamera) {
+        recordsCamera = aRecordsCamera;
+        
+        if (recordsCamera) {
+            cameraManager = [[DLCamCaptureManager alloc] init];
+            cameraManager.delegate = self;
+        } else {
+            [cameraManager release];
+            cameraManager = nil;
         }
     }
 }
@@ -396,7 +451,7 @@ static Delight *sharedInstance = nil;
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
     [recordingContext release];
 	recordingContext = [ctx retain];
-	if ( recordingContext.shouldRecordVideo ) {
+	if (recordingContext.shouldRecordVideo && !usabilityTestEnabled) {
 		// start recording
 		[self startRecording];
 	} else {
@@ -456,11 +511,85 @@ static Delight *sharedInstance = nil;
 	[taskController saveRecordingContext];
 }
 
+#pragma mark - DLCamCaptureManagerDelegate
+
+- (void)captureManagerRecordingBegan:(DLCamCaptureManager *)captureManager
+{
+    DLDebugLog(@"Began camera recording");
+}
+
+- (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
+{
+    DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
+}
+
+- (void)captureManager:(DLCamCaptureManager *)captureManager didFailWithError:(NSError *)error
+{
+    DLDebugLog(@"Camera recording failed: %@", error);
+}
+
 #pragma mark - DLGestureTrackerDelegate
 
 - (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location
 {
     return [screenshotController locationIsInPrivateView:location];
+}
+
+- (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker
+{
+    if (usabilityTestEnabled && recordingContext.shouldRecordVideo) {
+        if (![videoEncoder isRecording]) {
+            // Start usability test mode
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
+                                                                message:@"Start usability test?\n\n\n"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"Cancel"
+                                                      otherButtonTitles:@"Start", nil];
+            
+            UITextField *descriptionField = [[UITextField alloc] initWithFrame:CGRectMake(20.0, 80.0, 245.0, 25.0)];
+            descriptionField.backgroundColor = [UIColor whiteColor];
+            descriptionField.placeholder = @"Description (Optional)";
+            descriptionField.tag = kDLAlertViewTextFieldTag;
+            [alertView addSubview:descriptionField];
+            [descriptionField release];
+            
+            alertView.tag = kDLAlertViewTagStartUsabilityTest;        
+            [alertView show];
+            [alertView release];
+        } else {
+            // Stop usability test mode
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
+                                                                message:@"Stop usability test?"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"Cancel"
+                                                      otherButtonTitles:@"Stop", nil];
+            alertView.tag = kDLAlertViewTagStopUsabilityTest;
+            [alertView show];
+            [alertView release];        
+        }
+    }
+}
+
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    switch (alertView.tag) {
+        case kDLAlertViewTagStartUsabilityTest:
+            if (buttonIndex == 1) {
+                UITextField *textField = (UITextField *)[alertView viewWithTag:kDLAlertViewTextFieldTag];
+                recordingContext.usabilityTestDescription = textField.text;
+                [self startRecording];
+            }
+            break;
+        case kDLAlertViewTagStopUsabilityTest:
+            if (buttonIndex == 1) {
+                [self stopRecording];
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 @end

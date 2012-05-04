@@ -238,9 +238,9 @@
     [lock lock];
     BOOL success = [videoWriter finishWriting];
     if (success) {
-        DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
+        DLDebugLog(@"Completed screen capture, file is stored at: %@", outputPath);
     } else {
-        DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
+        DLDebugLog(@"Screen capture failed: %@", [[videoWriter error] localizedDescription]);
     }
         
     [self cleanupWriter];        
@@ -267,7 +267,7 @@
     if ([fileManager fileExistsAtPath:outputPath]) {
         NSError *error;
         if ([fileManager removeItemAtPath:outputPath error:&error] == NO) {
-            DLDebugLog(@"Could not delete old recording file at path:  %@", outputPath);
+            DLDebugLog(@"Could not delete old recording file at path: %@", outputPath);
         }
     }
     
