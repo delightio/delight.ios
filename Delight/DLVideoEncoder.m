@@ -201,6 +201,10 @@
     
     NSParameterAssert(videoWriterInput);
     videoWriterInput.expectsMediaDataInRealTime = YES;
+    if (encodesRawGLBytes) {
+        // Flip video to its correct orientation
+        videoWriterInput.transform = CGAffineTransformMakeScale(1, -1);
+    }
     
     NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kCVPixelFormatType_32ARGB], kCVPixelBufferPixelFormatTypeKey, nil];                                      
     avAdaptor = [[AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:videoWriterInput sourcePixelBufferAttributes:bufferAttributes] retain];
