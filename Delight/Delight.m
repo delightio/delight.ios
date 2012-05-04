@@ -379,6 +379,7 @@ static Delight *sharedInstance = nil;
     if (now - lastScreenshotTime < targetFrameInterval) {
         if (glView) {
             // We'll try again on a subsequent render loop iteration
+            [pool drain];
             return;
         } else {
             [NSThread sleepForTimeInterval:targetFrameInterval - (now - lastScreenshotTime)];
