@@ -130,6 +130,11 @@
         }
     }
     
+    if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
+        DLDebugLog(@"Not ready for video data");
+        return;
+    }
+    
     CVPixelBufferRef pixel_buffer = NULL;
     
     CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, pixelBufferPool, &pixel_buffer);
