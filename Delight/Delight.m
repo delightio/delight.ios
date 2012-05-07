@@ -359,7 +359,13 @@ static Delight *sharedInstance = nil;
         if (recordsCamera) {
             cameraManager = [[DLCamCaptureManager alloc] init];
             cameraManager.delegate = self;
+            if ([videoEncoder isRecording]) {
+                [cameraManager startRecording];
+            }
         } else {
+            if ([cameraManager isRecording]) {
+                [cameraManager stopRecording];
+            }
             [cameraManager release];
             cameraManager = nil;
         }
