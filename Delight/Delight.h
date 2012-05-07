@@ -2,14 +2,10 @@
 //  Delight.h
 //  Delight
 //
-//  Created by Chris Haugli on 1/18/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
 
 @class DLTaskController;
 @class DLRecordingContext;
@@ -57,6 +53,7 @@
 
 // Start/stop/pause/resume recording
 + (void)startWithAppToken:(NSString *)appToken;
++ (void)startUsabilityTestWithAppToken:(NSString *)appToken;
 + (void)stop;
 + (void)pause;
 + (void)resume;
@@ -80,14 +77,6 @@
 // Set whether recordings are copied to the user's photo album
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
 + (BOOL)savesToPhotoAlbum;
-
-// Set whether the user is recorded on camera
-+ (void)setRecordsCamera:(BOOL)recordsCamera;
-+ (BOOL)recordsCamera;
-
-// Set whether usability test mode is enabled (recording starts/stops after shake)
-+ (void)setUsabilityTestEnabled:(BOOL)usabilityTestEnabled;
-+ (BOOL)usabilityTestEnabled;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;

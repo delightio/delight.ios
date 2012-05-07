@@ -9,7 +9,9 @@
 #import "Delight.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
-#import <AssetsLibrary/AssetsLibrary.h>
+#import <OpenGLES/EAGL.h>
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
 #import "DLTaskController.h"
 #import "DLScreenshotController.h"
 #import "DLVideoEncoder.h"
@@ -35,6 +37,7 @@ static Delight *sharedInstance = nil;
 @interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // OpenGL ES beta methods
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
++ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 + (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 
@@ -79,6 +82,14 @@ static Delight *sharedInstance = nil;
 	[delight tryCreateNewSession];
 }
 
++ (void)startUsabilityTestWithAppToken:(NSString *)appToken
+{
+    Delight *delight = [self sharedInstance];
+    delight.usabilityTestEnabled = YES;
+    delight.recordsCamera = YES;
+    [self startWithAppToken:appToken];
+}
+
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes
 {
     Delight *delight = [self sharedInstance];
@@ -86,6 +97,14 @@ static Delight *sharedInstance = nil;
     delight.autoCaptureEnabled = NO;
     delight.videoEncoder.encodesRawGLBytes = encodeRawBytes;
 	[delight tryCreateNewSession];
+}
+
++ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes
+{
+    Delight *delight = [self sharedInstance];
+    delight.usabilityTestEnabled = YES;
+    delight.recordsCamera = YES;
+    [self startOpenGLWithAppToken:appToken encodeRawBytes:encodeRawBytes];
 }
 
 + (void)stop
@@ -153,26 +172,6 @@ static Delight *sharedInstance = nil;
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum
 {
     [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
-}
-
-+ (BOOL)recordsCamera
-{
-    return [self sharedInstance].recordsCamera;
-}
-
-+ (void)setRecordsCamera:(BOOL)recordsCamera
-{
-    [self sharedInstance].recordsCamera = recordsCamera;
-}
-
-+ (BOOL)usabilityTestEnabled
-{
-    return [self sharedInstance].usabilityTestEnabled;
-}
-
-+ (void)setUsabilityTestEnabled:(BOOL)usabilityTestEnabled
-{
-    [self sharedInstance].usabilityTestEnabled = usabilityTestEnabled;
 }
 
 + (BOOL)hidesKeyboardInRecording
@@ -583,7 +582,7 @@ static Delight *sharedInstance = nil;
 {
     switch (alertView.tag) {
         case kDLAlertViewTagStartUsabilityTest:
-            if (buttonIndex == 1) {
+            if (buttonIndex == 1 && recordingContext.shouldRecordVideo) {
                 UITextField *textField = (UITextField *)[alertView viewWithTag:kDLAlertViewTextFieldTag];
                 recordingContext.usabilityTestDescription = textField.text;
                 [self startRecording];
