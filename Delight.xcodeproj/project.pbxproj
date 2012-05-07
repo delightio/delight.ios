@@ -130,8 +130,7 @@
 				836ABF271548D47400926A71 /* DLCamRecorder.h */,
 				836ABF281548D47400926A71 /* DLCamRecorder.m */,
 			);
-			name = Camera;
-			path = AVCam;
+			path = Camera;
 			sourceTree = "<group>";
 		};
 		83B8967314EAEC68006D93C2 = {
