@@ -28,7 +28,7 @@
 		83B896B214EAEFBF006D93C2 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AC14EAEFBF006D93C2 /* CoreMedia.framework */; };
 		83B896B314EAEFBF006D93C2 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AD14EAEFBF006D93C2 /* CoreVideo.framework */; };
 		83B896B414EAEFBF006D93C2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AE14EAEFBF006D93C2 /* QuartzCore.framework */; };
-		83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896B614EAF090006D93C2 /* OpenGLES.framework */; };
+		83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896B614EAF090006D93C2 /* OpenGLES.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A93411C815352A3F0044077B /* DLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2C15338CC500003862 /* DLVideoEncoder.m */; };
 		A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2B15338CC500003862 /* DLVideoEncoder.h */; settings = {ATTRIBUTES = (); }; };
 		A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */; };
