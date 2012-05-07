@@ -4,7 +4,7 @@ Delight IO
 Basic Setup
 -----------
 
-1. Sign up on [http://delight.io](http://delight.io) to receive your app token
+1. Sign up on [http://delight.io](http://delight.io) to receive your app token.
 
 2. Add Delight.framework to your target. Also make sure the following frameworks are linked:
     * AssetsLibrary
@@ -12,7 +12,6 @@ Basic Setup
     * CoreGraphics
     * CoreMedia
     * CoreVideo
-    * OpenGLES
     * QuartzCore
     * SystemConfiguration
 
@@ -38,6 +37,16 @@ Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To s
 ### Saving to Photo Album ###
 
 If you would like the video to be copied to the user's Photo Album after each recording, call `[Delight setSavesToPhotoAlbum:YES]`. By default the video is not copied.
+
+### Recording the Camera ###
+
+The front-facing camera can be recorded by calling `[Delight setRecordsCamera:YES]`. The camera recording will be uploaded along with the screen recording, and saved to the photo album if the `[Delight savesToPhotoAlbum]` option is enabled. Due to camera initialization the length of the camera recording may be slightly shorter than the length of the screen capture recording.
+
+### Usability Test Mode ###
+
+Usability test mode is a special mode where recording does not start automatically at the start of each session. Instead, the user must shake the device to start recording. An alert view will appear to confirm and allow the user to enter a short description of the test. To stop recording, the user must either shake the device again or press the home button.
+
+To turn on usability test mode, call `[Delight setUsabilityTestEnabled:YES]` before `[Delight startWithAppToken:]`.
 
 Private Views
 -------------
