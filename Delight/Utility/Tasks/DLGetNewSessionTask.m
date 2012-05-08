@@ -26,7 +26,7 @@ NSString * const DLRecordElementName = @"recording";
 }
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"http://%@/app_sessions.xml", DL_BASE_URL];
+	NSString * urlStr = [NSString stringWithFormat:@"https://%@/app_sessions.xml", DL_BASE_URL];
 	NSDictionary * dict = [[NSBundle mainBundle] infoDictionary];
 	NSString * buildVer = [dict objectForKey:(NSString *)kCFBundleVersionKey];
 	if ( buildVer == nil ) buildVer = @"";
