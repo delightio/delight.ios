@@ -238,11 +238,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
 {
     NSMutableSet *gesturesJustCompleted = [[NSMutableSet alloc] initWithSet:gesturesInProgress];
-    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+    UIWindow *mainWindow = ([[[UIApplication sharedApplication] windows] count] ? [[[UIApplication sharedApplication] windows] objectAtIndex:0] : nil);
     
     for (UITouch *touch in [event allTouches]) {
         if (touch.timestamp > 0) {
-            CGPoint location = [touch locationInView:keyWindow];
+            CGPoint location = [touch locationInView:mainWindow];
             
             BOOL existing = NO;
             if (touch.phase != UITouchPhaseBegan) {
