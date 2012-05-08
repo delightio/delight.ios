@@ -49,6 +49,10 @@ To enable usability test mode, call `[Delight startUsabilityTestWithAppToken:]` 
 
 To attach an identifier to the user being recorded, such as a username or user ID, call `[Delight setAppUserID:]` with an NSString identifier.
 
+### Debug Log ###
+
+By default, debug log statements from the delight.io framework are suppressed. To turn them on, call `[Delight setDebugLogEnabled:YES]`.
+
 Private Views
 -------------
 

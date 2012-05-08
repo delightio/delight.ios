@@ -37,7 +37,7 @@
 
 @property (nonatomic, retain) NSString *appToken;
 @property (nonatomic, retain) NSString *appUserID;
-@property (nonatomic) BOOL enableDebugLog;
+@property (nonatomic) BOOL debugLogEnabled;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
 @property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
@@ -56,7 +56,6 @@
 // Start/stop/pause/resume recording
 + (void)startWithAppToken:(NSString *)appToken;
 + (void)startUsabilityTestWithAppToken:(NSString *)appToken;
-+ (void)enableDebugLog:(BOOL)aflag;
 + (void)stop;
 + (void)pause;
 + (void)resume;
@@ -81,9 +80,13 @@
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
 + (BOOL)savesToPhotoAlbum;
 
-// Sets a unique identifier for the user being recorded
+// Set a unique identifier for the user being recorded
 + (void)setAppUserID:(NSString *)appUserID;
 + (NSString *)appUserID;
+
+// Set whether the debug log should be printed to the console
++ (void)setDebugLogEnabled:(BOOL)debugLogEnabled;
++ (BOOL)debugLogEnabled;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;
