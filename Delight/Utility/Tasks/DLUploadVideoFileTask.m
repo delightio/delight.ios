@@ -23,7 +23,7 @@
 		[request setValue:[NSString stringWithFormat:@"%qu", [attrDict fileSize]] forHTTPHeaderField:@"Content-Length"];
 		// open up the file
 		[request setHTTPBodyStream:theStream];
-		DLDebugLog(@"uploading recording to delight server");
+		DLLog(@"[Delight] uploading recording to delight server");
 	}
 	return request;
 }
@@ -50,10 +50,10 @@
 	NSError * err = nil;
 	if ( ![[NSFileManager defaultManager] removeItemAtPath:self.recordingContext.filePath error:&err] ) {
 		// can't remove the file successfully
-		NSLog(@"can't delete uploaded video file: %@", self.recordingContext.filePath);
+		DLLog(@"[Delight] can't delete uploaded video file: %@", self.recordingContext.filePath);
 	}
 	if ( [self.recordingContext allTasksFinished] ) {
-		DLDebugLog(@"recording uploaded, session: %@", self.recordingContext.sessionID);
+		DLLog(@"[Delight] recording uploaded, session: %@", self.recordingContext.sessionID);
 		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;

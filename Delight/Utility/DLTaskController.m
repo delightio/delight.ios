@@ -174,11 +174,11 @@
 #pragma mark Task Management
 - (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
 	DLRecordingContext * ctx = aTask.recordingContext;
-	DLDebugLog(@"session created: %@", ctx.sessionID);
 	if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
 		// suppress recording flag if there's video files pending upload
 		ctx.shouldRecordVideo = NO;
 	}
+	DLLog(@"[Delight] %@ session created: %@", ctx.shouldRecordVideo ? @"recording" : @"non-recording", ctx.sessionID);
 	// notify the delegate
 	[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	self.task = nil;

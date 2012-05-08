@@ -36,6 +36,7 @@
 }
 
 @property (nonatomic, retain) NSString *appToken;
+@property (nonatomic) BOOL enableDebugLog;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
 @property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
@@ -54,6 +55,7 @@
 // Start/stop/pause/resume recording
 + (void)startWithAppToken:(NSString *)appToken;
 + (void)startUsabilityTestWithAppToken:(NSString *)appToken;
++ (void)enableDebugLog:(BOOL)aflag;
 + (void)stop;
 + (void)pause;
 + (void)resume;

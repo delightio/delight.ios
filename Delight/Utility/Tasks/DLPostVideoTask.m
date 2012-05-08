@@ -29,7 +29,7 @@
 //	[str release];
 	[self.recordingContext setTaskFinished:DLFinishedPostVideo];
 	if ( [self.recordingContext allTasksFinished] ) {
-		DLDebugLog(@"recording uploaded, session: %@", self.recordingContext.sessionID);
+		DLLog(@"[Delight] recording uploaded, session: %@", self.recordingContext.sessionID);
 		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
