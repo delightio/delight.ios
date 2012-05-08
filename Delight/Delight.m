@@ -33,6 +33,7 @@
 #define kDLAlertViewTextFieldTag 101
 
 static Delight *sharedInstance = nil;
+BOOL __DL_ENABLE_DEBUG_LOG = NO;
 
 @interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // OpenGL ES beta methods
@@ -54,6 +55,7 @@ static Delight *sharedInstance = nil;
 @implementation Delight
 
 @synthesize appToken;
+@synthesize enableDebugLog;
 @synthesize scaleFactor;
 @synthesize maximumFrameRate;
 @synthesize maximumRecordingDuration;
@@ -105,6 +107,10 @@ static Delight *sharedInstance = nil;
     delight.usabilityTestEnabled = YES;
     delight.recordsCamera = YES;
     [self startOpenGLWithAppToken:appToken encodeRawBytes:encodeRawBytes];
+}
+
++ (void)enableDebugLog:(BOOL)aflag {
+	[self sharedInstance].enableDebugLog = aflag;
 }
 
 + (void)stop
@@ -263,6 +269,14 @@ static Delight *sharedInstance = nil;
     [lock release];
     
     [super dealloc];
+}
+
+- (BOOL)enableDebugLog {
+	return __DL_ENABLE_DEBUG_LOG;
+}
+
+- (void)setEnableDebugLog:(BOOL)aflag {
+	__DL_ENABLE_DEBUG_LOG = aflag;
 }
 
 - (void)startRecording

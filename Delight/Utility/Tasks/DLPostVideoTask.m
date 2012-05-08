@@ -12,7 +12,7 @@
 @implementation DLPostVideoTask
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"http://%@/videos.xml", DL_BASE_URL];
+	NSString * urlStr = [NSString stringWithFormat:@"https://%@/videos.xml", DL_BASE_URL];
 	NSArray * urlComponents = [self.recordingContext.uploadURLString componentsSeparatedByString:@"?"];
 	NSString * paramStr = [NSString stringWithFormat:@"video[uri]=%@&video[app_session_id]=%@", [self stringByAddingPercentEscapes:[urlComponents objectAtIndex:0]], self.recordingContext.sessionID];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
@@ -29,7 +29,7 @@
 //	[str release];
 	[self.recordingContext setTaskFinished:DLFinishedPostVideo];
 	if ( [self.recordingContext allTasksFinished] ) {
-		DLDebugLog(@"recording uploaded, session: %@", self.recordingContext.sessionID);
+		DLLog(@"[Delight] recording uploaded, session: %@", self.recordingContext.sessionID);
 		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;

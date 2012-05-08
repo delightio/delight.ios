@@ -12,4 +12,6 @@
     #else
         #define DLDebugLog(format, args...)
     #endif
+#define DLLog(format, args...) if ( __DL_ENABLE_DEBUG_LOG ) NSLog(format, ## args)
+extern BOOL __DL_ENABLE_DEBUG_LOG;
 #endif

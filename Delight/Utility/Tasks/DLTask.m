@@ -104,20 +104,21 @@ NSString * const DL_APP_LOCALE = @"";
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	// check if there's error
-//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-//	NSLog(@"debug: %@", str);
-//	[str release];
 	if ( ![self responseContainsError] ) {
 		// process the data
 		[self.taskController.queue addOperationWithBlock:^{
 			[self processResponse];
 		}];
+	} else {
+		NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+		NSLog(@"[Delight] Server returns error: %@\nStatus code: %d", str, _httpResponse.statusCode);
+		[str release];
 	}
 	self.connection = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	DLDebugLog(@"error connecting to delight server: %@", error);
+	DLLog(@"[Delight] error connecting to delight server: %@", error);
 	self.connection = nil;
 	self.receivedData = nil;
 }
