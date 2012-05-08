@@ -36,6 +36,7 @@
 }
 
 @property (nonatomic, retain) NSString *appToken;
+@property (nonatomic, retain) NSString *appUserID;
 @property (nonatomic) BOOL enableDebugLog;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
@@ -79,6 +80,10 @@
 // Set whether recordings are copied to the user's photo album
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
 + (BOOL)savesToPhotoAlbum;
+
+// Sets a unique identifier for the user being recorded
++ (void)setAppUserID:(NSString *)appUserID;
++ (NSString *)appUserID;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;

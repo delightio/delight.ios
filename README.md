@@ -12,6 +12,7 @@ Basic Setup
     * CoreGraphics
     * CoreMedia
     * CoreVideo
+    * OpenGLES
     * QuartzCore
     * SystemConfiguration
 
@@ -46,7 +47,11 @@ The front-facing camera can be recorded by calling `[Delight setRecordsCamera:YE
 
 Usability test mode is a special mode where recording does not start automatically at the start of each session. Instead, the user must shake the device to start recording. An alert view will appear to confirm and allow the user to enter a short description of the test. To stop recording, the user must either shake the device again or press the home button.
 
-To turn on usability test mode, call `[Delight setUsabilityTestEnabled:YES]` before `[Delight startWithAppToken:]`.
+To enable usability test mode, call `[Delight startUsabilityTestWithAppToken:]` instead of `[Delight startWithAppToken:]`.
+
+### Identifying Users ###
+
+To attach an identifier to the user being recorded, such as a username or user ID, call `[Delight setAppUserID:]` with an NSString identifier.
 
 Private Views
 -------------

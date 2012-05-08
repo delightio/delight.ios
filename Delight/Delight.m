@@ -55,6 +55,7 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
 @implementation Delight
 
 @synthesize appToken;
+@synthesize appUserID;
 @synthesize enableDebugLog;
 @synthesize scaleFactor;
 @synthesize maximumFrameRate;
@@ -180,6 +181,16 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
     [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
 }
 
++ (NSString *)appUserID
+{
+    return [self sharedInstance].appUserID;
+}
+
++ (void)setAppUserID:(NSString *)appUserID
+{
+    [self sharedInstance].appUserID = appUserID;
+}
+
 + (BOOL)hidesKeyboardInRecording
 {
     return [self sharedInstance].screenshotController.hidesKeyboard;
@@ -259,6 +270,7 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [appToken release];
+    [appUserID release];
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
