@@ -8,6 +8,7 @@
 
 #import "DLGetNewSessionTask.h"
 #import "DLTaskController.h"
+#import <sys/utsname.h>
 
 NSString * const DLAppSessionElementName = @"app_session";
 NSString * const DLUploadURIElementName = @"upload_uris";
@@ -34,7 +35,14 @@ NSString * const DLRecordElementName = @"recording";
 	NSString * dotVer = [dict objectForKey:@"CFBundleShortVersionString"];
 	if ( dotVer == nil ) dotVer = buildVer;
 	else dotVer = [self stringByAddingPercentEscapes:dotVer];
-	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[locale]=%@&app_session[delight_version]=1", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier]];
+	UIDevice * theDevice = [UIDevice currentDevice];
+	// get the exact hardward name
+	struct utsname systemInfo;
+	uname(&systemInfo);
+	
+	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+	
+	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[app_locale]=%@&app_session[app_connectivity]=%@&app_session[delight_version]=2&app_session[device_hw_version]=%@&app_session[device_os_version]=%@", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier], self.taskController.networkStatusString, machineName, theDevice.systemVersion];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];

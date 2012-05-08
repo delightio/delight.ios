@@ -103,6 +103,9 @@ NSString * const DL_APP_LOCALE = @"";
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"debug: %d\n%@", _httpResponse.statusCode, str);
+	[str release];
 	// check if there's error
 	if ( ![self responseContainsError] ) {
 		// process the data

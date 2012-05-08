@@ -23,6 +23,7 @@
 @end
 
 @implementation DLTaskController
+@synthesize appToken = _appToken;
 @synthesize queue = _queue;
 @synthesize task = _task;
 @synthesize sessionDelegate = _sessionDelegate;
@@ -31,6 +32,7 @@
 @synthesize wifiReachability = _wifiReachability;
 @synthesize containsIncompleteSessions = _containsIncompleteSessions;
 @synthesize wifiConnected = _wifiConnected;
+@synthesize networkStatusString;
 
 - (id)init {
 	self = [super init];
@@ -49,6 +51,7 @@
 	[_unfinishedContexts release];
 	[_task release];
 	[_baseDirectory release];
+	[_appToken release];
 	[super dealloc];
 }
 
@@ -61,6 +64,13 @@
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
+	
+	if ( !firstReachabilityNotificationReceived ) {
+		// signal the flag to make a connection
+		pendingRequestSessionForFirstReachabilityNotification = YES;
+		self.appToken = aToken;
+		return;
+	}
 	
 	// begin connection
 	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] init];
@@ -206,17 +216,46 @@
 
 #pragma mark Notification
 - (void)handleReachabilityChangedNotification:(NSNotification *)aNotification {
+	if ( !firstReachabilityNotificationReceived ) {
+		firstReachabilityNotificationReceived = YES;
+	}
     NetworkStatus netStatus = [_wifiReachability currentReachabilityStatus];
-//    BOOL connectionRequired = [_wifiReachability connectionRequired];
-//	if ( !connectionRequired ) {
+    BOOL connectionRequired = [_wifiReachability connectionRequired];
+	if ( !connectionRequired ) {
 		if ( netStatus == ReachableViaWiFi ) {
 			// we can upload video file
 			_wifiConnected = YES;
 		} else {
 			_wifiConnected = NO;
 		}
-//	}
-	//	NSLog(@"########## wifi reachable %d ###########", NM_WIFI_REACHABLE);
+		if ( pendingRequestSessionForFirstReachabilityNotification ) {
+			pendingRequestSessionForFirstReachabilityNotification = NO;
+			// create new session
+			[self requestSessionIDWithAppToken:_appToken];
+		}
+	} else {
+		// there's no network interface or no connection at all
+		_wifiConnected = NO;
+	}
+}
+
+- (NSString *)networkStatusString {
+    NetworkStatus netStatus = [_wifiReachability currentReachabilityStatus];
+	NSString * statusStr = nil;
+	switch (netStatus) {
+		case ReachableViaWiFi:
+			statusStr = @"wifi";
+			break;
+			
+		case ReachableViaWWAN:
+			statusStr = @"wwan";
+			break;
+			
+		default:
+			statusStr = @"no_network";
+			break;
+	}
+	return statusStr;
 }
 
 @end
