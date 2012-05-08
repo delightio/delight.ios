@@ -71,6 +71,7 @@
 }
 
 - (void)uploadSession:(DLRecordingContext *)aSession {
+	if ( aSession == nil ) return;
 	// check if we can run background task
 	UIDevice* device = [UIDevice currentDevice];
 	BOOL backgroundSupported = NO;
