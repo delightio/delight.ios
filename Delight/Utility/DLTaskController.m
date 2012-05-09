@@ -146,7 +146,7 @@
 			NSDictionary * theTracks = ctx.tracks;
 			for (NSString * theKey in theTracks) {
 				NSDictionary * curTrack = [theTracks objectForKey:theKey];
-				if ( [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
+				if ( [ctx.sourceFilePaths objectForKey:theKey] && [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
 					// uplaod URL is still valid. Continue to upload
 					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:theKey];
 					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
