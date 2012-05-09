@@ -55,7 +55,8 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
 @implementation Delight
 
 @synthesize appToken;
-@synthesize enableDebugLog;
+@synthesize appUserID;
+@synthesize debugLogEnabled;
 @synthesize scaleFactor;
 @synthesize maximumFrameRate;
 @synthesize maximumRecordingDuration;
@@ -107,10 +108,6 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
     delight.usabilityTestEnabled = YES;
     delight.recordsCamera = YES;
     [self startOpenGLWithAppToken:appToken encodeRawBytes:encodeRawBytes];
-}
-
-+ (void)enableDebugLog:(BOOL)aflag {
-	[self sharedInstance].enableDebugLog = aflag;
 }
 
 + (void)stop
@@ -178,6 +175,26 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum
 {
     [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
+}
+
++ (NSString *)appUserID
+{
+    return [self sharedInstance].appUserID;
+}
+
++ (void)setAppUserID:(NSString *)appUserID
+{
+    [self sharedInstance].appUserID = appUserID;
+}
+
++ (BOOL)debugLogEnabled
+{
+    return [self sharedInstance].debugLogEnabled;
+}
+
++ (void)setDebugLogEnabled:(BOOL)debugLogEnabled
+{
+    [self sharedInstance].debugLogEnabled = debugLogEnabled;
 }
 
 + (BOOL)hidesKeyboardInRecording
@@ -259,6 +276,7 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [appToken release];
+    [appUserID release];
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
@@ -271,11 +289,11 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
     [super dealloc];
 }
 
-- (BOOL)enableDebugLog {
+- (BOOL)debugLogEnabled {
 	return __DL_ENABLE_DEBUG_LOG;
 }
 
-- (void)setEnableDebugLog:(BOOL)aflag {
+- (void)setDebugLogEnabled:(BOOL)aflag {
 	__DL_ENABLE_DEBUG_LOG = aflag;
 }
 

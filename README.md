@@ -12,6 +12,7 @@ Basic Setup
     * CoreGraphics
     * CoreMedia
     * CoreVideo
+    * OpenGLES
     * QuartzCore
     * SystemConfiguration
 
@@ -38,15 +39,19 @@ Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To s
 
 If you would like the video to be copied to the user's Photo Album after each recording, call `[Delight setSavesToPhotoAlbum:YES]`. By default the video is not copied.
 
-### Recording the Camera ###
-
-The front-facing camera can be recorded by calling `[Delight setRecordsCamera:YES]`. The camera recording will be uploaded along with the screen recording, and saved to the photo album if the `[Delight savesToPhotoAlbum]` option is enabled. Due to camera initialization the length of the camera recording may be slightly shorter than the length of the screen capture recording.
-
 ### Usability Test Mode ###
 
-Usability test mode is a special mode where recording does not start automatically at the start of each session. Instead, the user must shake the device to start recording. An alert view will appear to confirm and allow the user to enter a short description of the test. To stop recording, the user must either shake the device again or press the home button.
+Usability test mode is a special mode which records the front-facing camera, if available, in addition to the screen. When usability test mode is enabled, recording does not start automatically at the start of each session. Instead, the user must shake the device to start recording. An alert view will appear to confirm and allow the user to enter a short description of the test. To stop recording, the user must shake the device again.
 
-To turn on usability test mode, call `[Delight setUsabilityTestEnabled:YES]` before `[Delight startWithAppToken:]`.
+To enable usability test mode, call `[Delight startUsabilityTestWithAppToken:]` instead of `[Delight startWithAppToken:]`.
+
+### Identifying Users ###
+
+To attach an identifier to the user being recorded, such as a username or user ID, call `[Delight setAppUserID:]` with an NSString identifier.
+
+### Debug Log ###
+
+By default, debug log statements from the delight.io framework are suppressed. To turn them on, call `[Delight setDebugLogEnabled:YES]`.
 
 Private Views
 -------------
