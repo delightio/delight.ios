@@ -31,7 +31,7 @@
 
 #define kDLAlertViewTagStartUsabilityTest 1
 #define kDLAlertViewTagStopUsabilityTest 2
-#define kDLAlertViewTextFieldTag 101
+#define kDLAlertViewDescriptionFieldTag 101
 
 static Delight *sharedInstance = nil;
 BOOL __DL_ENABLE_DEBUG_LOG = NO;
@@ -602,13 +602,14 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                                                       cancelButtonTitle:@"Cancel"
                                                       otherButtonTitles:@"Start", nil];
             
-            UITextField *descriptionField = [[UITextField alloc] initWithFrame:CGRectMake(20.0, 80.0, 245.0, 25.0)];
+            UITextField *descriptionField = [[UITextField alloc] init];
+            descriptionField.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
             descriptionField.backgroundColor = [UIColor whiteColor];
             descriptionField.placeholder = @"Description (Optional)";
-            descriptionField.tag = kDLAlertViewTextFieldTag;
+            descriptionField.tag = kDLAlertViewDescriptionFieldTag;
             [alertView addSubview:descriptionField];
             [descriptionField release];
-            
+
             alertView.tag = kDLAlertViewTagStartUsabilityTest;        
             [alertView show];
             [alertView release];
@@ -628,13 +629,22 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 #pragma mark - UIAlertViewDelegate
 
+- (void)willPresentAlertView:(UIAlertView *)alertView
+{
+    if (alertView.tag == kDLAlertViewTagStartUsabilityTest) {
+        // Need to know the alert view size to position the text field properly
+        UITextField *descriptionField = (UITextField *)[alertView viewWithTag:kDLAlertViewDescriptionFieldTag];
+        descriptionField.frame = CGRectMake(20.0, alertView.frame.size.height - 97, 245.0, 25.0);
+    }
+}
+
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     switch (alertView.tag) {
         case kDLAlertViewTagStartUsabilityTest:
             if (buttonIndex == 1 && recordingContext.shouldRecordVideo) {
-                UITextField *textField = (UITextField *)[alertView viewWithTag:kDLAlertViewTextFieldTag];
-                recordingContext.usabilityTestDescription = textField.text;
+                UITextField *descriptionField = (UITextField *)[alertView viewWithTag:kDLAlertViewDescriptionFieldTag];
+                recordingContext.usabilityTestDescription = descriptionField.text;
                 [self startRecording];
             }
             break;
