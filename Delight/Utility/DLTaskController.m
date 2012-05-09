@@ -143,23 +143,27 @@
 	if ( ctx.shouldRecordVideo && (!ctx.wifiUploadOnly || (_wifiConnected && ctx.wifiUploadOnly)) ) {
 		if ( [ctx shouldCompleteTask:DLFinishedUploadVideoFile] ) {
 			// check if the link has expired
-			if ( [ctx.uploadURLExpiryDate timeIntervalSinceNow] > 5.0 ) {
-				// uplaod URL is still valid. Continue to upload
-				DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] init];
-				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-					// task expires. clean it up if it has not finished yet
-					[uploadTask cancel];
-					[self saveRecordingContext];
-					[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
-				}];
-				uploadTask.taskController = self;
-				uploadTask.backgroundTaskIdentifier = bgIdf;
-				uploadTask.recordingContext = ctx;
-				[self.queue addOperation:uploadTask];
-				[uploadTask release];
-			} else {
-				// renew the upload URL
-				[self renewUploadURLForSession:ctx];
+			NSDictionary * theTracks = ctx.tracks;
+			for (NSString * theKey in theTracks) {
+				NSDictionary * curTrack = [theTracks objectForKey:theKey];
+				if ( [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
+					// uplaod URL is still valid. Continue to upload
+					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:[curTrack objectForKey:DLTrackURLKey] atPath:ctx.filePath];
+					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+						// task expires. clean it up if it has not finished yet
+						[uploadTask cancel];
+						[self saveRecordingContext];
+						[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+					}];
+					uploadTask.taskController = self;
+					uploadTask.backgroundTaskIdentifier = bgIdf;
+					uploadTask.recordingContext = ctx;
+					[self.queue addOperation:uploadTask];
+					[uploadTask release];
+				} else {
+					// renew the upload URL
+					[self renewUploadURLForSession:ctx];
+				}
 			}
 		} else if ( [ctx shouldCompleteTask:DLFinishedPostVideo] ) {
 			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];

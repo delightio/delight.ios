@@ -74,16 +74,25 @@ NSString * const DLRecordElementName = @"recording";
 		// create a new session object
 		self.recordingContext = [[[DLRecordingContext alloc] init] autorelease];
 	} else if ( [elementName isEqualToString:DLUploadURIElementName] ) {
-		// we can get the URI directly from the attribute
-		NSString * strURL = [attributeDict objectForKey:@"screen"];
-		self.recordingContext.uploadURLString = strURL;
-		// get expiry timestamp
-		NSRange firstRange = [strURL rangeOfString:@"Expires="];
-		NSRange nextRange = [strURL rangeOfString:@"&" options:0 range:NSMakeRange(firstRange.length + firstRange.location, [strURL length] - firstRange.length - firstRange.location)];
-		NSString * dateStr = [strURL substringWithRange:NSMakeRange(firstRange.length + firstRange.location, nextRange.location - firstRange.length - firstRange.location)];
-		if ( dateStr ) {
-			self.recordingContext.uploadURLExpiryDate = [NSDate dateWithTimeIntervalSince1970:[dateStr doubleValue]];
+		NSMutableDictionary * trackDict = [NSMutableDictionary dictionaryWithCapacity:4];
+		for (NSString * theKey in attributeDict) {
+			if ( [theKey rangeOfString:@"_track"].location != NSNotFound ) {
+				// this is a track URL
+				// we can get the URI directly from the attribute
+				NSString * strURL = [attributeDict objectForKey:theKey];
+				// get expiry timestamp
+				NSRange firstRange = [strURL rangeOfString:@"Expires="];
+				NSRange nextRange = [strURL rangeOfString:@"&" options:0 range:NSMakeRange(firstRange.length + firstRange.location, [strURL length] - firstRange.length - firstRange.location)];
+				NSString * dateStr = [strURL substringWithRange:NSMakeRange(firstRange.length + firstRange.location, nextRange.location - firstRange.length - firstRange.location)];
+				NSDate * expDate = nil;
+				if ( dateStr ) {
+					expDate = [NSDate dateWithTimeIntervalSince1970:[dateStr doubleValue]];
+				}
+				// save the track
+				[trackDict setObject:[NSDictionary dictionaryWithObjectsAndKeys:strURL, DLTrackURLKey, expDate == nil ? [NSNull null] : expDate, DLTrackExpiryDateKey, nil] forKey:theKey];
+			}
 		}
+		self.recordingContext.tracks = trackDict;
 	} else {
 		// prepare the string buffer
 		_contentOfCurrentProperty = [[NSMutableString alloc] initWithCapacity:16];

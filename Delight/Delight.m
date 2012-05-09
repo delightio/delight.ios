@@ -320,7 +320,7 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
         }
         
         recordingContext.startTime = [NSDate date];
-        recordingContext.filePath = videoEncoder.outputPath;
+        recordingContext.screenFilePath = videoEncoder.outputPath;
         
         if (autoCaptureEnabled) {
             [self scheduleScreenshot];

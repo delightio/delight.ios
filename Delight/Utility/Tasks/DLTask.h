@@ -12,6 +12,12 @@
 
 #define DL_REQUEST_TIMEOUT	30.0
 
+extern NSString * const DLTrackURLKey;
+extern NSString * const DLTrackExpiryDateKey;
+extern NSString * const DLScreenTrackKey;
+extern NSString * const DLTouchTrackKey;
+extern NSString * const DLFrontTrackKey;
+
 @class DLTaskController;
 
 extern NSString * const DL_BASE_URL;
