@@ -362,7 +362,7 @@
     }
 }
 
-- (BOOL)locationIsInPrivateView:(CGPoint)location
+- (BOOL)locationIsInPrivateView:(CGPoint)location privateViewFrame:(CGRect *)frame
 {
     UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
     
@@ -370,12 +370,18 @@
         CGRect frameInWindow = [view convertRect:view.bounds toView:keyWindow];
             
         if (CGRectContainsPoint(frameInWindow, location)) {
+            if (frame) {
+                *frame = frameInWindow;
+            }
             return YES;
         }
     }
 
     if (keyboardWindow && hidesKeyboard) {
         if (CGRectContainsPoint(keyboardFrame, location)) {
+            if (frame) {
+                *frame = keyboardFrame;
+            }
             return YES;
         }
     }

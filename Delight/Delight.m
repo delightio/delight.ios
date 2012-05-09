@@ -586,9 +586,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 #pragma mark - DLGestureTrackerDelegate
 
-- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location
+- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location privateViewFrame:(CGRect *)frame
 {
-    return [screenshotController locationIsInPrivateView:location];
+    return [screenshotController locationIsInPrivateView:location privateViewFrame:frame];
 }
 
 - (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker

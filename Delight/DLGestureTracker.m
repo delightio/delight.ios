@@ -100,9 +100,16 @@
     [lock unlock];
     
     for (DLGesture *gesture in allGestures) {
-        BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue]];
+        CGRect privateViewFrame;
+        BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue] privateViewFrame:&privateViewFrame];
 
-        if (!startLocationIsInPrivateView) {
+        if (startLocationIsInPrivateView) {
+            // Gesture is in a private view. Don't draw it, that could leak private information. Just flash the view it's in.
+            CGRect scaledPrivateViewFrame = CGRectApplyAffineTransform(privateViewFrame, CGAffineTransformMakeScale(scaleFactor * scale, scaleFactor * scale));
+            CGContextSetRGBFillColor(context, 0, 0, 1, 0.5);             
+            CGContextFillRect(context, scaledPrivateViewFrame);
+        
+        } else {
             if (gesture.type == DLGestureTypeTap) {
                 // Tap: draw a circle at the start point
                 CGPoint location = [[gesture.locations objectAtIndex:0] CGPointValue];
