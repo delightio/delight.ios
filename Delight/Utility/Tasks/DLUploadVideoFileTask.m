@@ -11,15 +11,30 @@
 #import "DLTaskController.h"
 
 @implementation DLUploadVideoFileTask
+@synthesize trackName = _trackName;
+
+- (id)initWithTrack:(NSString *)trcName {
+	self = [super init];
+	_trackName = [trcName retain];
+	return self;
+}
+
+- (void)dealloc {
+	[_trackName release];
+	[super dealloc];
+}
 
 - (NSURLRequest *)URLRequest {
-	NSInputStream * theStream = [NSInputStream inputStreamWithFileAtPath:self.recordingContext.filePath];
+	NSDictionary * theDict = [self.recordingContext.tracks objectForKey:_trackName];
+	NSString * fPath = [self.recordingContext.sourceFilePaths objectForKey:_trackName];
+	NSInputStream * theStream = [NSInputStream inputStreamWithFileAtPath:fPath];
 	NSMutableURLRequest * request = nil;
 	if ( theStream ) {
-		request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.recordingContext.uploadURLString] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:600.0];
+		request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[theDict objectForKey:DLTrackURLKey]] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:600.0];
 		[request setHTTPMethod:@"PUT"];
 		// get file length
-		NSDictionary * attrDict = [[NSFileManager defaultManager] attributesOfItemAtPath:self.recordingContext.filePath error:nil];
+		
+		NSDictionary * attrDict = [[NSFileManager defaultManager] attributesOfItemAtPath:fPath error:nil];
 		[request setValue:[NSString stringWithFormat:@"%qu", [attrDict fileSize]] forHTTPHeaderField:@"Content-Length"];
 		// open up the file
 		[request setHTTPBodyStream:theStream];
@@ -48,9 +63,10 @@
 	[self.recordingContext setTaskFinished:DLFinishedUploadVideoFile];
 	// delete video file
 	NSError * err = nil;
-	if ( ![[NSFileManager defaultManager] removeItemAtPath:self.recordingContext.filePath error:&err] ) {
+	NSString * fPath = [self.recordingContext.sourceFilePaths objectForKey:_trackName];
+	if ( ![[NSFileManager defaultManager] removeItemAtPath:fPath error:&err] ) {
 		// can't remove the file successfully
-		DLLog(@"[Delight] can't delete uploaded video file: %@", self.recordingContext.filePath);
+		DLLog(@"[Delight] can't delete uploaded video file: %@", fPath);
 	}
 	if ( [self.recordingContext allTasksFinished] ) {
 		DLLog(@"[Delight] recording uploaded, session: %@", self.recordingContext.sessionID);

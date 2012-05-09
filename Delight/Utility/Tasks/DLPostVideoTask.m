@@ -10,10 +10,19 @@
 #import "DLTaskController.h"
 
 @implementation DLPostVideoTask
+@synthesize trackName = _trackName;
+
+- (id)initWithTrack:(NSString *)trcName {
+	self = [super init];
+	_trackName = [trcName retain];
+	return self;
+}
 
 - (NSURLRequest *)URLRequest {
 	NSString * urlStr = [NSString stringWithFormat:@"https://%@/videos.xml", DL_BASE_URL];
-	NSArray * urlComponents = [self.recordingContext.uploadURLString componentsSeparatedByString:@"?"];
+	// get the URL for the specified track
+	NSDictionary * theDict = [self.recordingContext.tracks objectForKey:_trackName];
+	NSArray * urlComponents = [[theDict objectForKey:DLTrackURLKey] componentsSeparatedByString:@"?"];
 	NSString * paramStr = [NSString stringWithFormat:@"video[uri]=%@&video[app_session_id]=%@", [self stringByAddingPercentEscapes:[urlComponents objectAtIndex:0]], self.recordingContext.sessionID];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 	NSData * theData = [paramStr dataUsingEncoding:NSUTF8StringEncoding];

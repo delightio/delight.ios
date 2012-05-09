@@ -7,19 +7,18 @@
 //
 
 #import "DLRecordingContext.h"
+#import "DLTask.h"
 
 @implementation DLRecordingContext
 @synthesize sessionID = _sessionID;
-@synthesize uploadURLString = _uploadURLString;
-@synthesize uploadURLExpiryDate = _uploadURLExpiryDate;
+@synthesize tracks = _tracks;
+@synthesize sourceFilePaths = _sourceFilePaths;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize chunkSize = _chunkSize;
 @synthesize chunkOffset = _chunkOffset;
-@synthesize filePath = _filePath;
-@synthesize cameraFilePath = _cameraFilePath;
 @synthesize usabilityTestDescription = _usabilityTestDescription;
 @synthesize finishedTaskIndex = _finishedTaskIndex;
 @synthesize saved = _saved;
@@ -28,15 +27,15 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super init];
 	self.sessionID = [aDecoder decodeObjectForKey:@"sessionID"];
-	self.uploadURLString = [aDecoder decodeObjectForKey:@"uploadURLString"];
-	self.uploadURLExpiryDate = [aDecoder decodeObjectForKey:@"uploadURLExpiryDate"];
+	self.tracks = [aDecoder decodeObjectForKey:@"tracks"];
+	self.sourceFilePaths = [aDecoder decodeObjectForKey:@"sourceFilePaths"];
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
 	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
 	self.startTime = [aDecoder decodeObjectForKey:@"startTime"];
 	self.endTime = [aDecoder decodeObjectForKey:@"endTime"];
 	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
 	_chunkOffset = [aDecoder decodeIntegerForKey:@"chunkOffset"];
-	self.filePath = [aDecoder decodeObjectForKey:@"filePath"];
+	self.screenFilePath = [aDecoder decodeObjectForKey:@"screenFilePath"];
     self.cameraFilePath = [aDecoder decodeObjectForKey:@"cameraFilePath"];
     self.usabilityTestDescription = [aDecoder decodeObjectForKey:@"usabilityTestDescription"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
@@ -47,28 +46,24 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
 	[aCoder encodeObject:_sessionID forKey:@"sessionID"];
-	[aCoder encodeObject:_uploadURLString forKey:@"uploadURLString"];
-	[aCoder encodeObject:_uploadURLExpiryDate forKey:@"uploadURLExpiryDate"];
+	[aCoder encodeObject:_tracks forKey:@"tracks"];
+	[aCoder encodeObject:_sourceFilePaths forKey:@"sourceFilePaths"];
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
 	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
 	[aCoder encodeObject:_startTime forKey:@"startTime"];
 	[aCoder encodeObject:_endTime forKey:@"endTime"];
 	[aCoder encodeInteger:_chunkSize forKey:@"chunkSize"];
 	[aCoder encodeInteger:_chunkOffset forKey:@"chunkOffset"];
-	[aCoder encodeObject:_filePath forKey:@"filePath"];
-    [aCoder encodeObject:_cameraFilePath forKey:@"cameraFilePath"];
     [aCoder encodeObject:_usabilityTestDescription forKey:@"usabilityTestDescription"];
 	[aCoder encodeObject:_finishedTaskIndex forKey:@"finishedTaskIndex"];
 }
 
 - (void)dealloc {
 	[_sessionID release];
-	[_uploadURLString release];
-	[_uploadURLExpiryDate release];
+	[_tracks release];
+	[_sourceFilePaths release];
 	[_startTime release];
 	[_endTime release];
-	[_filePath release];
-    [_cameraFilePath release];
     [_usabilityTestDescription release];
 	[_finishedTaskIndex release];
 	[super dealloc];
@@ -111,6 +106,40 @@
 		}
 	}
 	return _finishedTaskIndex;
+}
+
+#pragma mark Getter-setter overrides
+- (NSString *)screenFilePath {
+	return [_sourceFilePaths objectForKey:DLScreenTrackKey];
+}
+
+- (void)setScreenFilePath:(NSString *)aPath {
+	if ( _sourceFilePaths == nil ) {
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
+	}
+	[_sourceFilePaths setObject:aPath forKey:DLScreenTrackKey];
+}
+
+- (NSString *)cameraFilePath {
+	return [_sourceFilePaths objectForKey:DLFrontTrackKey];
+}
+
+- (void)setCameraFilePath:(NSString *)aPath {
+	if ( _sourceFilePaths == nil ) {
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
+	}
+	[_sourceFilePaths setObject:aPath forKey:DLFrontTrackKey];
+}
+
+- (NSString *)touchFilePath {
+	return [_sourceFilePaths objectForKey:DLTouchTrackKey];
+}
+
+- (void)setTouchFilePath:(NSString *)aPath {
+	if ( _sourceFilePaths == nil ) {
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
+	}
+	[_sourceFilePaths setObject:aPath forKey:DLTouchTrackKey];
 }
 
 @end

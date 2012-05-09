@@ -10,4 +10,8 @@
 
 @interface DLUploadVideoFileTask : DLTask
 
+@property (nonatomic, retain) NSString * trackName;
+
+- (id)initWithTrack:(NSString *)trcName;
+
 @end

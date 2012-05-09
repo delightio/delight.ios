@@ -338,7 +338,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         }
         
         recordingContext.startTime = [NSDate date];
-        recordingContext.filePath = videoEncoder.outputPath;
+        recordingContext.screenFilePath = videoEncoder.outputPath;
         
         if (autoCaptureEnabled) {
             [self scheduleScreenshot];

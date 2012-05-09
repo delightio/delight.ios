@@ -15,6 +15,11 @@ NSString * const DL_BASE_URL = @"delightweb-staging.herokuapp.com";
 NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
 #endif
 NSString * const DL_APP_LOCALE = @"";
+NSString * const DLTrackURLKey = @"url";
+NSString * const DLTrackExpiryDateKey = @"expiry_date";
+NSString * const DLScreenTrackKey = @"screen_track";
+NSString * const DLTouchTrackKey = @"touch_track";
+NSString * const DLFrontTrackKey = @"front_track";
 
 @implementation DLTask
 @synthesize recordingContext = _recordingContext;
@@ -103,6 +108,9 @@ NSString * const DL_APP_LOCALE = @"";
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"debug: %d\n%@", _httpResponse.statusCode, str);
+	[str release];
 	// check if there's error
 	if ( ![self responseContainsError] ) {
 		// process the data
