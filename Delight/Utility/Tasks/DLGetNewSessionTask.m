@@ -9,6 +9,7 @@
 #import "DLGetNewSessionTask.h"
 #import "DLTaskController.h"
 #import <sys/utsname.h>
+#import "Delight.h"
 
 NSString * const DLAppSessionElementName = @"app_session";
 NSString * const DLUploadURIElementName = @"upload_uris";
@@ -28,6 +29,7 @@ NSString * const DLRecordElementName = @"recording";
 
 - (NSURLRequest *)URLRequest {
 	NSString * urlStr = [NSString stringWithFormat:@"https://%@/app_sessions.xml", DL_BASE_URL];
+	// check build and version number
 	NSDictionary * dict = [[NSBundle mainBundle] infoDictionary];
 	NSString * buildVer = [dict objectForKey:(NSString *)kCFBundleVersionKey];
 	if ( buildVer == nil ) buildVer = @"";
@@ -41,8 +43,12 @@ NSString * const DLRecordElementName = @"recording";
 	uname(&systemInfo);
 	
 	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
-	
+	// check User ID
+	NSString * userID = [Delight appUserID];
 	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[app_locale]=%@&app_session[app_connectivity]=%@&app_session[delight_version]=2.0&app_session[device_hw_version]=%@&app_session[device_os_version]=%@", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier], self.taskController.networkStatusString, machineName, theDevice.systemVersion];
+	if ( [userID length] ) {
+		paramStr = [paramStr stringByAppendingFormat:@"&app_session[app_user_id]=%@", [self stringByAddingPercentEscapes:userID]];
+	}
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
