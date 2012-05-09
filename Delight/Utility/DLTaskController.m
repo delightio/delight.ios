@@ -18,7 +18,7 @@
 /*!
  S3 pre-signed URL has an expiry date. If the pre-signed URL has been expired, we should get a new pre-signed URL
  */
-- (void)renewUploadURLForSession:(DLRecordingContext *)ctx;
+- (void)renewUploadURLForSession:(DLRecordingContext *)ctx wtihTrack:(NSString *)trcName;
 
 @end
 
@@ -148,7 +148,7 @@
 				NSDictionary * curTrack = [theTracks objectForKey:theKey];
 				if ( [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
 					// uplaod URL is still valid. Continue to upload
-					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:[curTrack objectForKey:DLTrackURLKey] atPath:ctx.filePath];
+					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:theKey];
 					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 						// task expires. clean it up if it has not finished yet
 						[uploadTask cancel];
@@ -162,7 +162,7 @@
 					[uploadTask release];
 				} else {
 					// renew the upload URL
-					[self renewUploadURLForSession:ctx];
+					[self renewUploadURLForSession:ctx wtihTrack:theKey];
 				}
 			}
 		} else if ( [ctx shouldCompleteTask:DLFinishedPostVideo] ) {
@@ -182,7 +182,7 @@
 	}
 }
 
-- (void)renewUploadURLForSession:(DLRecordingContext *)ctx {
+- (void)renewUploadURLForSession:(DLRecordingContext *)ctx wtihTrack:(NSString *)trcName {
 	
 }
 
