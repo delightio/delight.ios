@@ -15,6 +15,8 @@
 		836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* DLCamRecorder.m */; };
 		83827A551538BD82002EA080 /* DLGesture.h in Headers */ = {isa = PBXBuildFile; fileRef = 83827A531538BD81002EA080 /* DLGesture.h */; };
 		83827A561538BD82002EA080 /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
+		8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */; };
+		8382935F1558A04F007C6CDA /* CALayer+DLThreadSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */; };
 		839162701537C21000549347 /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
@@ -62,6 +64,8 @@
 		836ABF281548D47400926A71 /* DLCamRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamRecorder.m; sourceTree = "<group>"; };
 		83827A531538BD81002EA080 /* DLGesture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGesture.h; sourceTree = "<group>"; };
 		83827A541538BD82002EA080 /* DLGesture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGesture.m; sourceTree = "<group>"; };
+		8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+DLThreadSafe.h"; sourceTree = "<group>"; };
+		8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+DLThreadSafe.m"; sourceTree = "<group>"; };
 		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGestureTracker.h; sourceTree = "<group>"; };
 		8391626E1537C21000549347 /* DLGestureTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGestureTracker.m; sourceTree = "<group>"; };
 		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Delight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,6 +137,17 @@
 			path = Camera;
 			sourceTree = "<group>";
 		};
+		838293611558A054007C6CDA /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */,
+				83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */,
+				8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */,
+				8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */,
+			);
+			name = Categories;
+			sourceTree = "<group>";
+		};
 		83B8967314EAEC68006D93C2 = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				836ABF241548D47400926A71 /* Camera */,
+				838293611558A054007C6CDA /* Categories */,
 				A9A9A3CC1536EA3600B6E4AB /* Utility */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
@@ -182,8 +198,6 @@
 				83827A541538BD82002EA080 /* DLGesture.m */,
 				8391626D1537C21000549347 /* DLGestureTracker.h */,
 				8391626E1537C21000549347 /* DLGestureTracker.m */,
-				83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */,
-				83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */,
 				83B8968814EAEC68006D93C2 /* Supporting Files */,
 			);
 			path = Delight;
@@ -253,6 +267,7 @@
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
 				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
 				836ABF2D1548D47400926A71 /* DLCamRecorder.h in Headers */,
+				8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +396,7 @@
 				A98094581542A732002B2BCE /* DLReachability.m in Sources */,
 				836ABF2C1548D47400926A71 /* DLCamCaptureManager.m in Sources */,
 				836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */,
+				8382935F1558A04F007C6CDA /* CALayer+DLThreadSafe.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

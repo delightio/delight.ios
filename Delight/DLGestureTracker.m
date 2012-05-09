@@ -8,16 +8,6 @@
 
 #import "DLGestureTracker.h"
 #import "DLGesture.h"
-#import </usr/include/objc/objc-class.h>
-
-static void Swizzle(Class c, SEL orig, SEL new) {
-    Method origMethod = class_getInstanceMethod(c, orig);
-    Method newMethod = class_getInstanceMethod(c, new);
-    if(class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)))
-        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
-    else
-        method_exchangeImplementations(origMethod, newMethod);
-}
 
 @interface DLGestureTracker ()
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
@@ -40,10 +30,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         bitmapData = NULL;
         arrowheadPath = NULL;
         
-        // Method swizzling to intercept events
-        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
-        Swizzle([UIWindow class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));
-        Swizzle([UIApplication class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));        
         for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
             [window DLsetDelegate:self];
         }

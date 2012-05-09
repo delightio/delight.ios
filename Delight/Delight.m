@@ -18,6 +18,7 @@
 #import "DLGestureTracker.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "DLCamCaptureManager.h"
+#import </usr/include/objc/objc-class.h>
 
 #define kDLDefaultScaleFactor_iPad2x   0.25f
 #define kDLDefaultScaleFactor_iPad     0.5f
@@ -34,6 +35,16 @@
 
 static Delight *sharedInstance = nil;
 BOOL __DL_ENABLE_DEBUG_LOG = NO;
+
+static void Swizzle(Class c, SEL orig, SEL new) {
+    Method origMethod = class_getInstanceMethod(c, orig);
+    Method newMethod = class_getInstanceMethod(c, new);
+    if (class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod))) {
+        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
+    } else {
+        method_exchangeImplementations(origMethod, newMethod);
+    }
+}
 
 @interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // OpenGL ES beta methods
@@ -267,6 +278,14 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
 		taskController = [[DLTaskController alloc] init];
 		taskController.sessionDelegate = self;
 		taskController.baseDirectory = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"com.pipely.delight"];
+        
+        // Method swizzling to intercept touch/shake events
+        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
+        Swizzle([UIWindow class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));
+        Swizzle([UIApplication class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));
+        
+        // Method swizzling to rewrite UIWebView layer rendering code to avoid crash
+        Swizzle(NSClassFromString(@"TileHostLayer"), @selector(renderInContext:), @selector(DLrenderInContext:));
     }
     return self;
 }
@@ -280,7 +299,6 @@ BOOL __DL_ENABLE_DEBUG_LOG = NO;
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
-	[lock release];
     [cameraManager release];
 	[screenshotQueue release];	
 	[taskController release];
