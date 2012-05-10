@@ -593,7 +593,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker
 {
-    if (usabilityTestEnabled && recordingContext.shouldRecordVideo) {
+    if (usabilityTestEnabled && recordingContext.shouldRecordVideo && !alertViewVisible) {
         if (![videoEncoder isRecording]) {
             // Start usability test mode
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
@@ -613,6 +613,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             alertView.tag = kDLAlertViewTagStartUsabilityTest;        
             [alertView show];
             [alertView release];
+            alertViewVisible = YES;
         } else {
             // Stop usability test mode
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
@@ -622,7 +623,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                                                       otherButtonTitles:@"Stop", nil];
             alertView.tag = kDLAlertViewTagStopUsabilityTest;
             [alertView show];
-            [alertView release];        
+            [alertView release];   
+            alertViewVisible = YES;
         }
     }
 }
@@ -640,6 +642,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
+    alertViewVisible = NO;
+    
     switch (alertView.tag) {
         case kDLAlertViewTagStartUsabilityTest:
             if (buttonIndex == 1 && recordingContext.shouldRecordVideo) {

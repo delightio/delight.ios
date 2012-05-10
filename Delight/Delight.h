@@ -27,6 +27,7 @@
     NSTimeInterval lastScreenshotTime;
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
+    BOOL alertViewVisible;
     
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
