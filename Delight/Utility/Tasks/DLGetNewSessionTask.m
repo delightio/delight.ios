@@ -45,6 +45,7 @@ NSString * const DLRecordElementName = @"recording";
 	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
 	// check User ID
 	NSString * userID = [Delight appUserID];
+//	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_version]=%@&app_session[app_build]=%@&app_session[app_locale]=%@&app_session[app_connectivity]=%@&app_session[delight_version]=2.0&app_session[device_hw_version]=%@&app_session[device_os_version]=%@", dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier], self.taskController.networkStatusString, machineName, theDevice.systemVersion];
 	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[app_locale]=%@&app_session[app_connectivity]=%@&app_session[delight_version]=2.0&app_session[device_hw_version]=%@&app_session[device_os_version]=%@", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier], self.taskController.networkStatusString, machineName, theDevice.systemVersion];
 	if ( [userID length] ) {
 		paramStr = [paramStr stringByAppendingFormat:@"&app_session[app_user_id]=%@", [self stringByAddingPercentEscapes:userID]];
@@ -52,6 +53,7 @@ NSString * const DLRecordElementName = @"recording";
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
+//	[request setValue:_appToken	forHTTPHeaderField:@"HTTP_X_NB_AUTHTOKEN"];
 	[request setHTTPMethod:@"POST"];
 	
 	DLLog(@"[Delight] connecting to Delight server");
