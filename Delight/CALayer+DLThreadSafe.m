@@ -20,14 +20,14 @@
         [self DLrenderInContext:context];
     } else {
         // If calling from background thread, trying to render a UIWebView tile host layer will result in a crash.
-        // If visible in window, copy the layer to a plain CALayer and render that instead.
-        CALayer *layerCopy = [self plainLayerCopy];
+        // Copy the layer to a plain CALayer and render that instead.
+        CALayer *layerCopy = [self copyWithPlainLayer];
         [layerCopy renderInContext:context];
         [layerCopy release];
     }
 }
 
-- (CALayer *)plainLayerCopy
+- (CALayer *)copyWithPlainLayer
 {
     CALayer *newLayer = [[CALayer alloc] init];
     newLayer.contents = self.contents;
@@ -46,7 +46,7 @@
         CALayer *windowLayer = [[[[UIApplication sharedApplication] windows] objectAtIndex:0] layer];
         CGRect frameInWindow = [sublayer convertRect:sublayer.bounds toLayer:windowLayer];
         if (CGRectIntersectsRect(frameInWindow, windowLayer.bounds)) {
-            CALayer *sublayerCopy = [sublayer plainLayerCopy];
+            CALayer *sublayerCopy = [sublayer copyWithPlainLayer];
             [newLayer addSublayer:sublayerCopy];
             [sublayerCopy release];
         }

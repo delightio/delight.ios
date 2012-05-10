@@ -73,9 +73,7 @@
 
 - (void)writeFrameImage:(UIImage *)frameImage
 {
-    if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
-        DLDebugLog(@"Not ready for video data");
-    } else {
+    if ([videoWriterInput isReadyForMoreMediaData] && recording && !paused) {
         NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
         if (recordingStartTime < 0) {
             // This is the first frame
@@ -131,7 +129,6 @@
     }
     
     if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
-        DLDebugLog(@"Not ready for video data");
         return;
     }
     

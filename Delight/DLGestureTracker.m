@@ -11,7 +11,7 @@
 
 @interface DLGestureTracker ()
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
-- (CGContextRef)createBitmapContextOfSize:(CGSize)size;
+- (CGContextRef)newBitmapContextOfSize:(CGSize)size;
 @end
 
 @implementation DLGestureTracker
@@ -75,7 +75,7 @@
         return image;
     }
     
-    CGContextRef context = [self createBitmapContextOfSize:image.size];
+    CGContextRef context = [self newBitmapContextOfSize:image.size];
     CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
     CGContextScaleCTM(context, 1.0, -1.0);
     CGContextTranslateCTM(context, 0, -image.size.height);
@@ -183,7 +183,7 @@
     [lock unlock];
 }
 
-- (CGContextRef)createBitmapContextOfSize:(CGSize)size
+- (CGContextRef)newBitmapContextOfSize:(CGSize)size
 {
     CGContextRef    context = NULL;
     CGColorSpaceRef colorSpace;
@@ -209,13 +209,13 @@
                                      bitmapBytesPerRow,
                                      colorSpace,
                                      kCGImageAlphaNoneSkipFirst);
+    CGColorSpaceRelease( colorSpace );
     
     if (context == NULL) {
         free (bitmapData);
         fprintf (stderr, "Context not created!");
         return NULL;
     }
-    CGColorSpaceRelease( colorSpace );
     
     return context;
 }

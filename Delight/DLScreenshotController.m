@@ -14,7 +14,7 @@
 
 @interface DLScreenshotController ()
 - (UIWindow *)keyboardWindow;
-- (CGContextRef)createBitmapContextOfSize:(CGSize)size;
+- (CGContextRef)newBitmapContextOfSize:(CGSize)size;
 - (void)drawLabelCenteredAt:(CGPoint)point inWindow:(UIWindow *)window inContext:(CGContextRef)context 
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
@@ -77,7 +77,7 @@
 - (UIImage *)screenshot
 {
     CGSize windowSize = [[UIScreen mainScreen] bounds].size;
-    CGContextRef context = [self createBitmapContextOfSize:imageSize];
+    CGContextRef context = [self newBitmapContextOfSize:imageSize];
     
     // Flip the y-axis since Core Graphics starts with 0 at the bottom
     CGContextScaleCTM(context, 1.0, -1.0);
@@ -271,7 +271,7 @@
 	return nil;
 }
 
-- (CGContextRef)createBitmapContextOfSize:(CGSize)size 
+- (CGContextRef)newBitmapContextOfSize:(CGSize)size 
 {
     CGContextRef    context = NULL;
     CGColorSpaceRef colorSpace;
@@ -280,7 +280,6 @@
     
     bitmapBytesPerRow   = (size.width * 4);
     bitmapByteCount     = (bitmapBytesPerRow * size.height);
-    colorSpace = CGColorSpaceCreateDeviceRGB();
     if (bitmapData != NULL) {
         free(bitmapData);
     }
@@ -289,7 +288,8 @@
         fprintf (stderr, "Memory not allocated!");
         return NULL;
     }
-    
+
+    colorSpace = CGColorSpaceCreateDeviceRGB();
     context = CGBitmapContextCreate (bitmapData,
                                      size.width,
                                      size.height,
@@ -306,13 +306,13 @@
     CGContextSetShouldSmoothFonts(context, NO);
     CGContextSetShouldSubpixelPositionFonts(context, NO);
     CGContextSetShouldSubpixelQuantizeFonts(context, NO);
-    
-    if (context== NULL) {
+    CGColorSpaceRelease( colorSpace );
+
+    if (context == NULL) {
         free (bitmapData);
         fprintf (stderr, "Context not created!");
         return NULL;
     }
-    CGColorSpaceRelease( colorSpace );
     
     return context;
 }
