@@ -75,9 +75,7 @@
 
 - (void)writeFrameImage:(UIImage *)frameImage
 {
-    if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
-        DLDebugLog(@"Not ready for video data");
-    } else {
+    if ([videoWriterInput isReadyForMoreMediaData] && recording && !paused) {
         CMTime time = [self currentFrameTime];
         
         [lock lock];
@@ -123,6 +121,10 @@
             // We don't have a session yet
             return;
         }
+    }
+    
+    if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
+        return;
     }
     
     CVPixelBufferRef pixel_buffer = NULL;
@@ -183,6 +185,10 @@
     
     NSParameterAssert(videoWriterInput);
     videoWriterInput.expectsMediaDataInRealTime = YES;
+    if (encodesRawGLBytes) {
+        // Flip video to its correct orientation
+        videoWriterInput.transform = CGAffineTransformMakeScale(1, -1);
+    }
     
     NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kCVPixelFormatType_32ARGB], kCVPixelBufferPixelFormatTypeKey, nil];                                      
     avAdaptor = [[AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:videoWriterInput sourcePixelBufferAttributes:bufferAttributes] retain];
@@ -225,12 +231,9 @@
     [lock lock];
     BOOL success = [videoWriter finishWriting];
     if (success) {
-        DLDebugLog(@"Completed recording, file is stored at:  %@", outputPath);
-        if ([delegate respondsToSelector:@selector(videoEncoderDidFinishRecording:)]) {
-            [delegate videoEncoderDidFinishRecording:self];
-        }
+        DLDebugLog(@"Completed screen capture, file is stored at: %@", outputPath);
     } else {
-        DLDebugLog(@"finishWriting returned NO: %@", [[videoWriter error] localizedDescription]);
+        DLDebugLog(@"Screen capture failed: %@", [[videoWriter error] localizedDescription]);
         if ([delegate respondsToSelector:@selector(videoEncoder:didFailRecordingWithError:)]) {
             [delegate videoEncoder:self didFailRecordingWithError:[videoWriter error]];
         }
@@ -260,7 +263,7 @@
     if ([fileManager fileExistsAtPath:outputPath]) {
         NSError *error;
         if ([fileManager removeItemAtPath:outputPath error:&error] == NO) {
-            DLDebugLog(@"Could not delete old recording file at path:  %@", outputPath);
+            DLDebugLog(@"Could not delete old recording file at path: %@", outputPath);
         }
     }
     

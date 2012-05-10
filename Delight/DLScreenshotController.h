@@ -35,6 +35,6 @@
 - (UIImage *)openGLScreenshotForView:(UIView *)view backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 - (void)unregisterPrivateView:(UIView *)view;
-- (BOOL)locationIsInPrivateView:(CGPoint)location;
+- (BOOL)locationIsInPrivateView:(CGPoint)location privateViewFrame:(CGRect *)frame;
 
 @end

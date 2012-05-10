@@ -12,7 +12,7 @@
 @implementation DLUpdateSessionTask
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"http://%@/app_sessions/%@.xml", DL_BASE_URL, self.recordingContext.sessionID];
+	NSString * urlStr = [NSString stringWithFormat:@"https://%@/app_sessions/%@.xml", DL_BASE_URL, self.recordingContext.sessionID];
 	NSString * paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime]];
 	// the param needs to be put in query string. Not sure why. But, if not, it doesn't work
 	// check here: http://stackoverflow.com/questions/3469061/nsurlrequest-cannot-handle-http-body-when-method-is-not-post
@@ -32,10 +32,8 @@
 		// all tasks are done. end the background task
 		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
 		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
-		if ( self.recordingContext.loadedFromArchive ) {
-			// remove the task from incomplete array
-			[self.taskController removeRecordingContext:self.recordingContext];
-		}
+		// remove the task from incomplete array
+		[self.taskController removeRecordingContext:self.recordingContext];
 	}
 }
 

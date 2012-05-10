@@ -9,8 +9,17 @@
 #import "DLTask.h"
 #import "DLTaskController.h"
 
+#ifdef DL_USE_STAGING_SERVER
+NSString * const DL_BASE_URL = @"delightweb-staging.herokuapp.com";
+#else
 NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
+#endif
 NSString * const DL_APP_LOCALE = @"";
+NSString * const DLTrackURLKey = @"url";
+NSString * const DLTrackExpiryDateKey = @"expiry_date";
+NSString * const DLScreenTrackKey = @"screen_track";
+NSString * const DLTouchTrackKey = @"touch_track";
+NSString * const DLFrontTrackKey = @"front_track";
 
 @implementation DLTask
 @synthesize recordingContext = _recordingContext;
@@ -99,21 +108,25 @@ NSString * const DL_APP_LOCALE = @"";
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"debug: %d\n%@", _httpResponse.statusCode, str);
+	[str release];
 	// check if there's error
-//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-//	NSLog(@"debug: %@", str);
-//	[str release];
 	if ( ![self responseContainsError] ) {
 		// process the data
 		[self.taskController.queue addOperationWithBlock:^{
 			[self processResponse];
 		}];
+	} else {
+		NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+		NSLog(@"[Delight] Server returns error: %@\nStatus code: %d", str, _httpResponse.statusCode);
+		[str release];
 	}
 	self.connection = nil;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	NSLog(@"error: %@", error);
+	DLLog(@"[Delight] error connecting to delight server: %@", error);
 	self.connection = nil;
 	self.receivedData = nil;
 }

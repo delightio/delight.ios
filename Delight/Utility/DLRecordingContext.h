@@ -21,15 +21,18 @@ typedef enum {
 @interface DLRecordingContext : NSObject <NSCoding>
 
 @property (nonatomic, retain) NSString * sessionID;
-@property (nonatomic, retain) NSString * uploadURLString;
-@property (nonatomic, retain) NSDate * uploadURLExpiryDate;
+@property (nonatomic, retain) NSDictionary * tracks;
+@property (nonatomic, retain) NSMutableDictionary * sourceFilePaths;
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic, retain) NSDate * startTime;
 @property (nonatomic, retain) NSDate * endTime;
 @property (nonatomic) NSInteger chunkSize;
 @property (nonatomic) NSInteger chunkOffset;
-@property (nonatomic, retain) NSString * filePath;
+@property (nonatomic, retain) NSString * screenFilePath;
+@property (nonatomic, retain) NSString * cameraFilePath;
+@property (nonatomic, retain) NSString * touchFilePath;
+@property (nonatomic, retain) NSString * usabilityTestDescription;
 @property (nonatomic, retain) NSMutableIndexSet * finishedTaskIndex;
 @property (nonatomic) BOOL saved;
 @property (nonatomic, readonly) BOOL loadedFromArchive;

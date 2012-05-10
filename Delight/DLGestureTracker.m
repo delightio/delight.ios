@@ -10,20 +10,10 @@
 #import "DLGesture.h"
 #import "DLOrientationChange.h"
 #import "DLTouch.h"
-#import </usr/include/objc/objc-class.h>
-
-static void Swizzle(Class c, SEL orig, SEL new) {
-    Method origMethod = class_getInstanceMethod(c, orig);
-    Method newMethod = class_getInstanceMethod(c, new);
-    if(class_addMethod(c, orig, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)))
-        class_replaceMethod(c, new, method_getImplementation(origMethod), method_getTypeEncoding(origMethod));
-    else
-        method_exchangeImplementations(origMethod, newMethod);
-}
 
 @interface DLGestureTracker ()
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
-- (CGContextRef)createBitmapContextOfSize:(CGSize)size;
+- (CGContextRef)newBitmapContextOfSize:(CGSize)size;
 - (void)updateGesturesForEvent:(UIEvent *)event;
 - (void)handleDeviceOrientationDidChangeNotification:(NSNotification *)notification;
 @end
@@ -31,6 +21,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @implementation DLGestureTracker
 
 @synthesize scaleFactor;
+@synthesize mainWindow;
 @synthesize drawsGestures;
 @synthesize touches;
 @synthesize orientationChanges;
@@ -51,11 +42,15 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         startTime = -1;
         drawsGestures = YES;
         arrowheadPath = NULL;
-
-        // Method swizzling to intercept events
-        Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
-        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-            [window DLsetDelegate:self];
+        
+        NSArray *windows = [[UIApplication sharedApplication] windows];
+        if ([windows count]) {
+            for (UIWindow *window in windows) {
+                [window DLsetDelegate:self];
+            }
+            
+            // Assume rearmost window is the main app window
+            self.mainWindow = [windows objectAtIndex:0];
         }
         
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -78,6 +73,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [touches release];
     [orientationChanges release];
     [lock release];
+    [mainWindow release];
     
     if (bitmapData != NULL) {
         free(bitmapData);
@@ -98,7 +94,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         return image;
     }
     
-    CGContextRef context = [self createBitmapContextOfSize:image.size];
+    CGContextRef context = [self newBitmapContextOfSize:image.size];
     CGContextDrawImage(context, CGRectMake(0, 0, image.size.width, image.size.height), [image CGImage]);
     CGContextScaleCTM(context, 1.0, -1.0);
     CGContextTranslateCTM(context, 0, -image.size.height);
@@ -146,9 +142,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [lock unlock];
     
     for (DLGesture *gesture in allGestures) {
-        BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue]];
+        CGRect privateViewFrame;
+        BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue] privateViewFrame:&privateViewFrame];
 
-        if (!startLocationIsInPrivateView) {
+        if (startLocationIsInPrivateView) {
+            // Gesture is in a private view. Don't draw it, that could leak private information. Just flash the view it's in.
+            CGRect scaledPrivateViewFrame = CGRectApplyAffineTransform(privateViewFrame, CGAffineTransformMakeScale(scaleFactor * scale, scaleFactor * scale));
+            CGContextSetRGBFillColor(context, 0, 0, 1, 0.5);             
+            CGContextFillRect(context, scaledPrivateViewFrame);
+        
+        } else {
             if (gesture.type == DLGestureTypeTap) {
                 // Tap: draw a circle at the start point
                 CGPoint location = [[gesture.locations objectAtIndex:0] CGPointValue];
@@ -214,7 +217,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [lock unlock];
 }
 
-- (CGContextRef)createBitmapContextOfSize:(CGSize)size
+- (CGContextRef)newBitmapContextOfSize:(CGSize)size
 {
     CGContextRef    context = NULL;
     CGColorSpaceRef colorSpace;
@@ -240,13 +243,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                                      bitmapBytesPerRow,
                                      colorSpace,
                                      kCGImageAlphaNoneSkipFirst);
+    CGColorSpaceRelease( colorSpace );
     
     if (context == NULL) {
         free (bitmapData);
         fprintf (stderr, "Context not created!");
         return NULL;
     }
-    CGColorSpaceRelease( colorSpace );
     
     return context;
 }
@@ -254,11 +257,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)updateGesturesForEvent:(UIEvent *)event
 {
     NSMutableSet *gesturesJustCompleted = [[NSMutableSet alloc] initWithSet:gesturesInProgress];
-    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
     
     for (UITouch *touch in [event allTouches]) {
         if (touch.timestamp > 0) {
-            CGPoint location = [touch locationInView:keyWindow];
+            CGPoint location = [touch locationInView:mainWindow];
             
             BOOL existing = NO;
             if (touch.phase != UITouchPhaseBegan) {
@@ -335,17 +337,22 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (drawsGestures) {
         [self updateGesturesForEvent:event];
     } else {
-        UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-        
         for (UITouch *touch in [event allTouches]) {
             if (touch.timestamp > 0) {
-                CGPoint location = [touch locationInView:keyWindow];
+                CGPoint location = [touch locationInView:mainWindow];
                 
                 DLTouch *ourTouch = [[DLTouch alloc] initWithLocation:location phase:touch.phase timeInSession:touch.timestamp - startTime];
                 [touches addObject:ourTouch];
                 [ourTouch release];
             }
         }
+    }
+}
+
+- (void)windowAccelerometerDidShake:(UIWindow *)window
+{
+    if ([delegate respondsToSelector:@selector(gestureTrackerDidShake:)]) {
+        [delegate gestureTrackerDidShake:self];
     }
 }
 

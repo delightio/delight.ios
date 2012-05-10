@@ -8,6 +8,8 @@
 
 #import "DLGetNewSessionTask.h"
 #import "DLTaskController.h"
+#import <sys/utsname.h>
+#import "Delight.h"
 
 NSString * const DLAppSessionElementName = @"app_session";
 NSString * const DLUploadURIElementName = @"upload_uris";
@@ -26,7 +28,8 @@ NSString * const DLRecordElementName = @"recording";
 }
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"http://%@/app_sessions.xml", DL_BASE_URL];
+	NSString * urlStr = [NSString stringWithFormat:@"https://%@/app_sessions.xml", DL_BASE_URL];
+	// check build and version number
 	NSDictionary * dict = [[NSBundle mainBundle] infoDictionary];
 	NSString * buildVer = [dict objectForKey:(NSString *)kCFBundleVersionKey];
 	if ( buildVer == nil ) buildVer = @"";
@@ -34,11 +37,26 @@ NSString * const DLRecordElementName = @"recording";
 	NSString * dotVer = [dict objectForKey:@"CFBundleShortVersionString"];
 	if ( dotVer == nil ) dotVer = buildVer;
 	else dotVer = [self stringByAddingPercentEscapes:dotVer];
-	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[locale]=%@&app_session[delight_version]=1", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier]];
+	UIDevice * theDevice = [UIDevice currentDevice];
+	// get the exact hardward name
+	struct utsname systemInfo;
+	uname(&systemInfo);
+	
+	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+	// check User ID
+	NSString * userID = [Delight appUserID];
+//	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_version]=%@&app_session[app_build]=%@&app_session[app_locale]=%@&app_session[app_connectivity]=%@&app_session[delight_version]=2.0&app_session[device_hw_version]=%@&app_session[device_os_version]=%@", dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier], self.taskController.networkStatusString, machineName, theDevice.systemVersion];
+	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_token]=%@&app_session[app_version]=%@&app_session[app_build]=%@&app_session[app_locale]=%@&app_session[app_connectivity]=%@&app_session[delight_version]=2.0&app_session[device_hw_version]=%@&app_session[device_os_version]=%@", _appToken, dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier], self.taskController.networkStatusString, machineName, theDevice.systemVersion];
+	if ( [userID length] ) {
+		paramStr = [paramStr stringByAppendingFormat:@"&app_session[app_user_id]=%@", [self stringByAddingPercentEscapes:userID]];
+	}
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
+//	[request setValue:_appToken	forHTTPHeaderField:@"HTTP_X_NB_AUTHTOKEN"];
 	[request setHTTPMethod:@"POST"];
+	
+	DLLog(@"[Delight] connecting to Delight server");
 	return request;
 }
 
@@ -58,16 +76,25 @@ NSString * const DLRecordElementName = @"recording";
 		// create a new session object
 		self.recordingContext = [[[DLRecordingContext alloc] init] autorelease];
 	} else if ( [elementName isEqualToString:DLUploadURIElementName] ) {
-		// we can get the URI directly from the attribute
-		NSString * strURL = [attributeDict objectForKey:@"screen"];
-		self.recordingContext.uploadURLString = strURL;
-		// get expiry timestamp
-		NSRange firstRange = [strURL rangeOfString:@"Expires="];
-		NSRange nextRange = [strURL rangeOfString:@"&" options:0 range:NSMakeRange(firstRange.length + firstRange.location, [strURL length] - firstRange.length - firstRange.location)];
-		NSString * dateStr = [strURL substringWithRange:NSMakeRange(firstRange.length + firstRange.location, nextRange.location - firstRange.length - firstRange.location)];
-		if ( dateStr ) {
-			self.recordingContext.uploadURLExpiryDate = [NSDate dateWithTimeIntervalSince1970:[dateStr doubleValue]];
+		NSMutableDictionary * trackDict = [NSMutableDictionary dictionaryWithCapacity:4];
+		for (NSString * theKey in attributeDict) {
+			if ( [theKey rangeOfString:@"_track"].location != NSNotFound ) {
+				// this is a track URL
+				// we can get the URI directly from the attribute
+				NSString * strURL = [attributeDict objectForKey:theKey];
+				// get expiry timestamp
+				NSRange firstRange = [strURL rangeOfString:@"Expires="];
+				NSRange nextRange = [strURL rangeOfString:@"&" options:0 range:NSMakeRange(firstRange.length + firstRange.location, [strURL length] - firstRange.length - firstRange.location)];
+				NSString * dateStr = [strURL substringWithRange:NSMakeRange(firstRange.length + firstRange.location, nextRange.location - firstRange.length - firstRange.location)];
+				NSDate * expDate = nil;
+				if ( dateStr ) {
+					expDate = [NSDate dateWithTimeIntervalSince1970:[dateStr doubleValue]];
+				}
+				// save the track
+				[trackDict setObject:[NSDictionary dictionaryWithObjectsAndKeys:strURL, DLTrackURLKey, expDate == nil ? [NSNull null] : expDate, DLTrackExpiryDateKey, nil] forKey:theKey];
+			}
 		}
+		self.recordingContext.tracks = trackDict;
 	} else {
 		// prepare the string buffer
 		_contentOfCurrentProperty = [[NSMutableString alloc] initWithCapacity:16];

@@ -2,20 +2,17 @@
 //  Delight.h
 //  Delight
 //
-//  Created by Chris Haugli on 1/18/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
 
 @class DLTaskController;
 @class DLRecordingContext;
 @class DLScreenshotController;
 @class DLVideoEncoder;
 @class DLGestureTracker;
+@class DLCamCaptureManager;
 
 @protocol DLRecordingSessionDelegate <NSObject>
 
@@ -30,18 +27,24 @@
     NSTimeInterval lastScreenshotTime;
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
+    BOOL alertViewVisible;
     
 	DLTaskController * taskController;
 	DLRecordingContext * recordingContext;
     NSOperationQueue * screenshotQueue;
     NSLock * lock;
+	DLCamCaptureManager * cameraManager;
 }
 
 @property (nonatomic, retain) NSString *appToken;
+@property (nonatomic, retain) NSString *appUserID;
+@property (nonatomic) BOOL debugLogEnabled;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
 @property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
+@property (nonatomic, assign) BOOL recordsCamera;
+@property (nonatomic, assign, getter=isUsabilityTestEnabled) BOOL usabilityTestEnabled;
 @property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
@@ -53,6 +56,7 @@
 
 // Start/stop/pause/resume recording
 + (void)startWithAppToken:(NSString *)appToken;
++ (void)startUsabilityTestWithAppToken:(NSString *)appToken;
 + (void)stop;
 + (void)pause;
 + (void)resume;
@@ -76,6 +80,14 @@
 // Set whether recordings are copied to the user's photo album
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
 + (BOOL)savesToPhotoAlbum;
+
+// Set a unique identifier for the user being recorded
++ (void)setAppUserID:(NSString *)appUserID;
++ (NSString *)appUserID;
+
+// Set whether the debug log should be printed to the console
++ (void)setDebugLogEnabled:(BOOL)debugLogEnabled;
++ (BOOL)debugLogEnabled;
 
 // Set whether the keyboard is covered up in the recording
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording;

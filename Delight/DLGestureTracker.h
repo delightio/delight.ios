@@ -23,6 +23,7 @@
 }
 
 @property (nonatomic, assign) CGFloat scaleFactor;
+@property (nonatomic, retain) UIWindow *mainWindow;
 @property (nonatomic, assign) BOOL drawsGestures;
 @property (nonatomic, retain) NSMutableArray *touches;
 @property (nonatomic, retain) NSMutableArray *orientationChanges;
@@ -34,6 +35,8 @@
 
 @end
 
-@protocol DLGestureTrackerDelegate
-- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location;
+@protocol DLGestureTrackerDelegate <NSObject>
+- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location privateViewFrame:(CGRect *)frame;
+@optional
+- (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker;
 @end

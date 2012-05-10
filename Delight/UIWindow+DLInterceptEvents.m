@@ -27,4 +27,24 @@ DL_MAKE_CATEGORIES_LOADABLE(UIWindow_DLInterceptEvents);
     [self DLsendEvent:event];
 }
 
+- (void)DLmotionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+    if (event.subtype == UIEventSubtypeMotionShake) {
+        id<DLWindowDelegate> delegate = objc_getAssociatedObject(self, "DLDelegate");
+        [delegate windowAccelerometerDidShake:self];
+    }
+    
+    [self DLmotionEnded:motion withEvent:event];
+}
+
+@end
+
+@implementation UIApplication (DLInterceptEvents)
+
+- (void)DLmotionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+    // To avoid '-[UIApplication DLmotionEnded:withEvent:]: unrecognized selector
+    [self DLmotionEnded:motion withEvent:event];
+}
+
 @end
