@@ -22,6 +22,7 @@
 }
 
 @property (nonatomic, assign) CGFloat scaleFactor;
+@property (nonatomic, retain) UIWindow *mainWindow;
 @property (nonatomic, assign) id<DLGestureTrackerDelegate> delegate;
 
 - (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image;

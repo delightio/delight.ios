@@ -17,6 +17,7 @@
 @implementation DLGestureTracker
 
 @synthesize scaleFactor;
+@synthesize mainWindow;
 @synthesize delegate;
 
 - (id)init
@@ -30,8 +31,14 @@
         bitmapData = NULL;
         arrowheadPath = NULL;
         
-        for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
-            [window DLsetDelegate:self];
+        NSArray *windows = [[UIApplication sharedApplication] windows];
+        if ([windows count]) {
+            for (UIWindow *window in windows) {
+                [window DLsetDelegate:self];
+            }
+            
+            // Assume rearmost window is the main app window
+            self.mainWindow = [windows objectAtIndex:0];
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
@@ -47,6 +54,7 @@
     [gesturesInProgress release];
     [gesturesCompleted release];
     [lock release];
+    [mainWindow release];
     
     if (bitmapData != NULL) {
         free(bitmapData);
@@ -231,7 +239,6 @@
 - (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
 {
     NSMutableSet *gesturesJustCompleted = [[NSMutableSet alloc] initWithSet:gesturesInProgress];
-    UIWindow *mainWindow = ([[[UIApplication sharedApplication] windows] count] ? [[[UIApplication sharedApplication] windows] objectAtIndex:0] : nil);
     
     for (UITouch *touch in [event allTouches]) {
         if (touch.timestamp > 0) {
