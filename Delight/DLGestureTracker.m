@@ -226,12 +226,20 @@
 {
     UIWindow *window = [notification object];
     [window DLsetDelegate:self];
+    
+    if (!mainWindow) {
+        self.mainWindow = window;
+    }
 }
 
 - (void)handleWindowDidBecomeHiddenNotification:(NSNotification *)notification
 {
     UIWindow *window = [notification object];
-    [window DLsetDelegate:nil];    
+    [window DLsetDelegate:nil];  
+    
+    if (window == mainWindow) {
+        self.mainWindow = nil;
+    }
 }
 
 #pragma mark - DLWindowDelegate
