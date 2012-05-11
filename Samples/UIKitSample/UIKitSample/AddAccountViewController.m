@@ -131,6 +131,7 @@
         textField.autocorrectionType = UITextAutocorrectionTypeNo;
         textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
         textField.delegate = self;
+        textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         cell.accessoryView = textField;
         [textField release];
     }
