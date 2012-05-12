@@ -39,7 +39,7 @@
 @property (nonatomic, readonly) NSString * networkStatusString;
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
-- (void)uploadSession:(DLRecordingContext *)aSession;
+- (void)prepareSessionUpload:(DLRecordingContext *)aSession;
 
 // session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath;

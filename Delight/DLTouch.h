@@ -18,5 +18,6 @@
 @property (nonatomic, assign) NSTimeInterval timeInSession;
 
 - (id)initWithLocation:(CGPoint)aLocation phase:(UITouchPhase)aPhase timeInSession:(NSTimeInterval)aTimeInSession;
+- (NSDictionary *)dictionaryRepresentation;
 
 @end

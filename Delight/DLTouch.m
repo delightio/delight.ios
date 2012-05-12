@@ -25,6 +25,10 @@
     return self;
 }
 
+- (NSDictionary *)dictionaryRepresentation {
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:self.location.x], @"x", [NSNumber numberWithFloat:self.location.y], @"y", nil], @"location", [NSNumber numberWithInteger:phase], @"phase", [NSNumber numberWithDouble:timeInSession], @"timeInSession", nil];
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"Location: %@, phase: %i, time: %.3f", NSStringFromCGPoint(location), phase, timeInSession];

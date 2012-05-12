@@ -10,6 +10,7 @@
 #import "Delight.h"
 #import "DLRecordingContext.h"
 #import "DLReachability.h"
+#import "DLTouch.h"
 #import <UIKit/UIKit.h>
 
 @interface DLTaskController (PrivateMethods)
@@ -19,6 +20,9 @@
  S3 pre-signed URL has an expiry date. If the pre-signed URL has been expired, we should get a new pre-signed URL
  */
 - (void)renewUploadURLForSession:(DLRecordingContext *)ctx wtihTrack:(NSString *)trcName;
+- (void)uploadSession:(DLRecordingContext *)aSession;
+- (void)archiveTouchesForSession:(DLRecordingContext *)aSession;
+- (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx;
 
 @end
 
@@ -62,6 +66,22 @@
 	return _queue;
 }
 
+- (void)archiveTouchesForSession:(DLRecordingContext *)aSession {
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	NSString * errStr = nil;
+	NSArray * allTouches = aSession.touches;
+	NSMutableArray * dictTouches = [NSMutableArray arrayWithCapacity:[allTouches count]];
+	for (DLTouch * theTouch in allTouches) {
+		[dictTouches addObject:[theTouch dictionaryRepresentation]];
+	}
+	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:dictTouches format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
+	NSString * touchesPath = [self touchesFilePath];
+	[theData writeToFile:touchesPath atomically:NO];
+	// set file path
+	[aSession.sourceFilePaths setObject:touchesPath forKey:DLTouchTrackKey];
+	[pool release];
+}
+
 - (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
 	
@@ -80,8 +100,31 @@
 	[self.queue addOperation:theTask];
 }
 
-- (void)uploadSession:(DLRecordingContext *)aSession {
+- (void)prepareSessionUpload:(DLRecordingContext *)aSession {
 	if ( aSession == nil ) return;
+	BOOL backgroundSupported = NO;
+	UIDevice* device = [UIDevice currentDevice];
+	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
+	
+	if ( backgroundSupported ) {
+		UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+			[self saveRecordingContext];
+			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+		}];
+		[self.queue addOperationWithBlock:^{
+			// save file touches file from session
+			[self archiveTouchesForSession:aSession];
+			// create tasks to upload
+			[self uploadSession:aSession];
+			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+		}];
+	} else {
+		// if the system does not support background processing, we have to save the touches in main thread.
+		[self archiveTouchesForSession:aSession];
+	}
+}
+
+- (void)uploadSession:(DLRecordingContext *)aSession {
 	// check if we can run background task
 	UIDevice* device = [UIDevice currentDevice];
 	BOOL backgroundSupported = NO;
@@ -108,6 +151,10 @@
 #pragma mark Session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath {
 	return [self.baseDirectory stringByAppendingPathComponent:@"UnfinishedRecordingContexts.archive"];
+}
+
+- (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx {
+	return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"touches-%@.plist", ctx.sessionID]];
 }
 
 - (void)removeRecordingContext:(DLRecordingContext *)ctx {
