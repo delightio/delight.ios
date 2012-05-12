@@ -40,6 +40,7 @@
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)uploadSession:(DLRecordingContext *)aSession;
+- (void)updateSession:(DLRecordingContext *)aSession;
 
 // session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath;

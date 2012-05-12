@@ -13,7 +13,13 @@
 
 - (NSURLRequest *)URLRequest {
 	NSString * urlStr = [NSString stringWithFormat:@"https://%@/app_sessions/%@.xml", DL_BASE_URL, self.recordingContext.sessionID];
-	NSString * paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime]];
+	NSString * paramStr = nil;
+	NSString * usrID = self.recordingContext.appUserID;
+	if ( usrID ) {
+		paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f&app_session[app_user_id]=%@", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime], self.recordingContext.appUserID];
+	} else {
+		paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime]];
+	}
 	// the param needs to be put in query string. Not sure why. But, if not, it doesn't work
 	// check here: http://stackoverflow.com/questions/3469061/nsurlrequest-cannot-handle-http-body-when-method-is-not-post
 	NSString * fstr = [NSString stringWithFormat:@"%@?%@", urlStr, paramStr];

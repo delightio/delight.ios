@@ -400,6 +400,17 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
+- (void)setAppUserID:(NSString *)anID {
+	if ( appUserID == anID ) return;
+	[appUserID release];
+	appUserID = [anID retain];
+	if ( recordingContext ) {
+		recordingContext.appUserID = appUserID;
+		// post the change
+		[taskController updateSession:recordingContext];
+	}
+}
+
 - (void)setRecordsCamera:(BOOL)aRecordsCamera
 {
     if (recordsCamera != aRecordsCamera) {

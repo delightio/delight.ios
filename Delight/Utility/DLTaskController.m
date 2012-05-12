@@ -105,6 +105,15 @@
 	}
 }
 
+- (void)updateSession:(DLRecordingContext *)aSession {
+	if ( aSession == nil ) return;
+	if ( _task ) return;
+	DLUpdateSessionTask * theTask = [[DLUpdateSessionTask alloc] init];
+	_task = theTask;
+	theTask.recordingContext = aSession;
+	[self.queue addOperation:theTask];
+}
+
 #pragma mark Session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath {
 	return [self.baseDirectory stringByAppendingPathComponent:@"UnfinishedRecordingContexts.archive"];
