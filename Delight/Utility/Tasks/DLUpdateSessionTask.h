@@ -10,5 +10,6 @@
 
 @interface DLUpdateSessionTask : DLTask
 
+@property (nonatomic) BOOL sessionDidEnd;
 
 @end

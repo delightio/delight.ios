@@ -46,7 +46,7 @@
 - (NSString *)unfinishedRecordingContextsArchiveFilePath;
 - (void)removeRecordingContext:(DLRecordingContext *)ctx;
 // task management
-- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;
+- (void)handleSessionTaskCompletion:(DLTask *)aTask;
 //- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx;
 - (void)saveRecordingContext;
 

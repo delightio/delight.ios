@@ -111,6 +111,7 @@
 	DLUpdateSessionTask * theTask = [[DLUpdateSessionTask alloc] init];
 	_task = theTask;
 	theTask.recordingContext = aSession;
+	theTask.taskController = self;
 	[self.queue addOperation:theTask];
 }
 
@@ -137,6 +138,7 @@
 	UIBackgroundTaskIdentifier bgIdf = UIBackgroundTaskInvalid;
 	if ( [ctx shouldCompleteTask:DLFinishedUpdateSession] ) {
 		DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
+		sessTask.sessionDidEnd = YES;
 		bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			// task expires. clean it up if it has not finished yet
 			[sessTask cancel];
@@ -196,15 +198,17 @@
 }
 
 #pragma mark Task Management
-- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
-	DLRecordingContext * ctx = aTask.recordingContext;
-	if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
-		// suppress recording flag if there's video files pending upload
-		ctx.shouldRecordVideo = NO;
+- (void)handleSessionTaskCompletion:(DLTask *)aTask {
+	if ( [aTask isKindOfClass:[DLGetNewSessionTask class]] ) {
+		DLRecordingContext * ctx = aTask.recordingContext;
+		if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
+			// suppress recording flag if there's video files pending upload
+			ctx.shouldRecordVideo = NO;
+		}
+		DLLog(@"[Delight] %@ session created: %@", ctx.shouldRecordVideo ? @"recording" : @"non-recording", ctx.sessionID);
+		// notify the delegate
+		[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	}
-	DLLog(@"[Delight] %@ session created: %@", ctx.shouldRecordVideo ? @"recording" : @"non-recording", ctx.sessionID);
-	// notify the delegate
-	[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	self.task = nil;
 }
 
