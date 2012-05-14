@@ -56,7 +56,6 @@
 
 // Start/stop/pause/resume recording
 + (void)startWithAppToken:(NSString *)appToken;
-+ (void)startUsabilityTestWithAppToken:(NSString *)appToken;
 + (void)stop;
 + (void)pause;
 + (void)resume;

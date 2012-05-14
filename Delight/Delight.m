@@ -47,11 +47,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 @interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
-// OpenGL ES beta methods
+// Methods not yet ready for the public
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
 + (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
++ (void)startUsabilityTestWithAppToken:(NSString *)appToken;
 
 + (Delight *)sharedInstance;
 - (void)startRecording;
