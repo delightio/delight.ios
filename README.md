@@ -27,9 +27,9 @@ Advanced Setup
 
 By default, recordings will be at 50% scale for iPhones and non-Retina iPads, and 25% scale for Retina iPads. These numbers were chosen to strike a balance between recording quality, performance and upload time. To record at a different scale, call `[Delight setScaleFactor:]` before `[Delight startWithAppToken:]`. The scale factor is a number between 0 and 1, for example 0.5 for 50% scale.
 
-### Frame Rate ###
+### Maximum Frame Rate ###
 
-The frame rate will auto-adjust to become as high as possible. This may use up a lot of CPU, so you may want to reduce the frame rate to limit the effect on your app. To do so, call `[Delight setMaximumFrameRate:]` with the new maximum frame rate (in frames per second). You may need to experiment to find the right value. By default the maximum frame rate is 30 fps.
+The default and recommended maximum frame rate is 15 frames per second. You can call `[Delight setMaximumFrameRate:]` to set a different maximum frame rate.
 
 ### Recording Control ###
 
@@ -38,12 +38,6 @@ Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To s
 ### Saving to Photo Album ###
 
 If you would like the video to be copied to the user's Photo Album after each recording, call `[Delight setSavesToPhotoAlbum:YES]`. By default the video is not copied.
-
-### Usability Test Mode ###
-
-Usability test mode is a special mode which records the front-facing camera, if available, in addition to the screen. When usability test mode is enabled, recording does not start automatically at the start of each session. Instead, the user must shake the device to start recording. An alert view will appear to confirm and allow the user to enter a short description of the test. To stop recording, the user must shake the device again.
-
-To enable usability test mode, call `[Delight startUsabilityTestWithAppToken:]` instead of `[Delight startWithAppToken:]`.
 
 ### Identifying Users ###
 

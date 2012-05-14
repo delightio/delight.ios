@@ -17,8 +17,6 @@ Changelog
 ---------
 
 * API additions:
-  * **Usability Test Mode**: A new mode has been added where both the front-facing camera and screen are recorded simultaneously. In this mode, the user must shake the device to start/stop recording. To enable usability test mode, call `[Delight startUsabilityTestWithAppToken:]` instead of `[Delight startWithAppToken:]`.
-
   * **App User ID Field**: To associate a recording with a particular user, you can call `[Delight setAppUserID:]` with an NSString identifier of your choosing. This identifier will be displayed when viewing the recording in the control panel.
 
   * **Debug Logging**: Debug logging to the console can be turned on/off by calling `[Delight setDebugLogEnabled:]`.
