@@ -21,8 +21,6 @@
 		8385CA80154768530057FC37 /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
 		8385CA831547688E0057FC37 /* DLOrientationChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA811547688D0057FC37 /* DLOrientationChange.h */; };
 		8385CA841547688E0057FC37 /* DLOrientationChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA821547688E0057FC37 /* DLOrientationChange.m */; };
-		8391626F1537C21000549347 /* DLGestureTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 8391626D1537C21000549347 /* DLGestureTracker.h */; settings = {ATTRIBUTES = (); }; };
-		839162701537C21000549347 /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
 		83B8969914EAECD6006D93C2 /* Delight.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969314EAECD6006D93C2 /* Delight.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -75,8 +73,8 @@
 		8385CA7E154768530057FC37 /* DLTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTouch.m; sourceTree = "<group>"; };
 		8385CA811547688D0057FC37 /* DLOrientationChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLOrientationChange.h; sourceTree = "<group>"; };
 		8385CA821547688E0057FC37 /* DLOrientationChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLOrientationChange.m; sourceTree = "<group>"; };
-		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGestureTracker.h; sourceTree = "<group>"; };
-		8391626E1537C21000549347 /* DLGestureTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGestureTracker.m; sourceTree = "<group>"; };
+		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DLGestureTracker.h; path = /Source/pipely/delight.ios/Delight/DLGestureTracker.h; sourceTree = "<absolute>"; };
+		8391626E1537C21000549347 /* DLGestureTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DLGestureTracker.m; path = /Source/pipely/delight.ios/Delight/DLGestureTracker.m; sourceTree = "<absolute>"; };
 		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Delight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B8968514EAEC68006D93C2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		83B8968914EAEC68006D93C2 /* Delight-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Delight-Info.plist"; sourceTree = "<group>"; };
@@ -221,8 +219,6 @@
 				83149B2C15338CC500003862 /* DLVideoEncoder.m */,
 				83827A531538BD81002EA080 /* DLGesture.h */,
 				83827A541538BD82002EA080 /* DLGesture.m */,
-				8391626D1537C21000549347 /* DLGestureTracker.h */,
-				8391626E1537C21000549347 /* DLGestureTracker.m */,
 				83B8968814EAEC68006D93C2 /* Supporting Files */,
 			);
 			path = Delight;
@@ -289,7 +285,6 @@
 				836ABF2B1548D47400926A71 /* DLCamCaptureManager.h in Headers */,
 				A9A9A3EC1537BEB400B6E4AB /* DLUploadVideoFileTask.h in Headers */,
 				83827A551538BD82002EA080 /* DLGesture.h in Headers */,
-				8391626F1537C21000549347 /* DLGestureTracker.h in Headers */,
 				A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */,
 				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
 				8385CA7F154768530057FC37 /* DLTouch.h in Headers */,
@@ -418,7 +413,6 @@
 				A9A9A3E51537225F00B6E4AB /* DLGetNewSessionTask.m in Sources */,
 				A9A9A3E91537BE2F00B6E4AB /* DLUpdateSessionTask.m in Sources */,
 				A9A9A3ED1537BEB400B6E4AB /* DLUploadVideoFileTask.m in Sources */,
-				839162701537C21000549347 /* DLGestureTracker.m in Sources */,
 				83827A561538BD82002EA080 /* DLGesture.m in Sources */,
 				A96BE1E7153E156800D8BA2D /* DLPostVideoTask.m in Sources */,
 				A98094581542A732002B2BCE /* DLReachability.m in Sources */,

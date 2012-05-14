@@ -13,8 +13,8 @@
 @implementation DLUploadVideoFileTask
 @synthesize trackName = _trackName;
 
-- (id)initWithTrack:(NSString *)trcName {
-	self = [super init];
+- (id)initWithTrack:(NSString *)trcName appToken:(NSString *)aToken {
+	self = [super initWithAppToken:aToken];
 	_trackName = [trcName retain];
 	return self;
 }
@@ -38,6 +38,7 @@
 		[request setValue:[NSString stringWithFormat:@"%qu", [attrDict fileSize]] forHTTPHeaderField:@"Content-Length"];
 		// open up the file
 		[request setHTTPBodyStream:theStream];
+		[request setValue:self.appToken	forHTTPHeaderField:@"X-NB-AuthToken"];
 		DLLog(@"[Delight] uploading recording to delight server");
 	}
 	return request;
@@ -48,7 +49,7 @@
 //	NSLog(@"uploaded video file: %@", str);
 //	[str release];
 	// create Post Video task
-	DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
+	DLPostVideoTask * postTask = [[DLPostVideoTask alloc] initWithTrack:_trackName appToken:self.appToken];
 	UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 		// task expires. clean it up if it has not finished yet
 		[postTask cancel];

@@ -21,6 +21,7 @@ typedef enum {
 @interface DLRecordingContext : NSObject <NSCoding>
 
 @property (nonatomic, retain) NSString * sessionID;
+@property (nonatomic, retain) NSString * appUserID;
 @property (nonatomic, retain) NSDictionary * tracks;
 @property (nonatomic, retain) NSMutableDictionary * sourceFilePaths;
 @property (nonatomic, retain) NSArray * touches;

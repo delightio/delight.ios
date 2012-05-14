@@ -28,10 +28,12 @@ NSString * const DLFrontTrackKey = @"front_track";
 @synthesize receivedData = _receivedData;
 @synthesize httpResponse = _httpResponse;
 @synthesize connection = _connection;
+@synthesize appToken = _appToken;
 
-- (id)init {
+- (id)initWithAppToken:(NSString *)aToken {
 	self = [super init];
 	_backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+	_appToken = [aToken retain];
 	return self;
 }
 
@@ -39,6 +41,7 @@ NSString * const DLFrontTrackKey = @"front_track";
 	[_recordingContext release];
 	[_receivedData release];
 	[_httpResponse release];
+	[_appToken release];
 	[super dealloc];
 }
 

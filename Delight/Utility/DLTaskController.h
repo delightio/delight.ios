@@ -40,12 +40,14 @@
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)prepareSessionUpload:(DLRecordingContext *)aSession;
+- (void)uploadSession:(DLRecordingContext *)aSession;
+- (void)updateSession:(DLRecordingContext *)aSession;
 
 // session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath;
 - (void)removeRecordingContext:(DLRecordingContext *)ctx;
 // task management
-- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask;
+- (void)handleSessionTaskCompletion:(DLTask *)aTask;
 //- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx;
 - (void)saveRecordingContext;
 
