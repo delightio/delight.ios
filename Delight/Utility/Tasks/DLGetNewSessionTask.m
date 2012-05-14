@@ -18,11 +18,9 @@ NSString * const DLIDElementName = @"id";
 NSString * const DLRecordElementName = @"recording";
 
 @implementation DLGetNewSessionTask
-@synthesize appToken = _appToken;
 @synthesize contentOfCurrentProperty = _contentOfCurrentProperty;
 
 - (void)dealloc {
-	[_appToken release];
 	[_contentOfCurrentProperty release];
 	[super dealloc];
 }
@@ -53,7 +51,7 @@ NSString * const DLRecordElementName = @"recording";
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
-	[request setValue:_appToken	forHTTPHeaderField:@"HTTP_X_NB_AUTHTOKEN"];
+	[request setValue:self.appToken	forHTTPHeaderField:@"X-NB-AuthToken"];
 	[request setHTTPMethod:@"POST"];
 	
 	DLLog(@"[Delight] connecting to Delight server");

@@ -26,6 +26,7 @@
 	NSString * fstr = [NSString stringWithFormat:@"%@?%@", urlStr, paramStr];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:fstr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
+	[request setValue:self.appToken	forHTTPHeaderField:@"X-NB-AuthToken"];
 	[request setHTTPMethod:@"PUT"];
 	return request;
 }
