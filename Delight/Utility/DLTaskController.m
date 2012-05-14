@@ -73,8 +73,7 @@
 	}
 	
 	// begin connection
-	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] init];
-	theTask.appToken = aToken;
+	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] initWithAppToken:aToken];
 	theTask.taskController = self;
 	_task = theTask;
 	[self.queue addOperation:theTask];
@@ -105,6 +104,16 @@
 	}
 }
 
+- (void)updateSession:(DLRecordingContext *)aSession {
+	if ( aSession == nil ) return;
+	if ( _task ) return;
+	DLUpdateSessionTask * theTask = [[DLUpdateSessionTask alloc] initWithAppToken:_appToken];
+	_task = theTask;
+	theTask.recordingContext = aSession;
+	theTask.taskController = self;
+	[self.queue addOperation:theTask];
+}
+
 #pragma mark Session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath {
 	return [self.baseDirectory stringByAppendingPathComponent:@"UnfinishedRecordingContexts.archive"];
@@ -127,7 +136,8 @@
 	// upload in the background
 	UIBackgroundTaskIdentifier bgIdf = UIBackgroundTaskInvalid;
 	if ( [ctx shouldCompleteTask:DLFinishedUpdateSession] ) {
-		DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
+		DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] initWithAppToken:_appToken];
+		sessTask.sessionDidEnd = YES;
 		bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			// task expires. clean it up if it has not finished yet
 			[sessTask cancel];
@@ -148,7 +158,7 @@
 				NSDictionary * curTrack = [theTracks objectForKey:theKey];
 				if ( [ctx.sourceFilePaths objectForKey:theKey] && [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
 					// uplaod URL is still valid. Continue to upload
-					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:theKey];
+					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:theKey appToken:_appToken];
 					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 						// task expires. clean it up if it has not finished yet
 						[uploadTask cancel];
@@ -166,7 +176,7 @@
 				}
 			}
 		} else if ( [ctx shouldCompleteTask:DLFinishedPostVideo] ) {
-			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
+			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] initWithTrack:nil appToken:_appToken];
 			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 				// task expires. clean it up if it has not finished yet
 				[postTask cancel];
@@ -187,15 +197,17 @@
 }
 
 #pragma mark Task Management
-- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
-	DLRecordingContext * ctx = aTask.recordingContext;
-	if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
-		// suppress recording flag if there's video files pending upload
-		ctx.shouldRecordVideo = NO;
+- (void)handleSessionTaskCompletion:(DLTask *)aTask {
+	if ( [aTask isKindOfClass:[DLGetNewSessionTask class]] ) {
+		DLRecordingContext * ctx = aTask.recordingContext;
+		if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
+			// suppress recording flag if there's video files pending upload
+			ctx.shouldRecordVideo = NO;
+		}
+		DLLog(@"[Delight] %@ session created: %@", ctx.shouldRecordVideo ? @"recording" : @"non-recording", ctx.sessionID);
+		// notify the delegate
+		[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	}
-	DLLog(@"[Delight] %@ session created: %@", ctx.shouldRecordVideo ? @"recording" : @"non-recording", ctx.sessionID);
-	// notify the delegate
-	[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	self.task = nil;
 }
 

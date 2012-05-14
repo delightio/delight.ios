@@ -12,22 +12,21 @@
 @implementation DLPostVideoTask
 @synthesize trackName = _trackName;
 
-- (id)initWithTrack:(NSString *)trcName {
-	self = [super init];
+- (id)initWithTrack:(NSString *)trcName appToken:(NSString *)aToken {
+	self = [super initWithAppToken:aToken];
 	_trackName = [trcName retain];
 	return self;
 }
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"https://%@/videos.xml", DL_BASE_URL];
+	NSString * urlStr = [NSString stringWithFormat:@"https://%@/%@s.xml", DL_BASE_URL, _trackName];
 	// get the URL for the specified track
-	NSDictionary * theDict = [self.recordingContext.tracks objectForKey:_trackName];
-	NSArray * urlComponents = [[theDict objectForKey:DLTrackURLKey] componentsSeparatedByString:@"?"];
-	NSString * paramStr = [NSString stringWithFormat:@"video[uri]=%@&video[app_session_id]=%@", [self stringByAddingPercentEscapes:[urlComponents objectAtIndex:0]], self.recordingContext.sessionID];
+	NSString * paramStr = [NSString stringWithFormat:@"%@[app_session_id]=%@", _trackName, self.recordingContext.sessionID];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 	NSData * theData = [paramStr dataUsingEncoding:NSUTF8StringEncoding];
 	[request setHTTPBody:theData];
 	[request setValue:[NSString stringWithFormat:@"%d", [theData length]] forHTTPHeaderField:@"Content-Length"];
+	[request setValue:self.appToken	forHTTPHeaderField:@"X-NB-AuthToken"];
 	[request setHTTPMethod:@"POST"];
 	return request;
 }

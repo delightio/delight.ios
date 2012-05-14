@@ -31,6 +31,9 @@ extern NSString * const DL_APP_LOCALE;
 @property (nonatomic, retain) NSMutableData * receivedData;
 @property (nonatomic, retain) NSHTTPURLResponse * httpResponse;
 @property (nonatomic, retain) NSURLConnection * connection;
+@property (nonatomic, retain) NSString * appToken;
+
+- (id)initWithAppToken:(NSString *)aToken;
 
 - (NSString *)stringByAddingPercentEscapes:(NSString *)str;
 - (NSURLRequest *)URLRequest;
