@@ -25,7 +25,7 @@
 #define kDLDefaultScaleFactor_iPhone2x 0.5f
 #define kDLDefaultScaleFactor_iPhone   0.5f
 
-#define kDLDefaultMaximumFrameRate 30.0f
+#define kDLDefaultMaximumFrameRate 15.0f
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
 #define kDLMaximumSessionInactiveTime 60.0f*5
 
