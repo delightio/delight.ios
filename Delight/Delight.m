@@ -17,6 +17,7 @@
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
 #import "UIWindow+DLInterceptEvents.h"
+#import "UITextField+DLPrivateView.h"
 #import "DLCamCaptureManager.h"
 #import </usr/include/objc/objc-class.h>
 
@@ -284,6 +285,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         // Method swizzling to rewrite UIWebView layer rendering code to avoid crash
         Swizzle(NSClassFromString(@"TileHostLayer"), @selector(renderInContext:), @selector(DLrenderInContext:));
+        
+        // Method swizzling to automatically make secure UITextFields private views
+        Swizzle([UITextField class], @selector(didMoveToSuperview), @selector(DLdidMoveToSuperview));
+        Swizzle([UITextField class], @selector(setSecureTextEntry:), @selector(DLsetSecureTextEntry:));
     }
     return self;
 }

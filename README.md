@@ -54,6 +54,8 @@ Private Views
 
 You may not want to record certain views, such as password prompts. Call `[Delight registerPrivateView:description:]` with a view and a descriptive text to make a view private (will appear blacked out in the recording). You must call `[Delight unregisterPrivateView:]` before the view is deallocated. `[Delight privateViews]` will return an NSSet of all private views currently registered.
 
+Note that UITextFields with the secureTextEntry property set to true are automatically registered as private views.
+
 ### Hiding the Keyboard ###
 
 To allow/prevent the keyboard from being recorded, call `[Delight setHidesKeyboardInRecording:]`. When set to YES, the keyboard area will be covered up by a grey box in the recording and keystroke gestures will not be drawn. By default, the keyboard is shown in the recording.

@@ -13,6 +13,8 @@
 		836ABF2C1548D47400926A71 /* DLCamCaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF261548D47400926A71 /* DLCamCaptureManager.m */; };
 		836ABF2D1548D47400926A71 /* DLCamRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF271548D47400926A71 /* DLCamRecorder.h */; };
 		836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* DLCamRecorder.m */; };
+		838187001563156400608514 /* UITextField+DLPrivateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 838186FE1563156400608514 /* UITextField+DLPrivateView.h */; };
+		838187011563156400608514 /* UITextField+DLPrivateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 838186FF1563156400608514 /* UITextField+DLPrivateView.m */; };
 		83827A551538BD82002EA080 /* DLGesture.h in Headers */ = {isa = PBXBuildFile; fileRef = 83827A531538BD81002EA080 /* DLGesture.h */; };
 		83827A561538BD82002EA080 /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
 		8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */; };
@@ -62,6 +64,8 @@
 		836ABF261548D47400926A71 /* DLCamCaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamCaptureManager.m; sourceTree = "<group>"; };
 		836ABF271548D47400926A71 /* DLCamRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamRecorder.h; sourceTree = "<group>"; };
 		836ABF281548D47400926A71 /* DLCamRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamRecorder.m; sourceTree = "<group>"; };
+		838186FE1563156400608514 /* UITextField+DLPrivateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+DLPrivateView.h"; sourceTree = "<group>"; };
+		838186FF1563156400608514 /* UITextField+DLPrivateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+DLPrivateView.m"; sourceTree = "<group>"; };
 		83827A531538BD81002EA080 /* DLGesture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGesture.h; sourceTree = "<group>"; };
 		83827A541538BD82002EA080 /* DLGesture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGesture.m; sourceTree = "<group>"; };
 		8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+DLThreadSafe.h"; sourceTree = "<group>"; };
@@ -144,6 +148,8 @@
 				83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */,
 				8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */,
 				8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */,
+				838186FE1563156400608514 /* UITextField+DLPrivateView.h */,
+				838186FF1563156400608514 /* UITextField+DLPrivateView.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -268,6 +274,7 @@
 				A98094571542A732002B2BCE /* DLReachability.h in Headers */,
 				836ABF2D1548D47400926A71 /* DLCamRecorder.h in Headers */,
 				8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */,
+				838187001563156400608514 /* UITextField+DLPrivateView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +404,7 @@
 				836ABF2C1548D47400926A71 /* DLCamCaptureManager.m in Sources */,
 				836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */,
 				8382935F1558A04F007C6CDA /* CALayer+DLThreadSafe.m in Sources */,
+				838187011563156400608514 /* UITextField+DLPrivateView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

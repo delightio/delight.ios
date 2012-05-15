@@ -26,16 +26,6 @@
     self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(createAccount:)] autorelease];
 }
 
-- (void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-    
-    // Unregister all private views
-    for (UIView *view in [Delight privateViews]) {
-        [Delight unregisterPrivateView:view];
-    }
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return YES;
@@ -52,10 +42,6 @@
             textField.keyboardType = UIKeyboardTypeDefault;
             textField.returnKeyType = UIReturnKeyNext;
             textField.placeholder = @"Account Name";
-            
-            // This cell could have been recycled from a password field cell.
-            // In that case, we no longer want it to be private.
-            [Delight unregisterPrivateView:textField];
             break;
         case 1:
             cell.textLabel.text = @"Email";
@@ -64,10 +50,6 @@
             textField.keyboardType = UIKeyboardTypeEmailAddress;
             textField.returnKeyType = UIReturnKeyNext;
             textField.placeholder = @"example@example.com";
-            
-            // This cell could have been recycled from a password field cell.
-            // In that case, we no longer want it to be private.
-            [Delight unregisterPrivateView:textField];
             break;
         case 2:
             cell.textLabel.text = @"Password";
@@ -76,9 +58,6 @@
             textField.keyboardType = UIKeyboardTypeDefault;
             textField.returnKeyType = UIReturnKeyDone;
             textField.placeholder = @"Required";
-            
-            // We want the password text field to be private in the recording.
-            [Delight registerPrivateView:textField description:@"Password"];
             break;
     }
 }

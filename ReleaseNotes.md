@@ -25,6 +25,8 @@ Changelog
 
 * Made private views flash when receiving touch events.
 
+* Secure UITextFields are now automatically registered as private views.
+
 * Fixed a crash that occurred when a new session could not be created (e.g. if the app token was invalid).
 
 * Fixed a crash that occurred when recording a UIWebView.
