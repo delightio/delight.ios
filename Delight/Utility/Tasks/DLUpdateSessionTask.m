@@ -14,13 +14,15 @@
 
 - (NSURLRequest *)URLRequest {
 	NSString * urlStr = [NSString stringWithFormat:@"https://%@/app_sessions/%@.xml", DL_BASE_URL, self.recordingContext.sessionID];
-	NSString * paramStr = nil;
-	NSString * usrID = self.recordingContext.appUserID;
-	if ( usrID ) {
-		paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f&app_session[app_user_id]=%@", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime], [self stringByAddingPercentEscapes:self.recordingContext.appUserID]];
-	} else {
-		paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime]];
-	}
+    
+    NSMutableString * propertyParams = [NSMutableString string];
+    for (NSString * key in [self.recordingContext.userProperties allKeys]) {
+        [propertyParams appendFormat:@"&app_session[properties][%@]=%@", [self stringByAddingPercentEscapes:key], 
+         [self stringByAddingPercentEscapes:[self.recordingContext.userProperties objectForKey:key]]];
+    }
+    
+    NSString * paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f%@", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime], propertyParams];
+
 	// the param needs to be put in query string. Not sure why. But, if not, it doesn't work
 	// check here: http://stackoverflow.com/questions/3469061/nsurlrequest-cannot-handle-http-body-when-method-is-not-post
 	NSString * fstr = [NSString stringWithFormat:@"%@?%@", urlStr, paramStr];

@@ -39,9 +39,9 @@ Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To s
 
 If you would like the video to be copied to the user's Photo Album after each recording, call `[Delight setSavesToPhotoAlbum:YES]`. By default the video is not copied.
 
-### Identifying Users ###
+### Properties ###
 
-To attach an identifier to the user being recorded, such as a username or user ID, call `[Delight setAppUserID:]` with an NSString identifier.
+You can attach arbitrary metadata to recordings by calling `[Delight setPropertyValue:forKey:]`. In the control panel, it is possible to filter recordings by property.
 
 ### Debug Log ###
 

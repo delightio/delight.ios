@@ -17,7 +17,7 @@ Changelog
 ---------
 
 * API additions:
-  * **App User ID Field**: To associate a recording with a particular user, you can call `[Delight setAppUserID:]` with an NSString identifier of your choosing. This identifier will be displayed when viewing the recording in the control panel.
+  * **Properties**: To attach arbitrary metadata to sessions, you can call `[Delight setPropertyValue:forKey:]` with a key and value of your choosing. In the control panel, it is possible to filter recordings by property.
 
   * **Debug Logging**: Debug logging to the console can be turned on/off by calling `[Delight setDebugLogEnabled:]`.
 

@@ -67,7 +67,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @implementation Delight
 
 @synthesize appToken;
-@synthesize appUserID;
 @synthesize debugLogEnabled;
 @synthesize scaleFactor;
 @synthesize maximumFrameRate;
@@ -79,6 +78,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize screenshotController;
 @synthesize videoEncoder;
 @synthesize gestureTracker;
+@synthesize userProperties;
 
 #pragma mark - Class methods
 
@@ -189,16 +189,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
 }
 
-+ (NSString *)appUserID
-{
-    return [self sharedInstance].appUserID;
-}
-
-+ (void)setAppUserID:(NSString *)appUserID
-{
-    [self sharedInstance].appUserID = appUserID;
-}
-
 + (BOOL)debugLogEnabled
 {
     return [self sharedInstance].debugLogEnabled;
@@ -234,6 +224,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return [self sharedInstance].screenshotController.privateViews;
 }
 
++ (void)setPropertyValue:(NSString *)value forKey:(NSString *)key
+{
+    [[self sharedInstance].userProperties setObject:value forKey:key];
+}
+
 #pragma mark -
 
 - (id)init
@@ -251,6 +246,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         screenshotQueue.maxConcurrentOperationCount = 1;
 
         lock = [[NSLock alloc] init];
+        userProperties = [[NSMutableDictionary alloc] init];
+        
         if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
             if ([UIScreen mainScreen].scale == 1.0) {
                 self.scaleFactor = kDLDefaultScaleFactor_iPad;
@@ -296,7 +293,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [appToken release];
-    [appUserID release];
     [screenshotController release];
     [videoEncoder release];
     [gestureTracker release];
@@ -304,7 +300,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[screenshotQueue release];	
 	[taskController release];
     [lock release];
-    
+    [userProperties release];
+
     [super dealloc];
 }
 
@@ -399,17 +396,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             [self scheduleScreenshot];
         }
     }
-}
-
-- (void)setAppUserID:(NSString *)anID {
-	if ( appUserID == anID ) return;
-	[appUserID release];
-	appUserID = [anID retain];
-	if ( recordingContext ) {
-		recordingContext.appUserID = appUserID;
-		// post the change
-		[taskController updateSession:recordingContext];
-	}
 }
 
 - (void)setRecordsCamera:(BOOL)aRecordsCamera
@@ -560,6 +546,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             if (recordingContext.shouldRecordVideo) {
                 [self stopRecording];
             }
+            recordingContext.userProperties = userProperties;
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
             [taskController uploadSession:recordingContext];
             [self tryCreateNewSession];

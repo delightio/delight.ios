@@ -37,7 +37,6 @@
 }
 
 @property (nonatomic, retain) NSString *appToken;
-@property (nonatomic, retain) NSString *appUserID;
 @property (nonatomic) BOOL debugLogEnabled;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) NSUInteger maximumFrameRate;
@@ -49,6 +48,7 @@
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
 @property (nonatomic, readonly) DLGestureTracker *gestureTracker;
+@property (nonatomic, readonly) NSMutableDictionary *userProperties;
 
 /*********************
  * Recording control *
@@ -80,10 +80,6 @@
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
 + (BOOL)savesToPhotoAlbum;
 
-// Set a unique identifier for the user being recorded
-+ (void)setAppUserID:(NSString *)appUserID;
-+ (NSString *)appUserID;
-
 // Set whether the debug log should be printed to the console
 + (void)setDebugLogEnabled:(BOOL)debugLogEnabled;
 + (BOOL)debugLogEnabled;
@@ -96,5 +92,8 @@
 + (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 + (void)unregisterPrivateView:(UIView *)view;
 + (NSSet *)privateViews;
+
+// Attach arbitrary properties to the session
++ (void)setPropertyValue:(NSString *)value forKey:(NSString *)key;
 
 @end

@@ -11,7 +11,6 @@
 
 @implementation DLRecordingContext
 @synthesize sessionID = _sessionID;
-@synthesize appUserID = _appUserID;
 @synthesize tracks = _tracks;
 @synthesize sourceFilePaths = _sourceFilePaths;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
@@ -21,6 +20,7 @@
 @synthesize chunkSize = _chunkSize;
 @synthesize chunkOffset = _chunkOffset;
 @synthesize usabilityTestDescription = _usabilityTestDescription;
+@synthesize userProperties = _userProperties;
 @synthesize finishedTaskIndex = _finishedTaskIndex;
 @synthesize saved = _saved;
 @synthesize loadedFromArchive = _loadedFromArchive;
@@ -28,7 +28,6 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super init];
 	self.sessionID = [aDecoder decodeObjectForKey:@"sessionID"];
-	self.appUserID = [aDecoder decodeObjectForKey:@"appUserID"];
 	self.tracks = [aDecoder decodeObjectForKey:@"tracks"];
 	self.sourceFilePaths = [aDecoder decodeObjectForKey:@"sourceFilePaths"];
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
@@ -40,6 +39,7 @@
 	self.screenFilePath = [aDecoder decodeObjectForKey:@"screenFilePath"];
     self.cameraFilePath = [aDecoder decodeObjectForKey:@"cameraFilePath"];
     self.usabilityTestDescription = [aDecoder decodeObjectForKey:@"usabilityTestDescription"];
+    self.userProperties = [aDecoder decodeObjectForKey:@"userProperties"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
 	_loadedFromArchive = YES;
 	
@@ -48,7 +48,6 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
 	[aCoder encodeObject:_sessionID forKey:@"sessionID"];
-	if ( _appUserID ) [aCoder encodeObject:_appUserID forKey:@"appUserID"];
 	[aCoder encodeObject:_tracks forKey:@"tracks"];
 	[aCoder encodeObject:_sourceFilePaths forKey:@"sourceFilePaths"];
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
@@ -58,17 +57,18 @@
 	[aCoder encodeInteger:_chunkSize forKey:@"chunkSize"];
 	[aCoder encodeInteger:_chunkOffset forKey:@"chunkOffset"];
     [aCoder encodeObject:_usabilityTestDescription forKey:@"usabilityTestDescription"];
+    [aCoder encodeObject:_userProperties forKey:@"userProperties"];
 	[aCoder encodeObject:_finishedTaskIndex forKey:@"finishedTaskIndex"];
 }
 
 - (void)dealloc {
 	[_sessionID release];
-	[_appUserID release];
 	[_tracks release];
 	[_sourceFilePaths release];
 	[_startTime release];
 	[_endTime release];
     [_usabilityTestDescription release];
+    [_userProperties release];
 	[_finishedTaskIndex release];
 	[super dealloc];
 }
