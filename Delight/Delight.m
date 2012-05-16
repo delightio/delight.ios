@@ -289,6 +289,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         // Method swizzling to automatically make secure UITextFields private views
         Swizzle([UITextField class], @selector(didMoveToSuperview), @selector(DLdidMoveToSuperview));
         Swizzle([UITextField class], @selector(setSecureTextEntry:), @selector(DLsetSecureTextEntry:));
+        Swizzle([UITextField class], @selector(becomeFirstResponder), @selector(DLbecomeFirstResponder));
+        Swizzle([UITextField class], @selector(resignFirstResponder), @selector(DLresignFirstResponder));
     }
     return self;
 }

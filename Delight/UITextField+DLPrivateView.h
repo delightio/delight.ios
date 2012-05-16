@@ -12,5 +12,7 @@
 
 - (void)DLdidMoveToSuperview;
 - (void)DLsetSecureTextEntry:(BOOL)secureTextEntry;
+- (void)DLbecomeFirstResponder;
+- (void)DLresignFirstResponder;
 
 @end

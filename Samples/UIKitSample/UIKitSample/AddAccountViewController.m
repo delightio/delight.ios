@@ -122,12 +122,6 @@
 
 #pragma mark - UITextFieldDelegate
 
-- (void)textFieldDidBeginEditing:(UITextField *)textField
-{
-    // Don't record the keyboard if the text field is secure
-    [Delight setHidesKeyboardInRecording:textField.secureTextEntry];
-}
-
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     UITextField *nameTextField = (UITextField *) [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]].accessoryView;

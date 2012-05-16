@@ -58,7 +58,7 @@ Note that UITextFields with the secureTextEntry property set to true are automat
 
 ### Hiding the Keyboard ###
 
-To allow/prevent the keyboard from being recorded, call `[Delight setHidesKeyboardInRecording:]`. When set to YES, the keyboard area will be covered up by a grey box in the recording and keystroke gestures will not be drawn. By default, the keyboard is shown in the recording.
+To allow/prevent the keyboard from being recorded, call `[Delight setHidesKeyboardInRecording:]`. When set to YES, the keyboard area will be covered up by a grey box in the recording and keystroke gestures will not be drawn. By default, the keyboard is shown in the recording, except for when the user is entering text into a secure UITextField.
 
 OpenGL ES Support
 -----------------
