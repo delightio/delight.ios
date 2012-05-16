@@ -10,28 +10,36 @@
 
 @implementation DLTouch
 
-@synthesize location;
-@synthesize phase;
-@synthesize timeInSession;
+@synthesize location = _location;
+@synthesize phase = _phase;
+@synthesize timeInSession = _timeInSession;
+@synthesize touchID = _touchID;
+@synthesize event = _event;
+
+- (id)initWithUITouch:(UITouch *)atouch {
+	self = [super init];
+	
+	return self;
+}
 
 - (id)initWithLocation:(CGPoint)aLocation phase:(UITouchPhase)aPhase timeInSession:(NSTimeInterval)aTimeInSession
 {
     self = [super init];
     if (self) {
-        self.location = aLocation;
-        self.phase = aPhase;
-        self.timeInSession = aTimeInSession;
+        _location = aLocation;
+        _phase = aPhase;
+        _timeInSession = aTimeInSession;
     }
     return self;
 }
 
 - (NSDictionary *)dictionaryRepresentation {
-	return [NSDictionary dictionaryWithObjectsAndKeys:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:self.location.x], @"x", [NSNumber numberWithFloat:self.location.y], @"y", nil], @"location", [NSNumber numberWithInteger:phase], @"phase", [NSNumber numberWithDouble:timeInSession], @"timeInSession", nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:_location.x], @"x", [NSNumber numberWithFloat:_location.y], @"y", nil], @"location", [NSNumber numberWithInteger:_phase], @"phase", [NSNumber numberWithDouble:_timeInSession], @"timeInSession", nil];
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Location: %@, phase: %i, time: %.3f", NSStringFromCGPoint(location), phase, timeInSession];
+    return [NSString stringWithFormat:@"Location: %@, phase: %i, time: %.3f", NSStringFromCGPoint(_location), _phase, _timeInSession];
 }
 
 @end

@@ -338,13 +338,11 @@
         [self updateGesturesForEvent:event];
     } else {
         for (UITouch *touch in [event allTouches]) {
-            if (touch.timestamp > 0) {
-                CGPoint location = [touch locationInView:mainWindow];
-                
-                DLTouch *ourTouch = [[DLTouch alloc] initWithLocation:location phase:touch.phase timeInSession:touch.timestamp - startTime];
-                [touches addObject:ourTouch];
-                [ourTouch release];
-            }
+			CGPoint location = [touch locationInView:mainWindow];
+			
+			DLTouch *ourTouch = [[DLTouch alloc] initWithLocation:location phase:touch.phase timeInSession:touch.timestamp - startTime];
+			[touches addObject:ourTouch];
+			[ourTouch release];
         }
     }
 }
