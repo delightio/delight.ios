@@ -41,7 +41,7 @@ If you would like the video to be copied to the user's Photo Album after each re
 
 ### Properties ###
 
-You can attach arbitrary metadata to recordings by calling `[Delight setPropertyValue:forKey:]`. In the control panel, it is possible to filter recordings by property.
+You can attach arbitrary metadata to recordings by calling `[Delight setPropertyValue:forKey:]`. The value must be either an NSString or NSNumber. In the control panel, it is possible to filter recordings by property.
 
 ### Debug Log ###
 

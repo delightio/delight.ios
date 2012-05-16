@@ -17,7 +17,7 @@ Changelog
 ---------
 
 * API additions:
-  * **Properties**: To attach arbitrary metadata to sessions, you can call `[Delight setPropertyValue:forKey:]` with a key and value of your choosing. In the control panel, it is possible to filter recordings by property.
+  * **Properties**: To attach arbitrary metadata to sessions, you can call `[Delight setPropertyValue:forKey:]` with a key and value of your choosing. The value must be either an NSString or NSNumber. In the control panel, it is possible to filter recordings by property.
 
   * **Debug Logging**: Debug logging to the console can be turned on/off by calling `[Delight setDebugLogEnabled:]`.
 

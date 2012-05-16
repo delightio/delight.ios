@@ -225,9 +225,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return [self sharedInstance].screenshotController.privateViews;
 }
 
-+ (void)setPropertyValue:(NSString *)value forKey:(NSString *)key
++ (void)setPropertyValue:(id)value forKey:(NSString *)key
 {
-    [[self sharedInstance].userProperties setObject:value forKey:key];
+    if (![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSNumber class]]) {
+        DLLog(@"[Delight] Ignoring property for key %@ - value must be an NSString or an NSNumber.", key);
+    } else {
+        [[self sharedInstance].userProperties setObject:value forKey:key];
+    }
 }
 
 #pragma mark -
@@ -532,6 +536,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		[self stopRecording];
 	}
     recordingContext.endTime = [NSDate date];
+    recordingContext.userProperties = userProperties;
 	[taskController uploadSession:recordingContext];
 #endif
     
@@ -553,8 +558,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             if (recordingContext.shouldRecordVideo) {
                 [self stopRecording];
             }
-            recordingContext.userProperties = userProperties;
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
+            recordingContext.userProperties = userProperties;
             [taskController uploadSession:recordingContext];
             [self tryCreateNewSession];
         }

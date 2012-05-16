@@ -17,12 +17,15 @@
     
     NSMutableString * propertyParams = [NSMutableString string];
     for (NSString * key in [self.recordingContext.userProperties allKeys]) {
-        [propertyParams appendFormat:@"&app_session[properties][%@]=%@", [self stringByAddingPercentEscapes:key], 
-         [self stringByAddingPercentEscapes:[self.recordingContext.userProperties objectForKey:key]]];
+        id value = [self.recordingContext.userProperties objectForKey:key];
+        if ([value isKindOfClass:[NSString class]]) {
+            value = [self stringByAddingPercentEscapes:value];
+        }
+        [propertyParams appendFormat:@"&app_session[properties][%@]=%@", [self stringByAddingPercentEscapes:key], value];
     }
     
     NSString * paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f%@", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime], propertyParams];
-
+    
 	// the param needs to be put in query string. Not sure why. But, if not, it doesn't work
 	// check here: http://stackoverflow.com/questions/3469061/nsurlrequest-cannot-handle-http-body-when-method-is-not-post
 	NSString * fstr = [NSString stringWithFormat:@"%@?%@", urlStr, paramStr];

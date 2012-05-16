@@ -93,7 +93,7 @@
 + (void)unregisterPrivateView:(UIView *)view;
 + (NSSet *)privateViews;
 
-// Attach arbitrary properties to the session
-+ (void)setPropertyValue:(NSString *)value forKey:(NSString *)key;
+// Attach arbitrary properties to the session. Value must be an NSString or NSNumber.
++ (void)setPropertyValue:(id)value forKey:(NSString *)key;
 
 @end
