@@ -337,10 +337,11 @@
     if (drawsGestures) {
         [self updateGesturesForEvent:event];
     } else {
+		++eventSequenceLog;
         for (UITouch *touch in [event allTouches]) {
 			CGPoint location = [touch locationInView:mainWindow];
 			
-			DLTouch *ourTouch = [[DLTouch alloc] initWithLocation:location phase:touch.phase timeInSession:touch.timestamp - startTime];
+			DLTouch *ourTouch = [[DLTouch alloc] initWithID:(NSUInteger)touch sequence:eventSequenceLog location:location phase:touch.phase timeInSession:touch.timestamp - startTime];
 			[touches addObject:ourTouch];
 			[ourTouch release];
         }

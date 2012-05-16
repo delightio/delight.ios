@@ -17,11 +17,9 @@
 @property (nonatomic, assign) UITouchPhase phase;
 @property (nonatomic, assign) NSTimeInterval timeInSession;
 @property (nonatomic, assign) NSUInteger touchID;
-@property (nonatomic, assign) UIEvent * event;
+@property (nonatomic, assign) NSUInteger sequenceNum;
 
-- (id)initWithUITouch:(UITouch *)atouch;
-
-- (id)initWithLocation:(CGPoint)aLocation phase:(UITouchPhase)aPhase timeInSession:(NSTimeInterval)aTimeInSession;
+- (id)initWithID:(NSUInteger)anID sequence:(NSUInteger)seqNum location:(CGPoint)aLocation phase:(UITouchPhase)aPhase timeInSession:(NSTimeInterval)aTimeInSession;
 - (NSDictionary *)dictionaryRepresentation;
 
 @end

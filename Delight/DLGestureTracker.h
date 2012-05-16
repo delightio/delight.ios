@@ -20,6 +20,7 @@
     NSMutableSet *gesturesCompleted;
     CGMutablePathRef arrowheadPath;
     NSLock *lock;
+	NSUInteger eventSequenceLog;
 }
 
 @property (nonatomic, assign) CGFloat scaleFactor;
