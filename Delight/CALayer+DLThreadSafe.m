@@ -27,6 +27,22 @@
     }
 }
 
+- (void)DLdrawInContext:(CGContextRef)context
+{
+    NSThread *currentThread = [NSThread currentThread];
+    
+    if ([currentThread isMainThread] || [[currentThread name] isEqualToString:@"WebThread"]) {
+        // No thread safety problems if calling from main or web thread, proceed as normal
+        [self DLdrawInContext:context];
+    } else {
+        // If calling from background thread, trying to draw a UIWebView WebLayer will result in a crash.
+        // Copy the layer to a plain CALayer and draw that instead.
+        CALayer *layerCopy = [self copyWithPlainLayer];
+        [layerCopy drawInContext:context];
+        [layerCopy release];
+    }    
+}
+
 - (CALayer *)copyWithPlainLayer
 {
     CALayer *newLayer = [[CALayer alloc] init];

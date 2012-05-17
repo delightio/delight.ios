@@ -10,5 +10,6 @@
 
 @interface CALayer (DLThreadSafe)
 - (void)DLrenderInContext:(CGContextRef)context;
+- (void)DLdrawInContext:(CGContextRef)context;
 - (CALayer *)copyWithPlainLayer;
 @end
