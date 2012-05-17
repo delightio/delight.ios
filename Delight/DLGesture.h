@@ -13,6 +13,9 @@ typedef enum {
     DLGestureTypeSwipe
 } DLGestureType;
 
+/*
+  DLGesture: Represents a single gesture such as a tap or a swipe.
+ */
 @interface DLGesture : NSObject
 
 @property (nonatomic, retain) NSMutableArray *locations;

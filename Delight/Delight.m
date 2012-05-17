@@ -43,7 +43,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
-@interface Delight () <DLGestureTrackerDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
+@interface Delight () <DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // Methods not yet ready for the public
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
@@ -218,8 +218,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         screenshotController = [[DLScreenshotController alloc] init];        
         
         videoEncoder = [[DLVideoEncoder alloc] init];
-
+        videoEncoder.delegate = self;
+        
         gestureTracker = [[DLGestureTracker alloc] init];
+        gestureTracker.drawsGestures = NO;
         gestureTracker.delegate = self;
         
         screenshotQueue = [[NSOperationQueue alloc] init];
@@ -333,6 +335,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [lock lock];
         [videoEncoder stopRecording];
         [lock unlock];
+		recordingContext.touches = gestureTracker.touches;
     }
 }
 
@@ -407,7 +410,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
     // Frame rate limiting
     float targetFrameInterval = 1.0f / maximumFrameRate;
-    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    NSTimeInterval now = [[NSProcessInfo processInfo] systemUptime];
     if (now - lastScreenshotTime < targetFrameInterval) {
         if (glView) {
             // We'll try again on a subsequent render loop iteration
@@ -418,7 +421,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         }
     }
     
-    NSTimeInterval start = [[NSDate date] timeIntervalSince1970];
+    NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
     lastScreenshotTime = start;
         
     if (videoEncoder.encodesRawGLBytes && glView) {
@@ -454,7 +457,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
     
 #ifdef DEBUG
-    NSTimeInterval end = [[NSDate date] timeIntervalSince1970];
+    NSTimeInterval end = [[NSProcessInfo processInfo] systemUptime];
     elapsedTime += (end - start);
     if (++frameCount % 20 == 0) {
         DLDebugLog(@"[Frame #%i] Current %.0f ms, average %.0f ms, %.0f fps", frameCount, (end - start) * 1000, (elapsedTime / frameCount) * 1000, 1.0f / (end - now));
@@ -504,8 +507,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		[self stopRecording];
 	}
     recordingContext.endTime = [NSDate date];
-    recordingContext.userProperties = userProperties;
-	[taskController uploadSession:recordingContext];
+	recordingContext.userProperties = userProperties;
+	[taskController prepareSessionUpload:recordingContext];
 #endif
     
     appInBackground = YES;
@@ -527,8 +530,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                 [self stopRecording];
             }
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
-            recordingContext.userProperties = userProperties;
-            [taskController uploadSession:recordingContext];
+			recordingContext.userProperties = userProperties;
+            [taskController prepareSessionUpload:recordingContext];
             [self tryCreateNewSession];
         }
     }
@@ -639,6 +642,21 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         default:
             break;
     }
+}
+
+#pragma mark - DLVideoEncoderDelegate
+
+- (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
+{
+    [gestureTracker startRecordingGesturesWithStartUptime:startTime];
+}
+
+- (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder
+{
+    NSLog(@"Touches: %@", gestureTracker.touches);
+    NSLog(@"Orientation changes: %@", gestureTracker.orientationChanges);
+    
+    [gestureTracker stopRecordingGestures];
 }
 
 @end

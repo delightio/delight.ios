@@ -34,7 +34,7 @@
     [window makeKeyAndVisible];
 
     [Delight startWithAppToken:@"Get your token at http://delight.io"];
-
+    
     return YES;
 }
 

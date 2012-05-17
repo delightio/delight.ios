@@ -23,6 +23,7 @@ typedef enum {
 @property (nonatomic, retain) NSString * sessionID;
 @property (nonatomic, retain) NSDictionary * tracks;
 @property (nonatomic, retain) NSMutableDictionary * sourceFilePaths;
+@property (nonatomic, retain) NSArray * touches;
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic) float scaleFactor;

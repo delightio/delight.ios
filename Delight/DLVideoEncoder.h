@@ -12,6 +12,8 @@
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
 
+@protocol DLVideoEncoderDelegate;
+
 /* 
    DLVideoEncoder encodes video to a file.
  */
@@ -21,8 +23,8 @@
     AVAssetWriterInputPixelBufferAdaptor *avAdaptor;
     CVPixelBufferPoolRef pixelBufferPool;
     
-    NSTimeInterval recordingStartTime;
-    NSTimeInterval pauseStartTime;
+    NSTimeInterval recordingStartTime;  // System uptime at recording start
+    NSTimeInterval pauseStartTime;      // System uptime at pause start
     NSTimeInterval totalPauseDuration;
     
     NSLock *lock;
@@ -35,6 +37,7 @@
 @property (nonatomic, retain) NSString *outputPath;
 @property (nonatomic, assign) CGSize videoSize;
 @property (nonatomic, assign) double averageBitRate;
+@property (nonatomic, assign) id<DLVideoEncoderDelegate> delegate;
 
 - (void)startNewRecording;
 - (void)stopRecording;
@@ -43,4 +46,11 @@
 - (void)pause;
 - (void)resume;
 
+@end
+
+@protocol DLVideoEncoderDelegate <NSObject>
+@optional
+- (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime;
+- (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder;
+- (void)videoEncoder:(DLVideoEncoder *)videoEncoder didFailRecordingWithError:(NSError *)error;
 @end

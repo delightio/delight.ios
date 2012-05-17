@@ -13,6 +13,7 @@
 @synthesize sessionID = _sessionID;
 @synthesize tracks = _tracks;
 @synthesize sourceFilePaths = _sourceFilePaths;
+@synthesize touches = _touches;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize scaleFactor = _scaleFactor;
@@ -71,6 +72,7 @@
 	[_sessionID release];
 	[_tracks release];
 	[_sourceFilePaths release];
+	[_touches release];
 	[_startTime release];
 	[_endTime release];
     [_usabilityTestDescription release];

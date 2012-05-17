@@ -8,16 +8,23 @@
 
 #import "DLGestureTracker.h"
 #import "DLGesture.h"
+#import "DLOrientationChange.h"
+#import "DLTouch.h"
 
 @interface DLGestureTracker ()
 - (void)drawPendingTouchMarksInContext:(CGContextRef)context;
 - (CGContextRef)newBitmapContextOfSize:(CGSize)size;
+- (void)updateGesturesForEvent:(UIEvent *)event;
+- (void)handleDeviceOrientationDidChangeNotification:(NSNotification *)notification;
 @end
 
 @implementation DLGestureTracker
 
 @synthesize scaleFactor;
 @synthesize mainWindow;
+@synthesize drawsGestures;
+@synthesize touches;
+@synthesize orientationChanges;
 @synthesize delegate;
 
 - (id)init
@@ -26,9 +33,14 @@
     if (self) {
         gesturesInProgress = [[NSMutableSet alloc] init];
         gesturesCompleted = [[NSMutableSet alloc] init];
+        touches = [[NSMutableArray alloc] init];
+        orientationChanges = [[NSMutableArray alloc] init];
         lock = [[NSLock alloc] init];
+
         scaleFactor = 1.0f;
         bitmapData = NULL;
+        startTime = -1;
+        drawsGestures = YES;
         arrowheadPath = NULL;
         
         NSArray *windows = [[UIApplication sharedApplication] windows];
@@ -41,8 +53,12 @@
             self.mainWindow = [windows objectAtIndex:0];
         }
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWindowDidBecomeHiddenNotification:) name:UIWindowDidBecomeHiddenNotification object:nil];
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self selector:@selector(handleWindowDidBecomeVisibleNotification:) name:UIWindowDidBecomeVisibleNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(handleWindowDidBecomeHiddenNotification:) name:UIWindowDidBecomeHiddenNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(handleDeviceOrientationDidChangeNotification:) name:UIDeviceOrientationDidChangeNotification object:nil];
     }
     return self;
 }
@@ -50,9 +66,12 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+
     [gesturesInProgress release];
     [gesturesCompleted release];
+    [touches release];
+    [orientationChanges release];
     [lock release];
     [mainWindow release];
     
@@ -70,7 +89,7 @@
 
 - (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image
 {
-    if (![gesturesInProgress count] && ![gesturesCompleted count]) {
+    if (!drawsGestures || (![gesturesInProgress count] && ![gesturesCompleted count])) {
         // If no gestures to draw, just return the original image
         return image;
     }
@@ -88,6 +107,21 @@
     CGContextRelease(context);
     
     return touchMarkImage;
+}
+
+- (void)startRecordingGesturesWithStartUptime:(NSTimeInterval)aStartTime
+{
+    startTime = aStartTime;
+    [touches removeAllObjects];
+    [orientationChanges removeAllObjects];
+        
+    // Set the initial orientation
+    [self handleDeviceOrientationDidChangeNotification:nil];
+}
+
+- (void)stopRecordingGestures
+{
+    startTime = -1;
 }
 
 #pragma mark - Private methods
@@ -220,31 +254,7 @@
     return context;
 }
 
-#pragma mark - Notifications
-
-- (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
-{
-    UIWindow *window = [notification object];
-    [window DLsetDelegate:self];
-    
-    if (!mainWindow) {
-        self.mainWindow = window;
-    }
-}
-
-- (void)handleWindowDidBecomeHiddenNotification:(NSNotification *)notification
-{
-    UIWindow *window = [notification object];
-    [window DLsetDelegate:nil];  
-    
-    if (window == mainWindow) {
-        self.mainWindow = nil;
-    }
-}
-
-#pragma mark - DLWindowDelegate
-
-- (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
+- (void)updateGesturesForEvent:(UIEvent *)event
 {
     NSMutableSet *gesturesJustCompleted = [[NSMutableSet alloc] initWithSet:gesturesInProgress];
     
@@ -287,6 +297,57 @@
     [gesturesInProgress minusSet:gesturesJustCompleted];
     
     [gesturesJustCompleted release];
+}
+
+#pragma mark - Notifications
+
+- (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
+{
+    UIWindow *window = [notification object];
+    [window DLsetDelegate:self];
+}
+
+- (void)handleWindowDidBecomeHiddenNotification:(NSNotification *)notification
+{
+    UIWindow *window = [notification object];
+    [window DLsetDelegate:nil];    
+}
+
+- (void)handleDeviceOrientationDidChangeNotification:(NSNotification *)notification
+{
+    if (startTime < 0) return;
+    
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    NSTimeInterval timeInSession = [[NSProcessInfo processInfo] systemUptime] - startTime;
+    
+    DLOrientationChange *orientationChange = [[DLOrientationChange alloc] initWithDeviceOrientation:deviceOrientation
+                                                                               interfaceOrientation:interfaceOrientation
+                                                                                      timeInSession:timeInSession];
+    [orientationChanges addObject:orientationChange];
+    [orientationChange release];
+}
+
+#pragma mark - DLWindowDelegate
+
+- (void)window:(UIWindow *)window sendEvent:(UIEvent *)event
+{
+    if (startTime < 0) return;
+    
+    if (drawsGestures) {
+        [self updateGesturesForEvent:event];
+    } else {
+		++eventSequenceLog;
+        for (UITouch *touch in [event allTouches]) {
+			CGPoint location = [touch locationInView:mainWindow];
+			
+            if (![delegate gestureTracker:self locationIsPrivate:location privateViewFrame:NULL]) {
+                DLTouch *ourTouch = [[DLTouch alloc] initWithID:(NSUInteger)touch sequence:eventSequenceLog location:location phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime];
+                [touches addObject:ourTouch];
+                [ourTouch release];
+            }
+        }
+    }
 }
 
 - (void)windowAccelerometerDidShake:(UIWindow *)window
