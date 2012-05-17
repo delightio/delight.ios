@@ -18,8 +18,9 @@
 @property (nonatomic, assign) NSTimeInterval timeInSession;
 @property (nonatomic, assign) NSUInteger touchID;
 @property (nonatomic, assign) NSUInteger sequenceNum;
+@property (nonatomic, assign) NSUInteger tapCount;
 
-- (id)initWithID:(NSUInteger)anID sequence:(NSUInteger)seqNum location:(CGPoint)aLocation phase:(UITouchPhase)aPhase timeInSession:(NSTimeInterval)aTimeInSession;
+- (id)initWithID:(NSUInteger)anID sequence:(NSUInteger)seqNum location:(CGPoint)aLocation phase:(UITouchPhase)aPhase tapCount:(NSUInteger)aCount timeInSession:(NSTimeInterval)aTimeInSession;
 - (NSDictionary *)dictionaryRepresentation;
 
 @end
