@@ -358,6 +358,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [lock lock];
         [videoEncoder stopRecording];
         [lock unlock];
+		recordingContext.touches = gestureTracker.touches;
     }
 }
 
@@ -400,6 +401,17 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             [self scheduleScreenshot];
         }
     }
+}
+
+- (void)setAppUserID:(NSString *)anID {
+	if ( appUserID == anID ) return;
+	[appUserID release];
+	appUserID = [anID retain];
+	if ( recordingContext ) {
+		recordingContext.appUserID = appUserID;
+		// post the change
+		[taskController updateSession:recordingContext];
+	}
 }
 
 - (void)setRecordsCamera:(BOOL)aRecordsCamera
@@ -529,7 +541,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		[self stopRecording];
 	}
     recordingContext.endTime = [NSDate date];
-	[taskController uploadSession:recordingContext];
+	[taskController prepareSessionUpload:recordingContext];
 #endif
     
     appInBackground = YES;
@@ -551,7 +563,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                 [self stopRecording];
             }
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
-            [taskController uploadSession:recordingContext];
+            [taskController prepareSessionUpload:recordingContext];
             [self tryCreateNewSession];
         }
     }

@@ -10,6 +10,7 @@
 #import "Delight.h"
 #import "DLRecordingContext.h"
 #import "DLReachability.h"
+#import "DLTouch.h"
 #import <UIKit/UIKit.h>
 
 @interface DLTaskController (PrivateMethods)
@@ -19,6 +20,9 @@
  S3 pre-signed URL has an expiry date. If the pre-signed URL has been expired, we should get a new pre-signed URL
  */
 - (void)renewUploadURLForSession:(DLRecordingContext *)ctx wtihTrack:(NSString *)trcName;
+- (void)uploadSession:(DLRecordingContext *)aSession;
+- (void)archiveTouchesForSession:(DLRecordingContext *)aSession;
+- (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx;
 
 @end
 
@@ -62,6 +66,22 @@
 	return _queue;
 }
 
+- (void)archiveTouchesForSession:(DLRecordingContext *)aSession {
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	NSString * errStr = nil;
+	NSArray * allTouches = aSession.touches;
+	NSMutableArray * dictTouches = [NSMutableArray arrayWithCapacity:[allTouches count]];
+	for (DLTouch * theTouch in allTouches) {
+		[dictTouches addObject:[theTouch dictionaryRepresentation]];
+	}
+	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:dictTouches format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
+	NSString * touchesPath = [self touchesFilePathForSession:aSession];
+	[theData writeToFile:touchesPath atomically:NO];
+	// set file path
+	[aSession.sourceFilePaths setObject:touchesPath forKey:DLTouchTrackKey];
+	[pool release];
+}
+
 - (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
 	
@@ -73,15 +93,37 @@
 	}
 	
 	// begin connection
-	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] init];
-	theTask.appToken = aToken;
+	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] initWithAppToken:aToken];
 	theTask.taskController = self;
 	_task = theTask;
 	[self.queue addOperation:theTask];
 }
 
-- (void)uploadSession:(DLRecordingContext *)aSession {
+- (void)prepareSessionUpload:(DLRecordingContext *)aSession {
 	if ( aSession == nil ) return;
+	BOOL backgroundSupported = NO;
+	UIDevice* device = [UIDevice currentDevice];
+	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
+	
+	if ( backgroundSupported ) {
+		UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+			[self saveRecordingContext];
+			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+		}];
+		[self.queue addOperationWithBlock:^{
+			// save file touches file from session
+			[self archiveTouchesForSession:aSession];
+			// create tasks to upload
+			[self uploadSession:aSession];
+			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+		}];
+	} else {
+		// if the system does not support background processing, we have to save the touches in main thread.
+		[self archiveTouchesForSession:aSession];
+	}
+}
+
+- (void)uploadSession:(DLRecordingContext *)aSession {
 	// check if we can run background task
 	UIDevice* device = [UIDevice currentDevice];
 	BOOL backgroundSupported = NO;
@@ -105,9 +147,23 @@
 	}
 }
 
+- (void)updateSession:(DLRecordingContext *)aSession {
+	if ( aSession == nil ) return;
+	if ( _task ) return;
+	DLUpdateSessionTask * theTask = [[DLUpdateSessionTask alloc] initWithAppToken:_appToken];
+	_task = theTask;
+	theTask.recordingContext = aSession;
+	theTask.taskController = self;
+	[self.queue addOperation:theTask];
+}
+
 #pragma mark Session management
 - (NSString *)unfinishedRecordingContextsArchiveFilePath {
 	return [self.baseDirectory stringByAppendingPathComponent:@"UnfinishedRecordingContexts.archive"];
+}
+
+- (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx {
+	return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"touches-%@.plist", ctx.sessionID]];
 }
 
 - (void)removeRecordingContext:(DLRecordingContext *)ctx {
@@ -127,7 +183,8 @@
 	// upload in the background
 	UIBackgroundTaskIdentifier bgIdf = UIBackgroundTaskInvalid;
 	if ( [ctx shouldCompleteTask:DLFinishedUpdateSession] ) {
-		DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] init];
+		DLUpdateSessionTask * sessTask = [[DLUpdateSessionTask alloc] initWithAppToken:_appToken];
+		sessTask.sessionDidEnd = YES;
 		bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			// task expires. clean it up if it has not finished yet
 			[sessTask cancel];
@@ -148,7 +205,7 @@
 				NSDictionary * curTrack = [theTracks objectForKey:theKey];
 				if ( [ctx.sourceFilePaths objectForKey:theKey] && [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
 					// uplaod URL is still valid. Continue to upload
-					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:theKey];
+					DLUploadVideoFileTask * uploadTask = [[DLUploadVideoFileTask alloc] initWithTrack:theKey appToken:_appToken];
 					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 						// task expires. clean it up if it has not finished yet
 						[uploadTask cancel];
@@ -166,7 +223,7 @@
 				}
 			}
 		} else if ( [ctx shouldCompleteTask:DLFinishedPostVideo] ) {
-			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] init];
+			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] initWithTrack:nil appToken:_appToken];
 			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 				// task expires. clean it up if it has not finished yet
 				[postTask cancel];
@@ -187,15 +244,17 @@
 }
 
 #pragma mark Task Management
-- (void)handleSessionTaskCompletion:(DLGetNewSessionTask *)aTask {
-	DLRecordingContext * ctx = aTask.recordingContext;
-	if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
-		// suppress recording flag if there's video files pending upload
-		ctx.shouldRecordVideo = NO;
+- (void)handleSessionTaskCompletion:(DLTask *)aTask {
+	if ( [aTask isKindOfClass:[DLGetNewSessionTask class]] ) {
+		DLRecordingContext * ctx = aTask.recordingContext;
+		if ( _containsIncompleteSessions && ctx.shouldRecordVideo ) {
+			// suppress recording flag if there's video files pending upload
+			ctx.shouldRecordVideo = NO;
+		}
+		DLLog(@"[Delight] %@ session created: %@", ctx.shouldRecordVideo ? @"recording" : @"non-recording", ctx.sessionID);
+		// notify the delegate
+		[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	}
-	DLLog(@"[Delight] %@ session created: %@", ctx.shouldRecordVideo ? @"recording" : @"non-recording", ctx.sessionID);
-	// notify the delegate
-	[_sessionDelegate taskController:self didGetNewSessionContext:aTask.recordingContext];
 	self.task = nil;
 }
 

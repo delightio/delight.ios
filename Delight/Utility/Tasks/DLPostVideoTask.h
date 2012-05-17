@@ -12,6 +12,6 @@
 
 @property (nonatomic, retain) NSString * trackName;
 
-- (id)initWithTrack:(NSString *)trcName;
+- (id)initWithTrack:(NSString *)trcName appToken:(NSString *)aToken;
 
 @end

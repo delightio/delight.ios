@@ -11,8 +11,10 @@
 
 @implementation DLRecordingContext
 @synthesize sessionID = _sessionID;
+@synthesize appUserID = _appUserID;
 @synthesize tracks = _tracks;
 @synthesize sourceFilePaths = _sourceFilePaths;
+@synthesize touches = _touches;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize startTime = _startTime;
@@ -27,6 +29,7 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super init];
 	self.sessionID = [aDecoder decodeObjectForKey:@"sessionID"];
+	self.appUserID = [aDecoder decodeObjectForKey:@"appUserID"];
 	self.tracks = [aDecoder decodeObjectForKey:@"tracks"];
 	self.sourceFilePaths = [aDecoder decodeObjectForKey:@"sourceFilePaths"];
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
@@ -46,6 +49,7 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
 	[aCoder encodeObject:_sessionID forKey:@"sessionID"];
+	if ( _appUserID ) [aCoder encodeObject:_appUserID forKey:@"appUserID"];
 	[aCoder encodeObject:_tracks forKey:@"tracks"];
 	[aCoder encodeObject:_sourceFilePaths forKey:@"sourceFilePaths"];
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
@@ -60,8 +64,10 @@
 
 - (void)dealloc {
 	[_sessionID release];
+	[_appUserID release];
 	[_tracks release];
 	[_sourceFilePaths release];
+	[_touches release];
 	[_startTime release];
 	[_endTime release];
     [_usabilityTestDescription release];
