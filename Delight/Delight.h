@@ -68,14 +68,6 @@
  * Configuration *
  *****************/
 
-// Set the amount the recording should be scaled by, e.g. 0.5 = 50% scale
-+ (void)setScaleFactor:(CGFloat)scaleFactor;
-+ (CGFloat)scaleFactor;
-
-// Set the maximum frame rate
-+ (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate;
-+ (NSUInteger)maximumFrameRate;
-
 // Set whether recordings are copied to the user's photo album
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
 + (BOOL)savesToPhotoAlbum;

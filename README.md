@@ -23,14 +23,6 @@ Basic Setup
 Advanced Setup
 --------------
 
-### Scale Factor ###
-
-By default, recordings will be at 50% scale for iPhones and non-Retina iPads, and 25% scale for Retina iPads. These numbers were chosen to strike a balance between recording quality, performance and upload time. To record at a different scale, call `[Delight setScaleFactor:]` before `[Delight startWithAppToken:]`. The scale factor is a number between 0 and 1, for example 0.5 for 50% scale.
-
-### Maximum Frame Rate ###
-
-The default and recommended maximum frame rate is 15 frames per second. You can call `[Delight setMaximumFrameRate:]` to set a different maximum frame rate.
-
 ### Recording Control ###
 
 Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To stop recording altogether, call `[Delight stop]`.

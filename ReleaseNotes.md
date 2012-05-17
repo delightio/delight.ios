@@ -6,7 +6,7 @@ ___
 ===
 ___
 
-delight.io 2.0 contains a number of API additions, performance improvements, and bug fixes. Users running previous versions of the framework must upgrade to version 2.0; otherwise, new sessions will not be recorded, regardless of whether recordings have been scheduled.
+delight.io 2.0 contains several API changes, performance improvements, and bug fixes. Users running previous versions of the framework must upgrade to version 2.0; otherwise, new sessions will not be recorded, regardless of whether recordings have been scheduled.
 
 Important Notes
 ---------------
@@ -16,10 +16,12 @@ Important Notes
 Changelog
 ---------
 
-* API additions:
+* API changes:
   * **Properties**: To attach arbitrary metadata to sessions, you can call `[Delight setPropertyValue:forKey:]` with a key and value of your choosing. The value must be either an NSString or NSNumber. In the control panel, it is possible to filter recordings by property.
 
   * **Debug Logging**: Debug logging to the console can be turned on/off by calling `[Delight setDebugLogEnabled:]`.
+
+  * It is no longer possible to manually set the scale factor or maximum frame rate. Reasonable defaults will be used.
 
 * Improved UIKit performance.
 

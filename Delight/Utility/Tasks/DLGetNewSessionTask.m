@@ -16,6 +16,8 @@ NSString * const DLUploadURIElementName = @"upload_uris";
 NSString * const DLWifiOnlyElementName = @"uploading_on_wifi_only";
 NSString * const DLIDElementName = @"id";
 NSString * const DLRecordElementName = @"recording";
+NSString * const DLScaleFactorElementName = @"scale_factor";
+NSString * const DLMaximumFrameRateElementName = @"maximum_frame_rate";
 
 @implementation DLGetNewSessionTask
 @synthesize contentOfCurrentProperty = _contentOfCurrentProperty;
@@ -100,7 +102,12 @@ NSString * const DLRecordElementName = @"recording";
 		self.recordingContext.shouldRecordVideo = [_contentOfCurrentProperty boolValue];
 	} else if ( [elementName isEqualToString:DLWifiOnlyElementName] ) {
 		self.recordingContext.wifiUploadOnly = [_contentOfCurrentProperty boolValue];
-	}
+	} else if ( [elementName isEqualToString:DLScaleFactorElementName] ) {
+        self.recordingContext.scaleFactor = [_contentOfCurrentProperty floatValue];
+    } else if ( [elementName isEqualToString:DLMaximumFrameRateElementName] ) {
+        self.recordingContext.maximumFrameRate = [_contentOfCurrentProperty integerValue];
+    }
+    
 	self.contentOfCurrentProperty = nil;
 }
 

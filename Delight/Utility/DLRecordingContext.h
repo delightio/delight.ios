@@ -25,6 +25,8 @@ typedef enum {
 @property (nonatomic, retain) NSMutableDictionary * sourceFilePaths;
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
+@property (nonatomic) float scaleFactor;
+@property (nonatomic) NSUInteger maximumFrameRate;
 @property (nonatomic, retain) NSDate * startTime;
 @property (nonatomic, retain) NSDate * endTime;
 @property (nonatomic) NSInteger chunkSize;

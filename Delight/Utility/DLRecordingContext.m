@@ -15,6 +15,8 @@
 @synthesize sourceFilePaths = _sourceFilePaths;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
+@synthesize scaleFactor = _scaleFactor;
+@synthesize maximumFrameRate = _maximumFrameRate;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize chunkSize = _chunkSize;
@@ -32,6 +34,8 @@
 	self.sourceFilePaths = [aDecoder decodeObjectForKey:@"sourceFilePaths"];
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
 	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
+    _scaleFactor = [aDecoder decodeFloatForKey:@"scaleFactor"];
+    _maximumFrameRate = [aDecoder decodeIntegerForKey:@"maximumFrameRate"];
 	self.startTime = [aDecoder decodeObjectForKey:@"startTime"];
 	self.endTime = [aDecoder decodeObjectForKey:@"endTime"];
 	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
@@ -52,6 +56,8 @@
 	[aCoder encodeObject:_sourceFilePaths forKey:@"sourceFilePaths"];
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
 	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
+    [aCoder encodeFloat:_scaleFactor forKey:@"scaleFactor"];
+    [aCoder encodeInteger:_maximumFrameRate forKey:@"maximumFrameRate"];
 	[aCoder encodeObject:_startTime forKey:@"startTime"];
 	[aCoder encodeObject:_endTime forKey:@"endTime"];
 	[aCoder encodeInteger:_chunkSize forKey:@"chunkSize"];

@@ -21,11 +21,7 @@
 #import "DLCamCaptureManager.h"
 #import </usr/include/objc/objc-class.h>
 
-#define kDLDefaultScaleFactor_iPad2x   0.25f
-#define kDLDefaultScaleFactor_iPad     0.5f
-#define kDLDefaultScaleFactor_iPhone2x 0.5f
-#define kDLDefaultScaleFactor_iPhone   0.5f
-
+#define kDLDefaultScaleFactor 0.5f
 #define kDLDefaultMaximumFrameRate 15.0f
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
 #define kDLMaximumSessionInactiveTime 60.0f*5
@@ -159,27 +155,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
 }
 
-+ (CGFloat)scaleFactor
-{
-    return [self sharedInstance].scaleFactor;
-}
-
-+ (void)setScaleFactor:(CGFloat)scaleFactor
-{
-
-    [self sharedInstance].scaleFactor = scaleFactor;
-}
-
-+ (NSUInteger)maximumFrameRate
-{
-    return [self sharedInstance].maximumFrameRate;
-}
-
-+ (void)setMaximumFrameRate:(NSUInteger)maximumFrameRate
-{
-    [self sharedInstance].maximumFrameRate = maximumFrameRate;
-}
-
 + (BOOL)savesToPhotoAlbum
 {
     return [self sharedInstance].videoEncoder.savesToPhotoAlbum;
@@ -253,20 +228,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         lock = [[NSLock alloc] init];
         userProperties = [[NSMutableDictionary alloc] init];
         
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-            if ([UIScreen mainScreen].scale == 1.0) {
-                self.scaleFactor = kDLDefaultScaleFactor_iPad;
-            } else {
-                self.scaleFactor = kDLDefaultScaleFactor_iPad2x;                
-            }
-        } else {
-            if ([UIScreen mainScreen].scale == 1.0) {
-                self.scaleFactor = kDLDefaultScaleFactor_iPhone;
-            } else {
-                self.scaleFactor = kDLDefaultScaleFactor_iPhone2x;                
-            }
-        }
-        
+        self.scaleFactor = kDLDefaultScaleFactor;
         self.maximumFrameRate = kDLDefaultMaximumFrameRate;
         self.maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
         self.autoCaptureEnabled = YES;
@@ -338,6 +300,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:YES attributes:nil error:&error];
         }
         
+        if (recordingContext) {
+            [self setMaximumFrameRate:recordingContext.maximumFrameRate];
+            [self setScaleFactor:recordingContext.scaleFactor];
+        }
+        
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         [videoEncoder startNewRecording];
         
@@ -388,7 +355,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 - (void)setScaleFactor:(CGFloat)aScaleFactor
-{
+{    
     if (videoEncoder.recording) {
         [NSException raise:@"Screen capture exception" format:@"Cannot change scale factor while recording is in progress."];
     }
