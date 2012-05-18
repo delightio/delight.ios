@@ -25,7 +25,9 @@ Advanced Setup
 
 ### Stopping the Recording ###
 
-By default, recording will stop when the user presses the device's home button or after 10 minutes, whichever comes first. To stop recording earlier, call `[Delight stop]`.
+By default, recording will stop when the user presses the device's home button or after 10 minutes, whichever comes first. To stop recording earlier, call `[Delight stop]`. 
+
+After a recording has been stopped, it is not possible to restart it again in that session.
 
 ### Saving to Photo Album ###
 
