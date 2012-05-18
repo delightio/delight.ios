@@ -23,6 +23,8 @@ Changelog
 
   * It is no longer possible to manually set the scale factor or maximum frame rate. Reasonable defaults will be used.
 
+  * Pausing/resuming a session is no longer supported.
+
 * Improved UIKit performance.
 
 * Made private views flash when receiving touch events.

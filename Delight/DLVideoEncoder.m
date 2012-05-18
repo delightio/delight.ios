@@ -21,7 +21,6 @@
 @implementation DLVideoEncoder
 
 @synthesize recording;
-@synthesize paused;
 @synthesize encodesRawGLBytes;
 @synthesize savesToPhotoAlbum;
 @synthesize outputPath;
@@ -75,7 +74,7 @@
 
 - (void)writeFrameImage:(UIImage *)frameImage
 {
-    if ([videoWriterInput isReadyForMoreMediaData] && recording && !paused) {
+    if ([videoWriterInput isReadyForMoreMediaData] && recording) {
         CMTime time = [self currentFrameTime];
         
         [lock lock];
@@ -123,7 +122,7 @@
         }
     }
     
-    if (![videoWriterInput isReadyForMoreMediaData] || !recording || paused) {
+    if (![videoWriterInput isReadyForMoreMediaData] || !recording) {
         return;
     }
     
@@ -145,22 +144,6 @@
     
     CVPixelBufferUnlockBaseAddress(pixel_buffer, 0);
     CVPixelBufferRelease(pixel_buffer);    
-}
-
-- (void)pause
-{
-    if (!paused) {
-        paused = YES;
-        pauseStartTime = [[NSProcessInfo processInfo] systemUptime];
-    }
-}
-
-- (void)resume
-{
-    if (paused) {
-        paused = NO;
-        totalPauseDuration += [[NSProcessInfo processInfo] systemUptime] - pauseStartTime;
-    }
 }
 
 #pragma mark - Private methods
@@ -198,7 +181,6 @@
     [videoWriter startSessionAtSourceTime:CMTimeMake(0, 1000)];
     
     recordingStartTime = -1;
-    totalPauseDuration = 0.0f;
     
     // Create our own pixel buffer, since when encoding raw bytes we need the buffer to be at least 1 byte larger
     // than the avAdaptor's pixel buffer to account for RGBA->ARGB offset shift.
@@ -282,7 +264,7 @@
         }
     }
     
-    float millisElapsed = (now - recordingStartTime - totalPauseDuration) * 1000.0;
+    float millisElapsed = (now - recordingStartTime) * 1000.0;
     CMTime time = CMTimeMake((int)millisElapsed, 1000);
     
     return time;

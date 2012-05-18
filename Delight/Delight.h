@@ -44,29 +44,18 @@
 @property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
 @property (nonatomic, assign) BOOL recordsCamera;
 @property (nonatomic, assign, getter=isUsabilityTestEnabled) BOOL usabilityTestEnabled;
-@property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, readonly) DLScreenshotController *screenshotController;
 @property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
 @property (nonatomic, readonly) DLGestureTracker *gestureTracker;
 @property (nonatomic, readonly) NSMutableDictionary *userProperties;
 
-/*********************
- * Recording control *
- *********************/
-
-// Start/stop/pause/resume recording
+// Start/stop recording
 + (void)startWithAppToken:(NSString *)appToken;
 + (void)stop;
-+ (void)pause;
-+ (void)resume;
 
 // Manually trigger a screen capture. Doesn't need to be called, but can be used if you want to ensure
 // that a screenshot is taken at a particular time.
 + (void)takeScreenshot;
-
-/*****************
- * Configuration *
- *****************/
 
 // Set whether recordings are copied to the user's photo album
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;

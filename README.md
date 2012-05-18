@@ -23,9 +23,9 @@ Basic Setup
 Advanced Setup
 --------------
 
-### Recording Control ###
+### Stopping the Recording ###
 
-Call `[Delight pause]` / `[Delight resume]` to temporarily pause recording. To stop recording altogether, call `[Delight stop]`.
+By default, recording will stop when the user presses the device's home button or after 10 minutes, whichever comes first. To stop recording earlier, call `[Delight stop]`. This will stop all recording until `[Delight startWithAppToken:]` is called again.
 
 ### Saving to Photo Album ###
 

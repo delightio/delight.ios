@@ -54,8 +54,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (Delight *)sharedInstance;
 - (void)startRecording;
 - (void)stopRecording;
-- (void)pause;
-- (void)resume;
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 - (void)scheduleScreenshot;
 - (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
@@ -69,7 +67,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize maximumFrameRate;
 @synthesize maximumRecordingDuration;
 @synthesize usabilityTestEnabled;
-@synthesize paused;
 @synthesize autoCaptureEnabled;
 @synthesize recordsCamera;
 @synthesize screenshotController;
@@ -123,16 +120,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     [[self sharedInstance] stopRecording];
     [sharedInstance release]; sharedInstance = nil;
-}
-
-+ (void)pause
-{
-    [[self sharedInstance] pause];
-}
-
-+ (void)resume
-{
-    [[self sharedInstance] resume];
 }
 
 + (void)takeScreenshot
@@ -336,24 +323,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [videoEncoder stopRecording];
         [lock unlock];
 		recordingContext.touches = gestureTracker.touches;
-    }
-}
-
-- (void)pause
-{
-    if (!paused) {
-        paused = YES;
-        [videoEncoder pause];
-        [screenshotQueue setSuspended:YES];
-    }
-}
-
-- (void)resume
-{
-    if (paused) {
-        paused = NO;
-        [videoEncoder resume];
-        [screenshotQueue setSuspended:NO];
     }
 }
 

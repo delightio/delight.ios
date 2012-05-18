@@ -23,15 +23,11 @@
     AVAssetWriterInputPixelBufferAdaptor *avAdaptor;
     CVPixelBufferPoolRef pixelBufferPool;
     
-    NSTimeInterval recordingStartTime;  // System uptime at recording start
-    NSTimeInterval pauseStartTime;      // System uptime at pause start
-    NSTimeInterval totalPauseDuration;
-    
+    NSTimeInterval recordingStartTime;  // System uptime at recording start    
     NSLock *lock;
 }
 
 @property (nonatomic, readonly, getter=isRecording) BOOL recording;
-@property (nonatomic, readonly, getter=isPaused) BOOL paused;
 @property (nonatomic, assign) BOOL encodesRawGLBytes;
 @property (nonatomic, assign) BOOL savesToPhotoAlbum;
 @property (nonatomic, retain) NSString *outputPath;
@@ -43,8 +39,6 @@
 - (void)stopRecording;
 - (void)writeFrameImage:(UIImage *)frameImage;
 - (void)encodeRawBytesForGLView:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-- (void)pause;
-- (void)resume;
 
 @end
 
