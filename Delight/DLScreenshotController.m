@@ -400,16 +400,17 @@
                                             keyboardFrame.origin.y * scaleFactor * contentScale,
                                             keyboardFrame.size.width * scaleFactor * contentScale,
                                             keyboardFrame.size.height * scaleFactor * contentScale);
-    
-    CGContextSetGrayFillColor(context, 0.7, 1.0);
+
+    UIColor *fillColor = [UIColor colorWithRed:128/255.0 green:137/255.0 blue:149/255.0 alpha:1.0];
+    CGContextSetFillColorWithColor(context, [fillColor CGColor]);
     CGContextFillRect(context, scaledKeyboardFrame);
     
     [self drawLabelCenteredAt:CGPointMake(CGRectGetMidX(scaledKeyboardFrame), CGRectGetMidY(scaledKeyboardFrame))
                      inWindow:window
                     inContext:context 
-                         text:@"Keyboard is hidden"
-                    textColor:[UIColor blackColor]
-              backgroundColor:[UIColor colorWithWhite:0.7 alpha:1.0]
+                         text:@"Keyboard Hidden"
+                    textColor:[UIColor whiteColor]
+              backgroundColor:fillColor
                      fontSize:24.0*scaleFactor*contentScale
                     transform:CGAffineTransformMake(window.transform.a, window.transform.b, window.transform.c, window.transform.d, 0, 0)]; // Only take into account scale/rotation
     
