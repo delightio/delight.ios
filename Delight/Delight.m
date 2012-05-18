@@ -449,7 +449,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 #ifdef DL_OFFLINE_RECORDING
     [self startRecording];
 #else
-	[taskController requestSessionIDWithAppToken:self.appToken];
+    if (!videoEncoder.recording) {
+        [taskController requestSessionIDWithAppToken:self.appToken];
+    }
 #endif
 }
 
