@@ -8,6 +8,7 @@
 
 #import "DLUpdateSessionTask.h"
 #import "DLTaskController.h"
+#import "DLMetrics.h"
 
 @implementation DLUpdateSessionTask
 @synthesize sessionDidEnd = _sessionDidEnd;
@@ -24,7 +25,26 @@
         [propertyParams appendFormat:@"&app_session[properties][%@]=%@", [self stringByAddingPercentEscapes:key], value];
     }
     
-    NSString * paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f%@", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime], propertyParams];
+    NSMutableString * metricsParams = [NSMutableString string];
+    if (self.recordingContext.metrics.privateViewCount) {
+        [metricsParams appendFormat:@"&app_session[metrics][private_view_count]=%i", self.recordingContext.metrics.privateViewCount];
+    }
+    if (self.recordingContext.metrics.keyboardHiddenCount) {
+        [metricsParams appendFormat:@"&app_session[metrics][keyboard_hidden_count]=%i", self.recordingContext.metrics.keyboardHiddenCount];
+    }
+    switch (self.recordingContext.metrics.stopReason) {
+        case DLMetricsStopReasonBackground:
+            [metricsParams appendString:@"&app_session[metrics][stop_by_background]=1"];
+            break;
+        case DLMetricsStopReasonManual:
+            [metricsParams appendString:@"&app_session[metrics][stop_by_manual]=1"];
+            break;
+        case DLMetricsStopReasonTimeLimit:
+            [metricsParams appendString:@"&app_session[metrics][stop_by_recording_limit]=1"];
+            break;
+    }
+    
+    NSString * paramStr = [NSString stringWithFormat:@"app_session[duration]=%.1f%@%@", [self.recordingContext.endTime timeIntervalSinceDate:self.recordingContext.startTime], propertyParams, metricsParams];
     
 	// the param needs to be put in query string. Not sure why. But, if not, it doesn't work
 	// check here: http://stackoverflow.com/questions/3469061/nsurlrequest-cannot-handle-http-body-when-method-is-not-post

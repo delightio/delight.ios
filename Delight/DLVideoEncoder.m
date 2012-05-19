@@ -214,6 +214,9 @@
     BOOL success = [videoWriter finishWriting];
     if (success) {
         DLDebugLog(@"Completed screen capture, file is stored at: %@", outputPath);
+        if ([delegate respondsToSelector:@selector(videoEncoderDidFinishRecording:)]) {
+            [delegate videoEncoderDidFinishRecording:self];
+        }
     } else {
         DLDebugLog(@"Screen capture failed: %@", [[videoWriter error] localizedDescription]);
         if ([delegate respondsToSelector:@selector(videoEncoder:didFailRecordingWithError:)]) {

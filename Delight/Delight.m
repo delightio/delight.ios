@@ -16,6 +16,7 @@
 #import "DLScreenshotController.h"
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
+#import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
 #import "DLCamCaptureManager.h"
@@ -43,7 +44,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
-@interface Delight () <DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
+@interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // Methods not yet ready for the public
 + (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
 + (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
@@ -119,7 +120,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)stop
 {
     [[self sharedInstance] stopRecording];
-    [sharedInstance release]; sharedInstance = nil;
+    [self sharedInstance]->metrics.stopReason = DLMetricsStopReasonManual;
 }
 
 + (void)takeScreenshot
@@ -170,11 +171,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording
 {
     [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboardInRecording;
+    if (hidesKeyboardInRecording) {
+        [self sharedInstance]->metrics.keyboardHiddenCount++;
+    }
 }
 
 + (void)registerPrivateView:(UIView *)view description:(NSString *)description
 {
     [[self sharedInstance].screenshotController registerPrivateView:view description:description];
+    
+    [self sharedInstance]->metrics.privateViewCount++;
 }
 
 + (void)unregisterPrivateView:(UIView *)view
@@ -216,6 +222,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
         lock = [[NSLock alloc] init];
         userProperties = [[NSMutableDictionary alloc] init];
+        metrics = [[DLMetrics alloc] init];
         
         self.scaleFactor = kDLDefaultScaleFactor;
         self.maximumFrameRate = kDLDefaultMaximumFrameRate;
@@ -264,7 +271,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[taskController release];
     [lock release];
     [userProperties release];
-
+    [metrics release];
+    
     [super dealloc];
 }
 
@@ -421,6 +429,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
         // We've exceeded the maximum recording duration
         [self stopRecording];
+        metrics.stopReason = DLMetricsStopReasonTimeLimit;
     } else if (autoCaptureEnabled) {
         [self scheduleScreenshot];
     }
@@ -453,6 +462,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [taskController requestSessionIDWithAppToken:self.appToken];
     }
 #endif
+    
+    [metrics reset];
 }
 
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
@@ -479,6 +490,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	}
     recordingContext.endTime = [NSDate date];
 	recordingContext.userProperties = userProperties;
+    recordingContext.metrics = metrics;
 	[taskController prepareSessionUpload:recordingContext];
 #endif
     
@@ -502,6 +514,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             }
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
 			recordingContext.userProperties = userProperties;
+            recordingContext.metrics = metrics;
             [taskController prepareSessionUpload:recordingContext];
             [self tryCreateNewSession];
         }
@@ -624,9 +637,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder
 {
-    NSLog(@"Touches: %@", gestureTracker.touches);
-    NSLog(@"Orientation changes: %@", gestureTracker.orientationChanges);
-    
     [gestureTracker stopRecordingGestures];
 }
 

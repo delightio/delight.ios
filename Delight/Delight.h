@@ -13,15 +13,9 @@
 @class DLVideoEncoder;
 @class DLGestureTracker;
 @class DLCamCaptureManager;
+@class DLMetrics;
 
-@protocol DLRecordingSessionDelegate <NSObject>
-
-@required
-- (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx;
-
-@end
-
-@interface Delight : NSObject <DLRecordingSessionDelegate> {
+@interface Delight : NSObject {
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
     NSTimeInterval lastScreenshotTime;
@@ -29,11 +23,12 @@
     BOOL appInBackground;
     BOOL alertViewVisible;
     
-	DLTaskController * taskController;
-	DLRecordingContext * recordingContext;
-    NSOperationQueue * screenshotQueue;
-    NSLock * lock;
-	DLCamCaptureManager * cameraManager;
+	DLTaskController *taskController;
+	DLRecordingContext *recordingContext;
+	DLCamCaptureManager *cameraManager;
+    DLMetrics *metrics;
+    NSOperationQueue *screenshotQueue;
+    NSLock *lock;
 }
 
 @property (nonatomic, retain) NSString *appToken;

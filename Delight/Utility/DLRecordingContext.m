@@ -8,6 +8,7 @@
 
 #import "DLRecordingContext.h"
 #import "DLTask.h"
+#import "DLMetrics.h"
 
 @implementation DLRecordingContext
 @synthesize sessionID = _sessionID;
@@ -27,6 +28,7 @@
 @synthesize finishedTaskIndex = _finishedTaskIndex;
 @synthesize saved = _saved;
 @synthesize loadedFromArchive = _loadedFromArchive;
+@synthesize metrics = _metrics;
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super init];
@@ -46,6 +48,7 @@
     self.usabilityTestDescription = [aDecoder decodeObjectForKey:@"usabilityTestDescription"];
     self.userProperties = [aDecoder decodeObjectForKey:@"userProperties"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
+    self.metrics = [aDecoder decodeObjectForKey:@"metrics"];
 	_loadedFromArchive = YES;
 	
 	return self;
@@ -66,6 +69,7 @@
     [aCoder encodeObject:_usabilityTestDescription forKey:@"usabilityTestDescription"];
     [aCoder encodeObject:_userProperties forKey:@"userProperties"];
 	[aCoder encodeObject:_finishedTaskIndex forKey:@"finishedTaskIndex"];
+    [aCoder encodeObject:_metrics forKey:@"metrics"];
 }
 
 - (void)dealloc {
@@ -78,6 +82,7 @@
     [_usabilityTestDescription release];
     [_userProperties release];
 	[_finishedTaskIndex release];
+    [_metrics release];
 	[super dealloc];
 }
 

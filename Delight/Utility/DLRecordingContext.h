@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class DLMetrics;
+
 typedef enum {
 	DLFinishedUpdateSession = 1,
 	DLFinishedUploadVideoFile,
@@ -40,6 +42,7 @@ typedef enum {
 @property (nonatomic, retain) NSMutableIndexSet * finishedTaskIndex;
 @property (nonatomic) BOOL saved;
 @property (nonatomic, readonly) BOOL loadedFromArchive;
+@property (nonatomic, retain) DLMetrics *metrics;
 
 - (BOOL)shouldCompleteTask:(DLFinishedTaskIdentifier)idfr;
 - (BOOL)allTasksFinished;
