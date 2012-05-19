@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @class DLMetrics;
 
@@ -26,6 +26,7 @@ typedef enum {
 @property (nonatomic, retain) NSDictionary * tracks;
 @property (nonatomic, retain) NSMutableDictionary * sourceFilePaths;
 @property (nonatomic, retain) NSArray * touches;
+@property (nonatomic, assign) CGRect touchBounds;
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic) float scaleFactor;

@@ -15,6 +15,7 @@
 @synthesize tracks = _tracks;
 @synthesize sourceFilePaths = _sourceFilePaths;
 @synthesize touches = _touches;
+@synthesize touchBounds = _touchBounds;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize scaleFactor = _scaleFactor;
@@ -35,6 +36,7 @@
 	self.sessionID = [aDecoder decodeObjectForKey:@"sessionID"];
 	self.tracks = [aDecoder decodeObjectForKey:@"tracks"];
 	self.sourceFilePaths = [aDecoder decodeObjectForKey:@"sourceFilePaths"];
+    _touchBounds = [aDecoder decodeCGRectForKey:@"touchBounds"];
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
 	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
     _scaleFactor = [aDecoder decodeFloatForKey:@"scaleFactor"];
@@ -58,6 +60,7 @@
 	[aCoder encodeObject:_sessionID forKey:@"sessionID"];
 	[aCoder encodeObject:_tracks forKey:@"tracks"];
 	[aCoder encodeObject:_sourceFilePaths forKey:@"sourceFilePaths"];
+    [aCoder encodeCGRect:_touchBounds forKey:@"touchBounds"];
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
 	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
     [aCoder encodeFloat:_scaleFactor forKey:@"scaleFactor"];

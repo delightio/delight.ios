@@ -331,6 +331,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [videoEncoder stopRecording];
         [lock unlock];
 		recordingContext.touches = gestureTracker.touches;
+        recordingContext.touchBounds = gestureTracker.mainWindow.bounds;
     }
 }
 
