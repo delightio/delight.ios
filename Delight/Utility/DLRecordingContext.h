@@ -31,6 +31,7 @@ typedef enum {
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic) float scaleFactor;
 @property (nonatomic) NSUInteger maximumFrameRate;
+@property (nonatomic) double averageBitRate;
 @property (nonatomic, retain) NSDate * startTime;
 @property (nonatomic, retain) NSDate * endTime;
 @property (nonatomic) NSInteger chunkSize;

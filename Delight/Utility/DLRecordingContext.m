@@ -20,6 +20,7 @@
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize scaleFactor = _scaleFactor;
 @synthesize maximumFrameRate = _maximumFrameRate;
+@synthesize averageBitRate = _averageBitRate;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize chunkSize = _chunkSize;
@@ -41,6 +42,7 @@
 	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
     _scaleFactor = [aDecoder decodeFloatForKey:@"scaleFactor"];
     _maximumFrameRate = [aDecoder decodeIntegerForKey:@"maximumFrameRate"];
+    _averageBitRate = [aDecoder decodeDoubleForKey:@"averageBitRate"];
 	self.startTime = [aDecoder decodeObjectForKey:@"startTime"];
 	self.endTime = [aDecoder decodeObjectForKey:@"endTime"];
 	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
@@ -65,6 +67,7 @@
 	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
     [aCoder encodeFloat:_scaleFactor forKey:@"scaleFactor"];
     [aCoder encodeInteger:_maximumFrameRate forKey:@"maximumFrameRate"];
+    [aCoder encodeDouble:_averageBitRate forKey:@"averageBitRate"];
 	[aCoder encodeObject:_startTime forKey:@"startTime"];
 	[aCoder encodeObject:_endTime forKey:@"endTime"];
 	[aCoder encodeInteger:_chunkSize forKey:@"chunkSize"];

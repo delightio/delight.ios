@@ -298,8 +298,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         }
         
         if (recordingContext) {
-            [self setMaximumFrameRate:recordingContext.maximumFrameRate];
-            [self setScaleFactor:recordingContext.scaleFactor];
+            self.maximumFrameRate = recordingContext.maximumFrameRate;
+            self.scaleFactor = recordingContext.scaleFactor;
+            videoEncoder.averageBitRate = recordingContext.averageBitRate;
         }
         
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
