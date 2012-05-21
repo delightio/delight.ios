@@ -23,8 +23,10 @@
 	NSUInteger eventSequenceLog;
 }
 
+// The view that touch locations will be relative to. By default, main application window will be used.
+@property (nonatomic, retain) UIView *touchView;
+
 @property (nonatomic, assign) CGFloat scaleFactor;
-@property (nonatomic, retain) UIWindow *mainWindow;
 @property (nonatomic, assign) BOOL drawsGestures;
 @property (nonatomic, retain) NSMutableArray *touches;
 @property (nonatomic, retain) NSMutableArray *orientationChanges;

@@ -21,7 +21,7 @@
 @implementation DLGestureTracker
 
 @synthesize scaleFactor;
-@synthesize mainWindow;
+@synthesize touchView;
 @synthesize drawsGestures;
 @synthesize touches;
 @synthesize orientationChanges;
@@ -50,7 +50,7 @@
             }
             
             // Assume rearmost window is the main app window
-            self.mainWindow = [windows objectAtIndex:0];
+            self.touchView = [windows objectAtIndex:0];
         }
         
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -73,7 +73,7 @@
     [touches release];
     [orientationChanges release];
     [lock release];
-    [mainWindow release];
+    [touchView release];
     
     if (bitmapData != NULL) {
         free(bitmapData);
@@ -260,7 +260,7 @@
     
     for (UITouch *touch in [event allTouches]) {
         if (touch.timestamp > 0) {
-            CGPoint location = [touch locationInView:mainWindow];
+            CGPoint location = [touch locationInView:touchView];
             
             BOOL existing = NO;
             if (touch.phase != UITouchPhaseBegan) {
@@ -339,7 +339,7 @@
     } else {
 		++eventSequenceLog;
         for (UITouch *touch in [event allTouches]) {
-			CGPoint location = [touch locationInView:mainWindow];
+			CGPoint location = [touch locationInView:touchView];
 			
             if (![delegate gestureTracker:self locationIsPrivate:location privateViewFrame:NULL]) {
                 DLTouch *ourTouch = [[DLTouch alloc] initWithID:(NSUInteger)touch sequence:eventSequenceLog location:location phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime];

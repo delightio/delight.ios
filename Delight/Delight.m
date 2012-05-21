@@ -331,7 +331,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [videoEncoder stopRecording];
         [lock unlock];
 		recordingContext.touches = gestureTracker.touches;
-        recordingContext.touchBounds = gestureTracker.mainWindow.bounds;
+        recordingContext.touchBounds = gestureTracker.touchView.bounds;
     }
 }
 
@@ -404,12 +404,14 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
     if (videoEncoder.encodesRawGLBytes && glView) {
         // Encode GL bytes directly
+        gestureTracker.touchView = glView;
         [videoEncoder encodeRawBytesForGLView:glView backingWidth:backingWidth backingHeight:backingHeight];
     } else {
         UIImage *previousScreenshot = [screenshotController.previousScreenshot retain];
 
         // Take new screenshot
         if (glView) {
+            gestureTracker.touchView = glView;            
             [screenshotController openGLScreenshotForView:glView backingWidth:backingWidth backingHeight:backingHeight];
         } else {
             [screenshotController screenshot];
