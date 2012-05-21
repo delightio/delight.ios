@@ -26,6 +26,7 @@
 @synthesize outputPath;
 @synthesize videoSize;
 @synthesize averageBitRate;
+@synthesize maximumKeyFrameInterval;
 @synthesize delegate;
 
 - (id)init
@@ -154,9 +155,13 @@
     videoWriter = [[AVAssetWriter alloc] initWithURL:[self tempFileURL] fileType:AVFileTypeQuickTimeMovie error:&error];
     NSParameterAssert(videoWriter);
     
-    NSDictionary *videoCompressionProps = [NSDictionary dictionaryWithObjectsAndKeys:
+    NSMutableDictionary *videoCompressionProps = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                            [NSNumber numberWithDouble:averageBitRate], AVVideoAverageBitRateKey,
                                            nil];
+    if (maximumKeyFrameInterval > 0) {
+        [videoCompressionProps setObject:[NSNumber numberWithInteger:maximumKeyFrameInterval] forKey:AVVideoMaxKeyFrameIntervalKey];
+    }
+    
     NSDictionary *videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
                                    AVVideoCodecH264, AVVideoCodecKey,
                                    [NSNumber numberWithInt:videoSize.width], AVVideoWidthKey,

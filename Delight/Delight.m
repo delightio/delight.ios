@@ -298,6 +298,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         }
         
         if (recordingContext) {
+            // Set recording properties from server
             if (recordingContext.maximumFrameRate > 0) {
                 self.maximumFrameRate = recordingContext.maximumFrameRate;
             }
@@ -306,6 +307,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             }
             if (recordingContext.averageBitRate > 0) {
                 videoEncoder.averageBitRate = recordingContext.averageBitRate;
+            }
+            if (recordingContext.maximumKeyFrameInterval > 0) {
+                videoEncoder.maximumKeyFrameInterval = recordingContext.maximumKeyFrameInterval;
             }
         }
         
