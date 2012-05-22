@@ -27,6 +27,7 @@
 @synthesize videoSize;
 @synthesize averageBitRate;
 @synthesize maximumKeyFrameInterval;
+@synthesize outputFileSize;
 @synthesize delegate;
 
 - (id)init
@@ -145,6 +146,16 @@
     
     CVPixelBufferUnlockBaseAddress(pixel_buffer, 0);
     CVPixelBufferRelease(pixel_buffer);    
+}
+
+- (long)outputFileSize
+{
+    NSError *error = nil;
+    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:outputPath error:&error];
+    if (error) {
+        return 0;
+    }
+    return [[fileAttributes objectForKey:NSFileSize] longValue];
 }
 
 #pragma mark - Private methods

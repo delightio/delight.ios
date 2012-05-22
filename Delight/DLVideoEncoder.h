@@ -34,6 +34,7 @@
 @property (nonatomic, assign) CGSize videoSize;
 @property (nonatomic, assign) double averageBitRate;
 @property (nonatomic, assign) NSUInteger maximumKeyFrameInterval;
+@property (nonatomic, readonly) long outputFileSize;
 @property (nonatomic, assign) id<DLVideoEncoderDelegate> delegate;
 
 - (void)startNewRecording;
