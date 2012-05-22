@@ -16,6 +16,7 @@
 @synthesize sourceFilePaths = _sourceFilePaths;
 @synthesize touches = _touches;
 @synthesize touchBounds = _touchBounds;
+@synthesize orientationChanges = _orientationChanges;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize scaleFactor = _scaleFactor;
@@ -38,7 +39,6 @@
 	self.sessionID = [aDecoder decodeObjectForKey:@"sessionID"];
 	self.tracks = [aDecoder decodeObjectForKey:@"tracks"];
 	self.sourceFilePaths = [aDecoder decodeObjectForKey:@"sourceFilePaths"];
-    _touchBounds = [aDecoder decodeCGRectForKey:@"touchBounds"];
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
 	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
     _scaleFactor = [aDecoder decodeFloatForKey:@"scaleFactor"];
@@ -64,7 +64,6 @@
 	[aCoder encodeObject:_sessionID forKey:@"sessionID"];
 	[aCoder encodeObject:_tracks forKey:@"tracks"];
 	[aCoder encodeObject:_sourceFilePaths forKey:@"sourceFilePaths"];
-    [aCoder encodeCGRect:_touchBounds forKey:@"touchBounds"];
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
 	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
     [aCoder encodeFloat:_scaleFactor forKey:@"scaleFactor"];
@@ -86,6 +85,7 @@
 	[_tracks release];
 	[_sourceFilePaths release];
 	[_touches release];
+    [_orientationChanges release];
 	[_startTime release];
 	[_endTime release];
     [_usabilityTestDescription release];
@@ -166,6 +166,17 @@
 		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
 	}
 	[_sourceFilePaths setObject:aPath forKey:DLTouchTrackKey];
+}
+
+- (NSString *)orientationFilePath {
+	return [_sourceFilePaths objectForKey:DLOrientationTrackKey];
+}
+
+- (void)setOrientationFilePath:(NSString *)aPath {
+	if ( _sourceFilePaths == nil ) {
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
+	}
+	[_sourceFilePaths setObject:aPath forKey:DLOrientationTrackKey];
 }
 
 @end

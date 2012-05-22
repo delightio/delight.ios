@@ -343,6 +343,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [lock unlock];
 		recordingContext.touches = gestureTracker.touches;
         recordingContext.touchBounds = gestureTracker.touchView.bounds;
+        recordingContext.orientationChanges = gestureTracker.orientationChanges;
     }
 }
 
