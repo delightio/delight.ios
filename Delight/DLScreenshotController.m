@@ -28,7 +28,6 @@
 @synthesize scaleFactor;
 @synthesize hidesKeyboard;
 @synthesize writesToPNG;
-@synthesize previousScreenshot;
 @synthesize imageSize;
 @synthesize privateViews;
 
@@ -59,7 +58,6 @@
     [openGLImage release];
     [openGLView release];
     [keyboardWindow release];
-    [previousScreenshot release];
     
     [super dealloc];
 }
@@ -135,8 +133,6 @@
     if (writesToPNG) {
         [self writeImageToPNG:image];
     }
-    
-    self.previousScreenshot = image;
     
     return image;
 }

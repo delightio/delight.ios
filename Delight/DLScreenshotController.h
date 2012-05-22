@@ -27,7 +27,6 @@
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL hidesKeyboard;
 @property (nonatomic, assign) BOOL writesToPNG;
-@property (nonatomic, retain) UIImage *previousScreenshot;
 @property (nonatomic, readonly) CGSize imageSize;
 @property (nonatomic, readonly) NSMutableSet *privateViews;
 
