@@ -79,7 +79,7 @@
 	// set touch bounds
 	[rootDict setObject:NSStringFromCGRect(aSession.touchBounds) forKey:@"touchBounds"];
 	
-	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:dictTouches format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
+	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * touchesPath = [self touchesFilePathForSession:aSession];
 	[theData writeToFile:touchesPath atomically:NO];
 	// set file path
