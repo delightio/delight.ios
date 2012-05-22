@@ -70,10 +70,15 @@
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	NSString * errStr = nil;
 	NSArray * allTouches = aSession.touches;
+	NSMutableDictionary * rootDict = [NSMutableDictionary dictionaryWithCapacity:3];
 	NSMutableArray * dictTouches = [NSMutableArray arrayWithCapacity:[allTouches count]];
 	for (DLTouch * theTouch in allTouches) {
 		[dictTouches addObject:[theTouch dictionaryRepresentation]];
 	}
+	[rootDict setObject:dictTouches forKey:@"touches"];
+	// set touch bounds
+	[rootDict setObject:NSStringFromCGRect(aSession.touchBounds) forKey:@"touchBounds"];
+	
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:dictTouches format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * touchesPath = [self touchesFilePathForSession:aSession];
 	[theData writeToFile:touchesPath atomically:NO];
