@@ -29,7 +29,7 @@
     self.window.rootViewController = teapotViewController;
     [self.window makeKeyAndVisible];
 
-    [Delight startOpenGLWithAppToken:@"Get your token at http://delight.io" encodeRawBytes:YES];
+    [Delight startOpenGLWithAppToken:@"Get your token at http://delight.io"];
     
     return YES;
 }

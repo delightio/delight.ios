@@ -46,9 +46,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 @interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // Methods not yet ready for the public
-+ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
-+ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes;
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer;
++ (void)startOpenGLWithAppToken:(NSString *)appToken;
++ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken;
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer;
 + (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 + (void)startUsabilityTestWithAppToken:(NSString *)appToken;
 
@@ -100,21 +100,21 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self startWithAppToken:appToken];
 }
 
-+ (void)startOpenGLWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes
++ (void)startOpenGLWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
     delight.appToken = appToken;
     delight.autoCaptureEnabled = NO;
-    delight.videoEncoder.encodesRawGLBytes = encodeRawBytes;
+    delight.videoEncoder.encodesRawGLBytes = YES;
 	[delight tryCreateNewSession];
 }
 
-+ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken encodeRawBytes:(BOOL)encodeRawBytes
++ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
     delight.usabilityTestEnabled = YES;
     delight.recordsCamera = YES;
-    [self startOpenGLWithAppToken:appToken encodeRawBytes:encodeRawBytes];
+    [self startOpenGLWithAppToken:appToken];
 }
 
 + (void)stop
@@ -128,10 +128,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [[self sharedInstance] takeScreenshot:nil backingWidth:0 backingHeight:0];
 }
 
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderBuffer:(GLuint)colorRenderBuffer
++ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer
 {
     GLint backingWidth, backingHeight;
-    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderBuffer);
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderbuffer);
     glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
     glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
 
