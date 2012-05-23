@@ -7,16 +7,29 @@
 
 #import <UIKit/UIKit.h>
 
-/** The `Delight` class is used to set up screen and gesture recording. The most important method is [Delight startWithAppToken:], which in most cases should be called as soon as possible after app launch, typically in your application delegate's `applicationDidFinishLaunching:withOptions:` method.
+/** The `Delight` class is used to set up screen and gesture recording. The most important method is `startWithAppToken:`, which in most cases should be called as soon as possible after app launch, typically in your application delegate's `applicationDidFinishLaunching:withOptions:` method.
+ 
+ This class requires the following frameworks to be linked:
+ 
+ * AssetsLibrary
+ * AVFoundation
+ * CoreGraphics
+ * CoreMedia
+ * CoreVideo
+ * OpenGLES
+ * QuartzCore
+ * SystemConfiguration
+
+ Additionally, `-ObjC` must be added to "Other Linker Flags" in your build settings.
  */
 @interface Delight : NSObject
 
 /**---------------------------------------------------------------------------------------
- * @name Recording Control
+ * @name Starting and Stopping Recording
  * ---------------------------------------------------------------------------------------
  */
 
-/** Starts capturing the screen and recording gestures. The recording will automatically stop after 10 minutes, or if the app is sent to the background, or if [Delight stop] is called. A new recording will be started whenever the app is brought to the foreground. Recordings only take place if you have scheduled recordings in your control panel at http://delight.io, and recordings are not paused.
+/** Starts capturing the screen and recording gestures. The recording will automatically end after 10 minutes, or if the app is sent to the background, or if `stop` is called. A new recording will be started whenever the app is brought to the foreground. Recordings only take place if you have scheduled recordings in your control panel at http://delight.io, and recordings are not paused.
  
  @warning This method should only be called once, typically in your application delegate's `applicationDidFinishLaunching:withOptions:` method.
  @see stop
@@ -25,7 +38,7 @@
 + (void)startWithAppToken:(NSString *)appToken;
 
 /** Stops the current recording, if there is one.
- @warning It is not possible to manually resume recording by calling [Delight startWithAppToken:] again. Recording will only resume once the app has been sent to the background and then brought back to the foreground.
+ @warning It is not possible to manually resume recording by calling `startWithAppToken:` again. Recording will only resume once the app has been sent to the background and then brought back to the foreground.
  */
 + (void)stop;
 
@@ -72,7 +85,7 @@
 
 /** Sets whether the on-screen keyboard should be covered up in the recording. Calling this method does not affect whether the on-screen keyboard is hidden for the user.
   
- **Note**: The keyboard is automatically hidden in the recording whenever the user is editing a [UITextField] with `secureTextEntry` enabled.
+ **Note**: The keyboard is automatically hidden in the recording whenever the user is editing a UITextField with `secureTextEntry` enabled.
  
  @param hidesKeyboardInRecording YES if debug log statements should be printed to the console; otherwise, NO.
  */
@@ -86,9 +99,9 @@
 
 /** Registers a view as being private, which covers it up in the recording.
  
- **Note**: Any [UITextField] with `secureTextEntry` enabled will automatically become a private view. No further action is required.
+ **Note**: Any UITextField with `secureTextEntry` enabled will automatically become a private view. No further action is required.
  
- @warning You must call [Delight unregisterPrivateView:] before the view will be deallocated.
+ @warning You must call `unregisterPrivateView:` before the view will be deallocated.
  @see unregisterPrivateView:
  @see privateViews
  @param view The view to make private.
