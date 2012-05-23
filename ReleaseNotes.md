@@ -23,7 +23,7 @@ Changelog
 
   * It is no longer possible to manually set the scale factor or maximum frame rate. Reasonable defaults will be used.
 
-  * Pausing/resuming a session is no longer supported.
+  * Pausing/resuming recording and manually triggering screenshots are no longer supported.
 
 * Improved UIKit performance.
 

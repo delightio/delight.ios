@@ -140,11 +140,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self sharedInstance]->metrics.stopReason = DLMetricsStopReasonManual;
 }
 
-+ (void)takeScreenshot
-{
-    [[self sharedInstance] takeScreenshot:nil backingWidth:0 backingHeight:0];
-}
-
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer
 {
     GLint backingWidth, backingHeight;
