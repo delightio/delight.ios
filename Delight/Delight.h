@@ -7,42 +7,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class DLTaskController;
-@class DLRecordingContext;
-@class DLScreenshotController;
-@class DLVideoEncoder;
-@class DLGestureTracker;
-@class DLCamCaptureManager;
-@class DLMetrics;
-
-@interface Delight : NSObject {
-    NSUInteger frameCount;
-    NSTimeInterval elapsedTime;
-    NSTimeInterval lastScreenshotTime;
-    NSTimeInterval resignActiveTime;
-    BOOL appInBackground;
-    BOOL alertViewVisible;
-    
-	DLTaskController *taskController;
-	DLRecordingContext *recordingContext;
-	DLCamCaptureManager *cameraManager;
-    DLMetrics *metrics;
-    NSOperationQueue *screenshotQueue;
-    NSLock *lock;
-}
-
-@property (nonatomic, retain) NSString *appToken;
-@property (nonatomic) BOOL debugLogEnabled;
-@property (nonatomic, assign) CGFloat scaleFactor;
-@property (nonatomic, assign) NSUInteger maximumFrameRate;
-@property (nonatomic, assign) NSTimeInterval maximumRecordingDuration;
-@property (nonatomic, assign, getter=isAutoCaptureEnabled) BOOL autoCaptureEnabled;
-@property (nonatomic, assign) BOOL recordsCamera;
-@property (nonatomic, assign, getter=isUsabilityTestEnabled) BOOL usabilityTestEnabled;
-@property (nonatomic, readonly) DLScreenshotController *screenshotController;
-@property (nonatomic, readonly) DLVideoEncoder *videoEncoder;
-@property (nonatomic, readonly) DLGestureTracker *gestureTracker;
-@property (nonatomic, readonly) NSMutableDictionary *userProperties;
+@interface Delight : NSObject
 
 // Start/stop recording
 + (void)startWithAppToken:(NSString *)appToken;

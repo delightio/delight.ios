@@ -60,20 +60,35 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 @end
 
-@implementation Delight
+@implementation Delight {
+    NSUInteger frameCount;
+    NSTimeInterval elapsedTime;
+    NSTimeInterval lastScreenshotTime;
+    NSTimeInterval resignActiveTime;
+    BOOL appInBackground;
+    BOOL alertViewVisible;
+    NSOperationQueue *screenshotQueue;
+    NSLock *lock;
 
-@synthesize appToken;
-@synthesize debugLogEnabled;
-@synthesize scaleFactor;
-@synthesize maximumFrameRate;
-@synthesize maximumRecordingDuration;
-@synthesize usabilityTestEnabled;
-@synthesize autoCaptureEnabled;
-@synthesize recordsCamera;
-@synthesize screenshotController;
-@synthesize videoEncoder;
-@synthesize gestureTracker;
-@synthesize userProperties;
+    // Helper classes
+	DLTaskController *taskController;
+	DLRecordingContext *recordingContext;
+    DLScreenshotController *screenshotController;
+    DLVideoEncoder *videoEncoder;
+    DLGestureTracker *gestureTracker;
+	DLCamCaptureManager *cameraManager;
+    DLMetrics *metrics;
+    
+    // Configuration
+    NSString *appToken;
+    BOOL recordsCamera;
+    BOOL usabilityTestEnabled;
+    BOOL autoCaptureEnabled;
+    CGFloat scaleFactor;
+    NSUInteger maximumFrameRate;
+    NSTimeInterval maximumRecordingDuration;
+    NSMutableDictionary *userProperties;
+}
 
 #pragma mark - Class methods
 
@@ -88,32 +103,34 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)startWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
-    delight.appToken = appToken;
+    if (delight->appToken != appToken) {
+        [delight->appToken release];
+        delight->appToken = [appToken retain];
+    }
 	[delight tryCreateNewSession];
 }
 
 + (void)startUsabilityTestWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
-    delight.usabilityTestEnabled = YES;
-    delight.recordsCamera = YES;
+    delight->usabilityTestEnabled = YES;
+    [delight setRecordsCamera:YES];
     [self startWithAppToken:appToken];
 }
 
 + (void)startOpenGLWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
-    delight.appToken = appToken;
-    delight.autoCaptureEnabled = NO;
-    delight.videoEncoder.encodesRawGLBytes = YES;
-	[delight tryCreateNewSession];
+    [delight setAutoCaptureEnabled:NO];
+    delight->videoEncoder.encodesRawGLBytes = YES;
+    [self startWithAppToken:appToken];
 }
 
 + (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
-    delight.usabilityTestEnabled = YES;
-    delight.recordsCamera = YES;
+    delight->usabilityTestEnabled = YES;
+    [delight setRecordsCamera:YES];
     [self startOpenGLWithAppToken:appToken];
 }
 
@@ -145,32 +162,32 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (BOOL)savesToPhotoAlbum
 {
-    return [self sharedInstance].videoEncoder.savesToPhotoAlbum;
+    return [self sharedInstance]->videoEncoder.savesToPhotoAlbum;
 }
 
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum
 {
-    [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
+    [self sharedInstance]->videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
 }
 
 + (BOOL)debugLogEnabled
 {
-    return [self sharedInstance].debugLogEnabled;
+    return [[self sharedInstance] debugLogEnabled];
 }
 
 + (void)setDebugLogEnabled:(BOOL)debugLogEnabled
 {
-    [self sharedInstance].debugLogEnabled = debugLogEnabled;
+    [[self sharedInstance] setDebugLogEnabled:debugLogEnabled];
 }
 
 + (BOOL)hidesKeyboardInRecording
 {
-    return [self sharedInstance].screenshotController.hidesKeyboard;
+    return [self sharedInstance]->screenshotController.hidesKeyboard;
 }
 
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording
 {
-    [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboardInRecording;
+    [self sharedInstance]->screenshotController.hidesKeyboard = hidesKeyboardInRecording;
     if (hidesKeyboardInRecording) {
         [self sharedInstance]->metrics.keyboardHiddenCount++;
     }
@@ -178,19 +195,19 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)registerPrivateView:(UIView *)view description:(NSString *)description
 {
-    [[self sharedInstance].screenshotController registerPrivateView:view description:description];
+    [[self sharedInstance]->screenshotController registerPrivateView:view description:description];
     
     [self sharedInstance]->metrics.privateViewCount++;
 }
 
 + (void)unregisterPrivateView:(UIView *)view
 {
-    [[self sharedInstance].screenshotController unregisterPrivateView:view];
+    [[self sharedInstance]->screenshotController unregisterPrivateView:view];
 }
 
 + (NSSet *)privateViews
 {
-    return [self sharedInstance].screenshotController.privateViews;
+    return [self sharedInstance]->screenshotController.privateViews;
 }
 
 + (void)setPropertyValue:(id)value forKey:(NSString *)key
@@ -198,7 +215,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSNumber class]]) {
         DLLog(@"[Delight] Ignoring property for key %@ - value must be an NSString or an NSNumber.", key);
     } else {
-        [[self sharedInstance].userProperties setObject:value forKey:key];
+        [[self sharedInstance]->userProperties setObject:value forKey:key];
     }
 }
 
@@ -224,11 +241,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         userProperties = [[NSMutableDictionary alloc] init];
         metrics = [[DLMetrics alloc] init];
         
-        self.scaleFactor = kDLDefaultScaleFactor;
-        self.maximumFrameRate = kDLDefaultMaximumFrameRate;
-        self.maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
-        self.autoCaptureEnabled = YES;
-
+        [self setScaleFactor:kDLDefaultScaleFactor];
+        [self setAutoCaptureEnabled:YES];
+        maximumFrameRate = kDLDefaultMaximumFrameRate;
+        maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
@@ -300,10 +317,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         if (recordingContext) {
             // Set recording properties from server
             if (recordingContext.maximumFrameRate > 0) {
-                self.maximumFrameRate = recordingContext.maximumFrameRate;
+                maximumFrameRate = recordingContext.maximumFrameRate;
             }
             if (recordingContext.scaleFactor > 0) {
-                self.scaleFactor = recordingContext.scaleFactor;
+                [self setScaleFactor:recordingContext.scaleFactor];
             }
             if (recordingContext.averageBitRate > 0) {
                 videoEncoder.averageBitRate = recordingContext.averageBitRate;
@@ -460,7 +477,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self startRecording];
 #else
     if (!videoEncoder.recording) {
-        [taskController requestSessionIDWithAppToken:self.appToken];
+        [taskController requestSessionIDWithAppToken:appToken];
     }
 #endif
     
