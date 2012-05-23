@@ -18,5 +18,6 @@
 @property (nonatomic, assign) NSTimeInterval timeInSession;
 
 - (id)initWithDeviceOrientation:(UIDeviceOrientation)aDeviceOrientation interfaceOrientation:(UIInterfaceOrientation)anInterfaceOrientation timeInSession:(NSTimeInterval)aTimeInSession;
+- (NSDictionary *)dictionaryRepresentation;
 
 @end

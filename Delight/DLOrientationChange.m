@@ -30,4 +30,12 @@
     return [NSString stringWithFormat:@"Device orientation: %i, interface orientation: %i, time: %.3f", deviceOrientation, interfaceOrientation, timeInSession];
 }
 
+- (NSDictionary *)dictionaryRepresentation
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSNumber numberWithInteger:deviceOrientation], @"deviceOrientation", 
+            [NSNumber numberWithInteger:interfaceOrientation], @"interfaceOrientation", 
+            [NSNumber numberWithDouble:timeInSession], @"time", nil];
+}
+
 @end

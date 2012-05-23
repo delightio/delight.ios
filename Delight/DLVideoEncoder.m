@@ -112,7 +112,7 @@
     }
 }
     
-- (void)encodeRawBytesForGLView:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
+- (void)encodeRawBytesWithBackingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {
     if (!videoWriter) {
         if (outputPath) {

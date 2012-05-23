@@ -319,13 +319,13 @@
     
     UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
     UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-    NSTimeInterval timeInSession = [[NSProcessInfo processInfo] systemUptime] - startTime;
+    NSTimeInterval timeInSession = (notification ? [[NSProcessInfo processInfo] systemUptime] - startTime : 0.0f);
     
     DLOrientationChange *orientationChange = [[DLOrientationChange alloc] initWithDeviceOrientation:deviceOrientation
                                                                                interfaceOrientation:interfaceOrientation
                                                                                       timeInSession:timeInSession];
     [orientationChanges addObject:orientationChange];
-    [orientationChange release];
+    [orientationChange release];    
 }
 
 #pragma mark - DLWindowDelegate

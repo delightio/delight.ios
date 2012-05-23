@@ -11,6 +11,7 @@
 #import "DLRecordingContext.h"
 #import "DLReachability.h"
 #import "DLTouch.h"
+#import "DLOrientationChange.h"
 #import <UIKit/UIKit.h>
 
 @interface DLTaskController (PrivateMethods)
@@ -22,7 +23,9 @@
 - (void)renewUploadURLForSession:(DLRecordingContext *)ctx wtihTrack:(NSString *)trcName;
 - (void)uploadSession:(DLRecordingContext *)aSession;
 - (void)archiveTouchesForSession:(DLRecordingContext *)aSession;
+- (void)archiveOrientationChangesForSession:(DLRecordingContext *)aSession;
 - (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx;
+- (NSString *)orientationFilePathForSession:(DLRecordingContext *)ctx;
 
 @end
 
@@ -87,6 +90,25 @@
 	[pool release];
 }
 
+- (void)archiveOrientationChangesForSession:(DLRecordingContext *)aSession {
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	NSString * errStr = nil;
+	NSArray * allOrientationChanges = aSession.orientationChanges;
+	NSMutableDictionary * rootDict = [NSMutableDictionary dictionaryWithCapacity:3];
+	NSMutableArray * dictOrientationChanges = [NSMutableArray arrayWithCapacity:[allOrientationChanges count]];
+	for (DLOrientationChange * theOrientationChange in allOrientationChanges) {
+		[dictOrientationChanges addObject:[theOrientationChange dictionaryRepresentation]];
+	}
+	[rootDict setObject:dictOrientationChanges forKey:@"orientationChanges"];
+	
+	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
+	NSString * orientationPath = [self orientationFilePathForSession:aSession];
+	[theData writeToFile:orientationPath atomically:NO];
+	// set file path
+	[aSession.sourceFilePaths setObject:orientationPath forKey:DLOrientationTrackKey];
+	[pool release];
+}
+
 - (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
 	
@@ -117,6 +139,7 @@
 		[self.queue addOperationWithBlock:^{
 			// save file touches file from session
 			[self archiveTouchesForSession:aSession];
+            [self archiveOrientationChangesForSession:aSession];
 			// create tasks to upload
 			[self uploadSession:aSession];
 			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
@@ -124,6 +147,7 @@
 	} else {
 		// if the system does not support background processing, we have to save the touches in main thread.
 		[self archiveTouchesForSession:aSession];
+        [self archiveOrientationChangesForSession:aSession];        
 	}
 }
 
@@ -168,6 +192,10 @@
 
 - (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx {
 	return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"touches-%@.plist", ctx.sessionID]];
+}
+
+- (NSString *)orientationFilePathForSession:(DLRecordingContext *)ctx {
+    return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"orientation-%@.plist", ctx.sessionID]];
 }
 
 - (void)removeRecordingContext:(DLRecordingContext *)ctx {
