@@ -342,7 +342,7 @@
 			CGPoint location = [touch locationInView:touchView];
 			
             if (![delegate gestureTracker:self locationIsPrivate:location privateViewFrame:NULL]) {
-                DLTouch *ourTouch = [[DLTouch alloc] initWithID:(NSUInteger)touch sequence:eventSequenceLog location:location phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime];
+                DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime];
                 [touches addObject:ourTouch];
                 [ourTouch release];
             }
