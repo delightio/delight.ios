@@ -113,7 +113,6 @@
 	if ( backgroundSupported ) {
 		UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			[self saveRecordingContext];
-			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 		}];
 		[self.queue addOperationWithBlock:^{
 			// save file touches file from session
@@ -194,7 +193,6 @@
 			// task expires. clean it up if it has not finished yet
 			[sessTask cancel];
 			[self saveRecordingContext];
-			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 		}];
 		sessTask.taskController = self;
 		sessTask.backgroundTaskIdentifier = bgIdf;
@@ -215,7 +213,6 @@
 						// task expires. clean it up if it has not finished yet
 						[uploadTask cancel];
 						[self saveRecordingContext];
-						[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 					}];
 					uploadTask.taskController = self;
 					uploadTask.backgroundTaskIdentifier = bgIdf;
@@ -233,7 +230,6 @@
 				// task expires. clean it up if it has not finished yet
 				[postTask cancel];
 				[self saveRecordingContext];
-				[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
 			}];
 			postTask.taskController = self;
 			postTask.backgroundTaskIdentifier = bgIdf;
