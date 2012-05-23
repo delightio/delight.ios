@@ -11,20 +11,20 @@
 @implementation DLTouch
 
 @synthesize location = _location;
+@synthesize previousLocation = _previousLocation;
 @synthesize phase = _phase;
 @synthesize timeInSession = _timeInSession;
-@synthesize touchID = _touchID;
 @synthesize sequenceNum = _sequenceNum;
 @synthesize tapCount = _tapCount;
 
-- (id)initWithID:(NSUInteger)anID sequence:(NSUInteger)seqNum location:(CGPoint)aLocation phase:(UITouchPhase)aPhase tapCount:(NSUInteger)aCount timeInSession:(NSTimeInterval)aTimeInSession
+- (id)initWithSequence:(NSUInteger)seqNum location:(CGPoint)aLocation previousLocation:(CGPoint)prevLoc phase:(UITouchPhase)aPhase tapCount:(NSUInteger)aCount timeInSession:(NSTimeInterval)aTimeInSession
 {
     self = [super init];
     if (self) {
         _location = aLocation;
+		_previousLocation = prevLoc;
         _phase = aPhase;
         _timeInSession = aTimeInSession;
-		_touchID = anID;
 		_sequenceNum = seqNum;
 		_tapCount = aCount;
     }
@@ -32,7 +32,7 @@
 }
 
 - (NSDictionary *)dictionaryRepresentation {
-	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:_location.x], @"x", [NSNumber numberWithFloat:_location.y], @"y", [NSNumber numberWithInteger:_phase], @"phase", [NSNumber numberWithDouble:_timeInSession], @"time", [NSNumber numberWithUnsignedInteger:_touchID], @"touchID", [NSNumber numberWithUnsignedInteger:_sequenceNum], @"seq", [NSNumber numberWithUnsignedInteger:_tapCount], @"tapCount", nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:NSStringFromCGPoint(_location), @"curLoc", NSStringFromCGPoint(_previousLocation), @"prevLoc", [NSNumber numberWithInteger:_phase], @"phase", [NSNumber numberWithDouble:_timeInSession], @"time", [NSNumber numberWithUnsignedInteger:_sequenceNum], @"seq", [NSNumber numberWithUnsignedInteger:_tapCount], @"tapCount", nil];
 }
 
 - (NSString *)description

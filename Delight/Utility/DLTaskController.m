@@ -81,6 +81,7 @@
 	[rootDict setObject:dictTouches forKey:@"touches"];
 	// set touch bounds
 	[rootDict setObject:NSStringFromCGRect(aSession.touchBounds) forKey:@"touchBounds"];
+	[rootDict setObject:@"0.1" forKey:@"formatVersion"];
 	
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * touchesPath = [self touchesFilePathForSession:aSession];
