@@ -37,8 +37,8 @@
  */
 + (void)startWithAppToken:(NSString *)appToken;
 
-/** Stops the current recording, if there is one.
- @warning It is not possible to manually resume recording by calling `startWithAppToken:` again. Recording will only resume once the app has been sent to the background and then brought back to the foreground.
+/** Stops the current recording, if there is one. Calling this method is optional. Recordings will automatically stop after 10 minutes, or if the app is sent to the background.
+ @warning It is not possible to manually resume recording by calling `startWithAppToken:` again. A new recording will begin once the app has been sent to the background and then brought back to the foreground.
  */
 + (void)stop;
 
