@@ -7,20 +7,9 @@
 
 #import <UIKit/UIKit.h>
 
-/** The `Delight` class is used to set up screen and gesture recording. The most important method is `startWithAppToken:`, which in most cases should be called as soon as possible after app launch, typically in your application delegate's `applicationDidFinishLaunching:withOptions:` method.
+/** The `Delight` class is used to set up screen and gesture recording. Refer to the [QuickStart Guide](http://delight.io/docs) for installation instructions.
  
- This class requires the following frameworks to be linked:
- 
- * AssetsLibrary
- * AVFoundation
- * CoreGraphics
- * CoreMedia
- * CoreVideo
- * OpenGLES
- * QuartzCore
- * SystemConfiguration
-
- Additionally, `-ObjC` must be added to "Other Linker Flags" in your build settings.
+ The most important method is `startWithAppToken:`, which in most cases should be called as soon as possible after app launch, typically in your application delegate's `applicationDidFinishLaunching:withOptions:` method. 
  */
 @interface Delight : NSObject
 
@@ -29,11 +18,11 @@
  * ---------------------------------------------------------------------------------------
  */
 
-/** Starts capturing the screen and recording gestures. The recording will automatically end after 10 minutes, or if the app is sent to the background, or if `stop` is called. A new recording will be started whenever the app is brought to the foreground. Recordings only take place if you have scheduled recordings in your control panel at http://delight.io, and recordings are not paused.
+/** Starts capturing the screen and recording gestures. The recording will automatically end after 10 minutes, or if the app is sent to the background, or if `stop` is called. A new recording will be started whenever the app is brought to the foreground. Recordings only take place if you have scheduled recordings in your [control panel](http://delight.io/apps), and recordings are not paused.
  
  @warning This method should only be called once, typically in your application delegate's `applicationDidFinishLaunching:withOptions:` method.
  @see stop
- @param appToken Your application token from http://delight.io.
+ @param appToken The application token from your [control panel](http://delight.io/apps).
  */
 + (void)startWithAppToken:(NSString *)appToken;
 
@@ -43,35 +32,11 @@
 + (void)stop;
 
 /**---------------------------------------------------------------------------------------
- * @name Configuration
+ * @name Adding Metadata
  * ---------------------------------------------------------------------------------------
  */
 
-/** Sets whether recordings are saved to the user's photo album, accessible via the Photos app.
- 
- @param savesToPhotoAlbum YES if recordings are to be saved to the user's photo album; otherwise, NO.
- */
-+ (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
-
-/** Returns a Boolean value indicating whether recordings are saved to the user's photo album, accessible via the Photos app.
- 
- @return YES if recordings are saved to the user's photo album; otherwise, NO.
- */
-+ (BOOL)savesToPhotoAlbum;
-
-/** Sets whether debug log statements should be printed to the console. This can be useful for troubleshooting issues with the framework.
- 
- @param debugLogEnabled YES if debug log statements should be printed to the console; otherwise, NO.
- */
-+ (void)setDebugLogEnabled:(BOOL)debugLogEnabled;
-
-/** Returns a Boolean value indicating whether debug log statements are printed to the console.
- 
- @return YES if debug log statements are printed to the console; otherwise, NO.
- */
-+ (BOOL)debugLogEnabled;
-
-/** Sets a custom property for the current session. Session properties are shown when viewing recordings on delight.io, so this method can be used to attach arbitrary metadata to recordings.
+/** Sets a custom property for the current session. Session properties are shown when viewing recordings on delight.io, so this method can be used to attach arbitrary metadata to recordings. If multiple values are set for the same key, only the last value will be used.
  
  @param value The property value. Must be an NSString or NSNumber.
  @param key The property key.
@@ -79,7 +44,7 @@
 + (void)setPropertyValue:(id)value forKey:(NSString *)key;
 
 /**---------------------------------------------------------------------------------------
- * @name Privacy
+ * @name Controlling Privacy
  * ---------------------------------------------------------------------------------------
  */
 
@@ -124,5 +89,34 @@
  @return A set of all views that are currently private.
  */
 + (NSSet *)privateViews;
+
+/**---------------------------------------------------------------------------------------
+ * @name Debugging
+ * ---------------------------------------------------------------------------------------
+ */
+
+/** Sets whether debug log statements should be printed to the console. This can be useful for troubleshooting issues with the framework.
+ 
+ @param debugLogEnabled YES if debug log statements should be printed to the console; otherwise, NO.
+ */
++ (void)setDebugLogEnabled:(BOOL)debugLogEnabled;
+
+/** Returns a Boolean value indicating whether debug log statements are printed to the console.
+ 
+ @return YES if debug log statements are printed to the console; otherwise, NO.
+ */
++ (BOOL)debugLogEnabled;
+
+/** Sets whether recordings are saved to the user's photo album, accessible via the Photos app.
+ 
+ @param savesToPhotoAlbum YES if recordings are to be saved to the user's photo album; otherwise, NO.
+ */
++ (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum;
+
+/** Returns a Boolean value indicating whether recordings are saved to the user's photo album, accessible via the Photos app.
+ 
+ @return YES if recordings are saved to the user's photo album; otherwise, NO.
+ */
++ (BOOL)savesToPhotoAlbum;
 
 @end
