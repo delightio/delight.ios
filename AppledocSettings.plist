@@ -16,7 +16,7 @@
 	<key>--company-id</key>
 	<string>com.pipely</string>
 	<key>--output</key>
-	<string>~/appledoc</string>
+        <string>/tmp/appledoc/delight.ios</string>
 	<key>--no-repeat-first-par</key>
 	<true/>
 	<key>--create-html</key>
