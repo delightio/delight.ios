@@ -163,7 +163,7 @@
 - (BOOL)setupWriter 
 {
     NSError *error = nil;
-    videoWriter = [[AVAssetWriter alloc] initWithURL:[self tempFileURL] fileType:AVFileTypeQuickTimeMovie error:&error];
+    videoWriter = [[AVAssetWriter alloc] initWithURL:[self tempFileURL] fileType:AVFileTypeMPEG4 error:&error];
     NSParameterAssert(videoWriter);
     
     NSMutableDictionary *videoCompressionProps = [NSMutableDictionary dictionaryWithObjectsAndKeys:
