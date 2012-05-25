@@ -62,7 +62,11 @@
 	[self.taskController.queue addOperation:postTask];
 	[postTask release];
 	
-	[self.recordingContext setTaskFinished:DLFinishedUploadVideoFile];
+	if ( [_trackName isEqualToString:@"screen_track"] ) {
+		[self.recordingContext setTaskFinished:DLFinishedUploadVideoFile];
+	} else if ( [_trackName isEqualToString:@"touch_track"] ) {
+		[self.recordingContext setTaskFinished:DLFinishedUploadTouchesFile];
+	}
 	// delete video file
 	NSError * err = nil;
 	NSString * fPath = [self.recordingContext.sourceFilePaths objectForKey:_trackName];
