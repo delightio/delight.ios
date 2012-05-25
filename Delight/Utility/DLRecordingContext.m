@@ -125,6 +125,7 @@
 			// this is a recording session. need to fulfill 3 upload tasks
 			[_finishedTaskIndex addIndex:DLFinishedPostVideo];
 			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
+			[_finishedTaskIndex addIndex:DLFinishedUploadTouchesFile];
 			[_finishedTaskIndex addIndex:DLFinishedUploadVideoFile];
 		} else {
 			// only upload the info
@@ -154,6 +155,7 @@
 	if ( _sourceFilePaths == nil ) {
 		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
 	}
+	[_finishedTaskIndex addIndex:DLFinishedUploadCameraFile];
 	[_sourceFilePaths setObject:aPath forKey:DLFrontTrackKey];
 }
 
