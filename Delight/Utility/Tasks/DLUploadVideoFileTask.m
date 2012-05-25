@@ -66,6 +66,8 @@
 		[self.recordingContext setTaskFinished:DLFinishedUploadVideoFile];
 	} else if ( [_trackName isEqualToString:@"touch_track"] ) {
 		[self.recordingContext setTaskFinished:DLFinishedUploadTouchesFile];
+	} else if ( [_trackName isEqualToString:@"orientation_track"] ) {
+		[self.recordingContext setTaskFinished:DLFinishedUploadOrientationFile];
 	}
 	// delete video file
 	NSError * err = nil;

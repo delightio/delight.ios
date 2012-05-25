@@ -114,6 +114,22 @@
 - (void)setTaskFinished:(DLFinishedTaskIdentifier)idfr {
 	@synchronized (self) {
 		[self.finishedTaskIndex removeIndex:idfr];
+		switch (idfr) {
+			case DLFinishedPostVideo:
+				[_sourceFilePaths removeObjectForKey:@"screen_track"];
+				break;
+				
+			case DLFinishedPostTouches:
+				[_sourceFilePaths removeObjectForKey:@"touch_track"];
+				break;
+				
+			case DLFinishedPostOrientation:
+				[_sourceFilePaths removeObjectForKey:@"orientation_track"];
+				break;
+				
+			default:
+				break;
+		}
 	}
 }
 
@@ -178,6 +194,7 @@
 	if ( _sourceFilePaths == nil ) {
 		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
 	}
+	[_finishedTaskIndex addIndex:DLFinishedUploadOrientationFile];
 	[_sourceFilePaths setObject:aPath forKey:DLOrientationTrackKey];
 }
 

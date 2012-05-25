@@ -15,7 +15,10 @@ typedef enum {
 	DLFinishedUploadVideoFile,
 	DLFinishedUploadCameraFile,
 	DLFinishedUploadTouchesFile,
-	DLFinishedPostVideo
+	DLFinishedUploadOrientationFile,
+	DLFinishedPostVideo,
+	DLFinishedPostTouches,
+	DLFinishedPostOrientation
 } DLFinishedTaskIdentifier;
 
 /*!

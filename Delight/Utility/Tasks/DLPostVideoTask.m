@@ -35,6 +35,13 @@
 //	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
 //	NSLog(@"posted video: %@", str);
 //	[str release];
+	if ( [_trackName isEqualToString:@"screen_track"] ) {
+		[self.recordingContext setTaskFinished:DLFinishedPostVideo];
+	} else if ( [_trackName isEqualToString:@"touch_track"] ) {
+		[self.recordingContext setTaskFinished:DLFinishedPostTouches];
+	} else if ( [_trackName isEqualToString:@"orientation_track"] ) {
+		[self.recordingContext setTaskFinished:DLFinishedPostOrientation];
+	}
 	[self.recordingContext setTaskFinished:DLFinishedPostVideo];
 	if ( [self.recordingContext allTasksFinished] ) {
 		DLLog(@"[Delight] recording uploaded, session: %@", self.recordingContext.sessionID);
