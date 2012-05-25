@@ -134,8 +134,9 @@
 	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
 	
 	if ( backgroundSupported ) {
-		UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+		bgTaskIdentifier = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			[self saveRecordingContext];
+			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];
 		}];
 		[self.queue addOperationWithBlock:^{
 			// save file touches file from session
@@ -143,7 +144,7 @@
             [self archiveOrientationChangesForSession:aSession];
 			// create tasks to upload
 			[self uploadSession:aSession];
-			[[UIApplication sharedApplication] endBackgroundTask:bgIdf];
+			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];
 		}];
 	} else {
 		// if the system does not support background processing, we have to save the touches in main thread.
@@ -222,6 +223,7 @@
 			// task expires. clean it up if it has not finished yet
 			[sessTask cancel];
 			[self saveRecordingContext];
+			[[UIApplication sharedApplication] endBackgroundTask:sessTask.backgroundTaskIdentifier];
 		}];
 		sessTask.taskController = self;
 		sessTask.backgroundTaskIdentifier = bgIdf;
@@ -242,6 +244,7 @@
 						// task expires. clean it up if it has not finished yet
 						[uploadTask cancel];
 						[self saveRecordingContext];
+						[[UIApplication sharedApplication] endBackgroundTask:uploadTask.backgroundTaskIdentifier];
 					}];
 					uploadTask.taskController = self;
 					uploadTask.backgroundTaskIdentifier = bgIdf;
@@ -259,6 +262,7 @@
 				// task expires. clean it up if it has not finished yet
 				[postTask cancel];
 				[self saveRecordingContext];
+				[[UIApplication sharedApplication] endBackgroundTask:postTask.backgroundTaskIdentifier];
 			}];
 			postTask.taskController = self;
 			postTask.backgroundTaskIdentifier = bgIdf;

@@ -22,6 +22,7 @@
 @interface DLTaskController : NSObject <NSURLConnectionDataDelegate> {
 	BOOL firstReachabilityNotificationReceived;
 	BOOL pendingRequestSessionForFirstReachabilityNotification;
+	UIBackgroundTaskIdentifier bgTaskIdentifier;
 }
 
 @property (nonatomic, retain) NSString * appToken;
