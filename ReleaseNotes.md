@@ -27,7 +27,7 @@ Changelog
 
 * Improved UIKit performance.
 
-* Made private views flash when receiving touch events.
+* Smoother gesture drawing.
 
 * Secure UITextFields are now automatically registered as private views.
 
