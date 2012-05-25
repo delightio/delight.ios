@@ -63,12 +63,13 @@
 	if ( _sessionDidEnd ) {
 		[self.recordingContext setTaskFinished:DLFinishedUpdateSession];
 		if ( [self.recordingContext allTasksFinished] ) {
-			// all tasks are done. end the background task
-			[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
-			self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+			// all tasks are done
 			// remove the task from incomplete array
 			[self.taskController removeRecordingContext:self.recordingContext];
 		}
+		// end the background task
+		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
+		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
 	} else {
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[self.taskController handleSessionTaskCompletion:self];

@@ -72,12 +72,13 @@
 	}
 	if ( [self.recordingContext allTasksFinished] ) {
 		DLLog(@"[Delight] recording uploaded, session: %@", self.recordingContext.sessionID);
-		// all tasks are done. end the background task
-		[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
-		self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+		// all tasks are done.
 		// remove the task from incomplete array
 		[self.taskController removeRecordingContext:self.recordingContext];
 	}
+	// end the background task
+	[[UIApplication sharedApplication] endBackgroundTask:self.backgroundTaskIdentifier];
+	self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
 }
 
 @end
