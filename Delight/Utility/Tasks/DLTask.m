@@ -113,7 +113,7 @@ NSString * const DLOrientationTrackKey = @"orientation_track";
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	NSLog(@"debug: %d\n%@", _httpResponse.statusCode, str);
+	DLDebugLog(@"debug: %d\n%@", _httpResponse.statusCode, str);
 	[str release];
 	// check if there's error
 	if ( ![self responseContainsError] ) {
