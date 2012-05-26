@@ -18,7 +18,7 @@
 - (void)drawLabelCenteredAt:(CGPoint)point inWindow:(UIWindow *)window inContext:(CGContextRef)context 
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
-- (void)hidePrivateViewsForWindow:(UIWindow *)window inContext:(CGContextRef)context;
+- (void)hidePrivateViews:(NSSet *)privateViews forWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
 @end
@@ -84,6 +84,8 @@
     // Clear the status bar since we don't draw over it
     CGContextClearRect(context, [[UIApplication sharedApplication] statusBarFrame]);
     
+    NSSet *privateViewsAtRenderTime = [[NSSet alloc] initWithSet:privateViews];
+    
     // Iterate over every window from back to front
     for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
         if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen]) {
@@ -106,19 +108,14 @@
                 // Draw the view hierarchy onto our context
                 [[window layer] renderInContext:context];
             }
-                        
-            // Draw the OpenGL view, if there is one
-            if (openGLImage && openGLView.window == window) {
-                CGContextDrawImage(context, openGLView.frame, [openGLImage CGImage]);
-                [openGLImage release]; openGLImage = nil;
-                [openGLView release]; openGLView = nil;
-            }
             
-            [self hidePrivateViewsForWindow:window inContext:context];
+            [self hidePrivateViews:privateViewsAtRenderTime forWindow:window inContext:context];
             
             CGContextRestoreGState(context);
         }
     }
+    
+    [privateViewsAtRenderTime release];
     
     if (hidesKeyboard) {
         [self hideKeyboardWindow:[self keyboardWindow] inContext:context];
@@ -238,7 +235,7 @@
     if (![privateViews containsObject:view]) {
         objc_setAssociatedObject(view, kDLDescriptionKey, description, OBJC_ASSOCIATION_RETAIN);
         [privateViews addObject:view];
-        DLDebugLog(@"Registered private view: %@", [view class]);
+        DLLog(@"[Delight] Registered private view: %@", [view class]);
     }
 }
 
@@ -247,7 +244,7 @@
     if ([privateViews containsObject:view]) {
         objc_setAssociatedObject(view, kDLDescriptionKey, nil, OBJC_ASSOCIATION_RETAIN);
         [privateViews removeObject:view];
-        DLDebugLog(@"Unregistered private view: %@", [view class]);
+        DLLog(@"[Delight] Unregistered private view: %@", [view class]);
     }
 }
 
@@ -332,10 +329,10 @@
     [labelSuperview release];    
 }
 
-- (void)hidePrivateViewsForWindow:(UIWindow *)window inContext:(CGContextRef)context
+- (void)hidePrivateViews:(NSSet *)views forWindow:(UIWindow *)window inContext:(CGContextRef)context
 {
     // Black out private views
-    for (UIView *view in privateViews) {
+    for (UIView *view in views) {
         NSString *description = objc_getAssociatedObject(view, kDLDescriptionKey);
 
         if ([view window] == window) {
