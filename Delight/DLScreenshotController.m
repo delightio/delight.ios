@@ -116,7 +116,9 @@
                                   -[window bounds].size.width * [[window layer] anchorPoint].x,
                                   -[window bounds].size.height * [[window layer] anchorPoint].y);
             
-            if (!hidesKeyboard || window != keyboardWindow) {
+            if (hidesKeyboard && window == keyboardWindow) {
+                [self hideKeyboardWindow:keyboardWindow inContext:context];
+            } else {
                 // Draw the view hierarchy onto our context
                 [[window layer] renderInContext:context];
             }
@@ -128,10 +130,6 @@
     }
     
     [privateFramesAtRenderTime release];
-    
-    if (hidesKeyboard) {
-        [self hideKeyboardWindow:[self keyboardWindow] inContext:context];
-    }
     
     // Retrieve the screenshot image
     CGImageRef cgImage = CGBitmapContextCreateImage(context);
