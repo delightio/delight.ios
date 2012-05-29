@@ -116,9 +116,7 @@
                                   -[window bounds].size.width * [[window layer] anchorPoint].x,
                                   -[window bounds].size.height * [[window layer] anchorPoint].y);
             
-            if (hidesKeyboard && window == keyboardWindow) {
-                [self hideKeyboardWindow:keyboardWindow inContext:context];
-            } else {
+            if (!hidesKeyboard || window != keyboardWindow) {
                 // Draw the view hierarchy onto our context
                 [[window layer] renderInContext:context];
             }
@@ -126,6 +124,10 @@
             [self hidePrivateFrames:privateFramesAtRenderTime forWindow:window inContext:context];
             
             CGContextRestoreGState(context);
+            
+            if (hidesKeyboard && window == keyboardWindow) {
+                [self hideKeyboardWindow:keyboardWindow inContext:context];
+            }
         }
     }
     
