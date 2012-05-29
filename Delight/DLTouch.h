@@ -19,8 +19,9 @@
 @property (nonatomic, assign) NSTimeInterval timeInSession;
 @property (nonatomic, assign) NSUInteger sequenceNum;
 @property (nonatomic, assign) NSUInteger tapCount;
+@property (nonatomic, assign, getter=isInPrivateView) BOOL inPrivateView;
 
-- (id)initWithSequence:(NSUInteger)seqNum location:(CGPoint)aLocation previousLocation:(CGPoint)prevLoc phase:(UITouchPhase)aPhase tapCount:(NSUInteger)aCount timeInSession:(NSTimeInterval)aTimeInSession;
+- (id)initWithSequence:(NSUInteger)seqNum location:(CGPoint)aLocation previousLocation:(CGPoint)prevLoc phase:(UITouchPhase)aPhase tapCount:(NSUInteger)aCount timeInSession:(NSTimeInterval)aTimeInSession inPrivateView:(BOOL)inPrivateView;
 - (NSDictionary *)dictionaryRepresentation;
 
 @end

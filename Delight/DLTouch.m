@@ -16,8 +16,9 @@
 @synthesize timeInSession = _timeInSession;
 @synthesize sequenceNum = _sequenceNum;
 @synthesize tapCount = _tapCount;
+@synthesize inPrivateView = _inPrivateView;
 
-- (id)initWithSequence:(NSUInteger)seqNum location:(CGPoint)aLocation previousLocation:(CGPoint)prevLoc phase:(UITouchPhase)aPhase tapCount:(NSUInteger)aCount timeInSession:(NSTimeInterval)aTimeInSession
+- (id)initWithSequence:(NSUInteger)seqNum location:(CGPoint)aLocation previousLocation:(CGPoint)prevLoc phase:(UITouchPhase)aPhase tapCount:(NSUInteger)aCount timeInSession:(NSTimeInterval)aTimeInSession inPrivateView:(BOOL)isInPrivateView
 {
     self = [super init];
     if (self) {
@@ -27,12 +28,18 @@
         _timeInSession = aTimeInSession;
 		_sequenceNum = seqNum;
 		_tapCount = aCount;
+        _inPrivateView = isInPrivateView;
     }
     return self;
 }
 
 - (NSDictionary *)dictionaryRepresentation {
-	return [NSDictionary dictionaryWithObjectsAndKeys:NSStringFromCGPoint(_location), @"curLoc", NSStringFromCGPoint(_previousLocation), @"prevLoc", [NSNumber numberWithInteger:_phase], @"phase", [NSNumber numberWithDouble:_timeInSession], @"time", [NSNumber numberWithUnsignedInteger:_sequenceNum], @"seq", [NSNumber numberWithUnsignedInteger:_tapCount], @"tapCount", nil];
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:NSStringFromCGPoint(_location), @"curLoc", NSStringFromCGPoint(_previousLocation), @"prevLoc", [NSNumber numberWithInteger:_phase], @"phase", [NSNumber numberWithDouble:_timeInSession], @"time", [NSNumber numberWithUnsignedInteger:_sequenceNum], @"seq", [NSNumber numberWithUnsignedInteger:_tapCount], @"tapCount", nil];
+    if (_inPrivateView) {
+        [dictionary setObject:[NSNumber numberWithBool:_inPrivateView] forKey:@"private"];
+    }
+    
+    return dictionary;
 }
 
 - (NSString *)description
