@@ -339,12 +339,13 @@
     } else {
 		++eventSequenceLog;
         for (UITouch *touch in [event allTouches]) {
+			CGRect privateViewFrame;
 			CGPoint location = [touch locationInView:touchView];
-			BOOL touchIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location privateViewFrame:NULL];
+            BOOL touchIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location privateViewFrame:&privateViewFrame];
             
-            DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView];
+            DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView privateViewFrame:privateViewFrame];
             [touches addObject:ourTouch];
-            [ourTouch release];
+            [ourTouch release];            
         }
     }
 }

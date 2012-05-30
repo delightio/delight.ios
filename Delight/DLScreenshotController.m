@@ -392,6 +392,9 @@
         }
     }
 
+    if (frame) {
+        *frame = CGRectZero;
+    }
     return NO;
 }
 
