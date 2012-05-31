@@ -11,7 +11,6 @@
 #import <sys/utsname.h>
 #import "Delight.h"
 
-NSString * const DLAppSessionElementName = @"app_session";
 NSString * const DLUploadURIElementName = @"upload_uris";
 NSString * const DLWifiOnlyElementName = @"uploading_on_wifi_only";
 NSString * const DLIDElementName = @"id";
@@ -20,6 +19,10 @@ NSString * const DLScaleFactorElementName = @"scale_factor";
 NSString * const DLMaximumFrameRateElementName = @"maximum_frame_rate";
 NSString * const DLAverageBitRateElementName = @"average_bit_rate";
 NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_interval";
+
+@interface DLGetNewSessionTask ()
+- (NSString *)parameterStringForProperties:(NSDictionary *)properties;
+@end
 
 @implementation DLGetNewSessionTask
 @synthesize contentOfCurrentProperty = _contentOfCurrentProperty;
@@ -30,7 +33,7 @@ NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_inte
 }
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"https://%@/app_sessions.xml", DL_BASE_URL];
+	NSString * urlStr = [NSString stringWithFormat:@"https://%@/%@s.xml", DL_BASE_URL, self.taskController.sessionObjectName];
 	// check build and version number
 	NSDictionary * dict = [[NSBundle mainBundle] infoDictionary];
 	NSString * buildVer = [dict objectForKey:(NSString *)kCFBundleVersionKey];
@@ -45,7 +48,15 @@ NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_inte
 	uname(&systemInfo);
 	
 	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
-	NSString * paramStr = [NSString stringWithFormat:@"app_session[app_version]=%@&app_session[app_build]=%@&app_session[app_locale]=%@&app_session[app_connectivity]=%@&app_session[delight_version]=2.0&app_session[device_hw_version]=%@&app_session[device_os_version]=%@", dotVer, buildVer, [[NSLocale currentLocale] localeIdentifier], self.taskController.networkStatusString, machineName, theDevice.systemVersion];
+	NSString * paramStr = [self parameterStringForProperties:[NSDictionary dictionaryWithObjectsAndKeys:dotVer, @"app_version", 
+                                                              buildVer, @"app_build",
+                                                              [[NSLocale currentLocale] localeIdentifier], @"app_locale",
+                                                              self.taskController.networkStatusString, @"app_connectivity",
+                                                              @"2.0", @"delight_version",
+                                                              machineName, @"device_hw_version", 
+                                                              theDevice.systemVersion, @"device_os_version",
+                                                              nil]];
+    
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
@@ -68,7 +79,7 @@ NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_inte
 
 #pragma mark XML parsing delegate
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
-	if ( [elementName isEqualToString:DLAppSessionElementName] ) {
+	if ( [elementName isEqualToString:self.taskController.sessionObjectName] ) {
 		// create a new session object
 		self.recordingContext = [[[DLRecordingContext alloc] init] autorelease];
 	} else if ( [elementName isEqualToString:DLUploadURIElementName] ) {
@@ -128,6 +139,15 @@ NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_inte
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.taskController handleSessionTaskCompletion:self];
 	});
+}
+
+- (NSString *)parameterStringForProperties:(NSDictionary *)properties
+{
+    NSMutableString *paramStr = [NSMutableString string];
+    for (NSString *propertyName in [properties allKeys]) {
+        [paramStr appendFormat:@"%@[%@]=%@&", self.taskController.sessionObjectName, propertyName, [properties objectForKey:propertyName]];
+    }
+    return [paramStr substringToIndex:[paramStr length] - 1];
 }
 
 @end

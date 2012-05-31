@@ -53,6 +53,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)startUsabilityTestWithAppToken:(NSString *)appToken;
 
 + (Delight *)sharedInstance;
+- (void)setAppToken:(NSString *)anAppToken;
 - (void)startRecording;
 - (void)stopRecording;
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
@@ -103,10 +104,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)startWithAppToken:(NSString *)appToken
 {
     Delight *delight = [self sharedInstance];
-    if (delight->appToken != appToken) {
-        [delight->appToken release];
-        delight->appToken = [appToken retain];
-    }
+    delight->taskController.sessionObjectName = @"app_session";
+    [delight setAppToken:appToken];
 	[delight tryCreateNewSession];
 }
 
@@ -123,7 +122,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     Delight *delight = [self sharedInstance];
     [delight setAutoCaptureEnabled:NO];
     delight->videoEncoder.encodesRawGLBytes = YES;
-    [self startWithAppToken:appToken];
+    delight->taskController.sessionObjectName = @"opengl_app_session";
+    [delight setAppToken:appToken];
+	[delight tryCreateNewSession];
 }
 
 + (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken
@@ -356,6 +357,14 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		recordingContext.touches = gestureTracker.touches;
         recordingContext.touchBounds = gestureTracker.touchView.bounds;
         recordingContext.orientationChanges = gestureTracker.orientationChanges;
+    }
+}
+
+- (void)setAppToken:(NSString *)anAppToken
+{
+    if (appToken != anAppToken) {
+        [appToken release];
+        appToken = [anAppToken retain];
     }
 }
 

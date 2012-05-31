@@ -40,6 +40,7 @@
 @synthesize containsIncompleteSessions = _containsIncompleteSessions;
 @synthesize wifiConnected = _wifiConnected;
 @synthesize networkStatusString;
+@synthesize sessionObjectName = _sessionObjectName;
 
 - (id)init {
 	self = [super init];
@@ -59,6 +60,7 @@
 	[_task release];
 	[_baseDirectory release];
 	[_appToken release];
+    [_sessionObjectName release];
 	[super dealloc];
 }
 
