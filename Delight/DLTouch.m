@@ -41,7 +41,6 @@
     
     if (_inPrivateView) {
         // Touches in private views: don't reveal the touch location, just send the private view frame
-        [dictionary setObject:[NSNumber numberWithBool:_inPrivateView] forKey:@"private"];
         [dictionary setObject:NSStringFromCGRect(_privateViewFrame) forKey:@"privateFrame"];
     } else {
         [dictionary setObject:NSStringFromCGPoint(_location) forKey:@"curLoc"];
