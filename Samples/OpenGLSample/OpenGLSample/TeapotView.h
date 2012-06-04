@@ -14,7 +14,7 @@
 	// The pixel dimensions of the backbuffer
 	GLint backingWidth;
 	GLint backingHeight;
-	
+    
 	EAGLContext *context;
 	
 	// OpenGL names for the renderbuffer and framebuffers used to render to this view
@@ -25,6 +25,9 @@
 
 	NSInteger animationFrameInterval;
 	CADisplayLink *displayLink;
+
+    GLfloat spinX, spinY;
+    GLfloat speedX, speedY;
 }
 
 @property (readonly, nonatomic, getter=isAnimating) BOOL animating;

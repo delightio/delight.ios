@@ -57,11 +57,21 @@
 		animating = FALSE;
 		animationFrameInterval = 1;
 		displayLink = nil;
-		
+        
 		[self setupView];
 	}
 	
 	return self;
+}
+
+- (void)dealloc
+{	
+	if ([EAGLContext currentContext] == context) {
+		[EAGLContext setCurrentContext:nil];
+	}
+	
+	[context release];
+	[super dealloc];
 }
 	
 - (void)setupView
@@ -112,28 +122,25 @@
 // Updates the OpenGL view
 - (void)drawView
 {
-	// Make sure that you are drawing to the current context
 	[EAGLContext setCurrentContext:context];
 		
 	glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-	//Setup model view matrix
+	// Setup model view matrix
 	glLoadIdentity();
 	glTranslatef(0.0, -0.1, -1.0);
 	glScalef(kTeapotScale, kTeapotScale, kTeapotScale);
 		
-    static GLfloat spinX = 0.0, spinY = 0.0;
-    glRotatef(spinX, 0.0, 0.0, 1.0);
-    glRotatef(spinY, 0.0, 1.0, 0.0);
-    glRotatef(90.0, 1.0, 0.0, 0.0);
-    spinX += 1.0;
-    spinY += 0.25;
-		
+    glRotatef(spinX, 0.0, -1.0, 0.0);
+    glRotatef(spinY, -cos(DEGREES_TO_RADIANS(spinX)), 0.0, sin(DEGREES_TO_RADIANS(spinX)));
+        
+    spinX += speedX / 4;
+    spinY += speedY / 4;
+    	
 	// Draw teapot. The new_teapot_indicies array is an RLE (run-length encoded) version of the teapot_indices array in teapot.h
-	for(int i = 0; i < num_teapot_indices; i += new_teapot_indicies[i] + 1)
-	{
+	for (int i = 0; i < num_teapot_indices; i += new_teapot_indicies[i] + 1) {
 		glDrawElements(GL_TRIANGLE_STRIP, new_teapot_indicies[i], GL_UNSIGNED_SHORT, &new_teapot_indicies[i+1]);
 	}
  
@@ -180,8 +187,7 @@
 	glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, backingWidth, backingHeight);
 	glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, depthRenderbuffer);
 
-	if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES)
-	{
+	if (glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES) {
 		NSLog(@"failed to make complete framebuffer object %x", glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES));
 		return NO;
 	}
@@ -197,8 +203,7 @@
 	glDeleteRenderbuffersOES(1, &viewRenderbuffer);
 	viewRenderbuffer = 0;
 	
-	if(depthRenderbuffer)
-	{
+	if (depthRenderbuffer) {
 		glDeleteRenderbuffersOES(1, &depthRenderbuffer);
 		depthRenderbuffer = 0;
 	}
@@ -217,12 +222,10 @@
 	// frame interval setting of one will fire 60 times a second when the display refreshes
 	// at 60 times a second. A frame interval setting of less than one results in undefined
 	// behavior.
-	if (frameInterval >= 1)
-	{
+	if (frameInterval >= 1) {
 		animationFrameInterval = frameInterval;
 		
-		if (animating)
-		{
+		if (animating) {
 			[self stopAnimation];
 			[self startAnimation];
 		}
@@ -231,8 +234,7 @@
 
 - (void)startAnimation
 {
-	if (!animating)
-	{
+	if (!animating) {
         displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(drawView)];
         [displayLink setFrameInterval:animationFrameInterval];
         [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
@@ -243,8 +245,7 @@
 
 - (void)stopAnimation
 {
-	if (animating)
-	{
+	if (animating) {
         [displayLink invalidate];
         displayLink = nil;
         
@@ -252,15 +253,17 @@
 	}
 }
 
-- (void)dealloc
-{	
-	if ([EAGLContext currentContext] == context)
-	{
-		[EAGLContext setCurrentContext:nil];
-	}
-	
-	[context release];
-	[super dealloc];
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInView:self];    
+    CGPoint lastLoc = [touch previousLocationInView:self];
+    
+    speedX = (lastLoc.x - location.x);
+    speedY = (lastLoc.y - location.y);
+    
+    spinX += speedX;
+    spinY += speedY;
 }
 
 @end
