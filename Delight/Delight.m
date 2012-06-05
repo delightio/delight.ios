@@ -88,6 +88,7 @@ typedef enum {
     NSString *appToken;
     DLAnnotation annotation;
     BOOL autoCaptureEnabled;
+	BOOL delaySessionUploadForCamera;
     CGFloat scaleFactor;
     NSUInteger maximumFrameRate;
     NSTimeInterval maximumRecordingDuration;
@@ -349,6 +350,7 @@ typedef enum {
 - (void)stopRecording 
 {
     if (cameraManager.recording) {
+		delaySessionUploadForCamera = YES;
         [cameraManager stopRecording];
     }
     
@@ -516,7 +518,9 @@ typedef enum {
     recordingContext.endTime = [NSDate date];
 	recordingContext.userProperties = userProperties;
     recordingContext.metrics = metrics;
-	[taskController prepareSessionUpload:recordingContext];
+	if ( delaySessionUploadForCamera ) {
+		[taskController prepareSessionUpload:recordingContext];
+	}
 #endif
     
     appInBackground = YES;
@@ -540,7 +544,9 @@ typedef enum {
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
 			recordingContext.userProperties = userProperties;
             recordingContext.metrics = metrics;
-            [taskController prepareSessionUpload:recordingContext];
+			if ( delaySessionUploadForCamera ) {
+				[taskController prepareSessionUpload:recordingContext];
+			}
             [self tryCreateNewSession];
         }
     }
@@ -571,6 +577,10 @@ typedef enum {
 
 - (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
 {
+	if ( delaySessionUploadForCamera ) {
+		delaySessionUploadForCamera = NO;
+		[taskController prepareSessionUpload:recordingContext];
+	}
     DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
 }
 
