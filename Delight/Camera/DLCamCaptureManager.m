@@ -163,7 +163,6 @@
     
     if (audioDevice && !cameraDevice && !audioOnly) {
         DLLog(@"[Delight] No front-facing camera available. Only audio will be captured.");
-        self.audioOnly = YES;
     } if (!cameraDevice && !audioDevice) {
         DLLog(@"[Delight] No front-facing camera or microphone available.");
         return NO;
@@ -313,11 +312,7 @@
         }
     }
     
-    if (audioOnly || !savesToPhotoAlbum) {
-        if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
-            [[self delegate] captureManagerRecordingFinished:self];
-        }
-    } else {
+    if (videoInput && savesToPhotoAlbum) {
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
         [library writeVideoAtPathToSavedPhotosAlbum:outputFileURL
                                     completionBlock:^(NSURL *assetURL, NSError *error) {
@@ -336,6 +331,10 @@
                                         }
                                     }];
         [library release];
+    } else {
+        if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
+            [[self delegate] captureManagerRecordingFinished:self];
+        }
     }
 }
 
