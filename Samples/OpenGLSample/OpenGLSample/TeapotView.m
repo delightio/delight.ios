@@ -88,7 +88,7 @@
 							fieldOfView = 60.0;
 	GLfloat					size;
 	
-	//Configure OpenGL lighting
+	// Configure OpenGL lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
@@ -101,21 +101,24 @@
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 		
-	//Configure OpenGL arrays
+	// Configure OpenGL arrays
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glVertexPointer(3 ,GL_FLOAT, 0, teapot_vertices);
 	glNormalPointer(GL_FLOAT, 0, teapot_normals);
 	glEnable(GL_NORMALIZE);
 
-	//Set the OpenGL projection matrix
+	// Set the OpenGL projection matrix
 	glMatrixMode(GL_PROJECTION);
 	size = zNear * tanf(DEGREES_TO_RADIANS(fieldOfView) / 2.0);
 	CGRect rect = self.bounds;
 	glFrustumf(-size, size, -size / (rect.size.width / rect.size.height), size / (rect.size.width / rect.size.height), zNear, zFar);
 	glViewport(0, 0, rect.size.width, rect.size.height);
-	
-	//Make the OpenGL modelview matrix the default
+    
+    glTranslatef(0.0, -0.1, -1.0);
+    glScalef(kTeapotScale, kTeapotScale, kTeapotScale);
+
+	// Make the OpenGL modelview matrix the default
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -127,18 +130,14 @@
 	glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-	// Setup model view matrix
-	glLoadIdentity();
-	glTranslatef(0.0, -0.1, -1.0);
-	glScalef(kTeapotScale, kTeapotScale, kTeapotScale);
-		
-    glRotatef(spinX, 0.0, -1.0, 0.0);
-    glRotatef(spinY, -cos(DEGREES_TO_RADIANS(spinX)), 0.0, sin(DEGREES_TO_RADIANS(spinX)));
+	
+    GLfloat matrix[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+    
+    glLoadIdentity();
+    glRotatef(angle, dy, dx, 0);    
+    glMultMatrixf(matrix);
         
-    spinX += speedX / 4;
-    spinY += speedY / 4;
-    	
 	// Draw teapot. The new_teapot_indicies array is an RLE (run-length encoded) version of the teapot_indices array in teapot.h
 	for (int i = 0; i < num_teapot_indices; i += new_teapot_indicies[i] + 1) {
 		glDrawElements(GL_TRIANGLE_STRIP, new_teapot_indicies[i], GL_UNSIGNED_SHORT, &new_teapot_indicies[i+1]);
@@ -253,17 +252,15 @@
 	}
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event 
 {
     UITouch *touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];    
-    CGPoint lastLoc = [touch previousLocationInView:self];
+    CGPoint location = [touch locationInView:self];
+    CGPoint oldLocation = [touch previousLocationInView:self];
     
-    speedX = (lastLoc.x - location.x);
-    speedY = (lastLoc.y - location.y);
-    
-    spinX += speedX;
-    spinY += speedY;
+    dx = (location.x - oldLocation.x) / 2.0;
+    dy = (location.y - oldLocation.y) / 2.0;
+    angle = 180.0 * sqrt(dx * dx + dy * dy) / self.bounds.size.width;
 }
 
 @end

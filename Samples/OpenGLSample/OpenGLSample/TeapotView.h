@@ -26,8 +26,7 @@
 	NSInteger animationFrameInterval;
 	CADisplayLink *displayLink;
 
-    GLfloat spinX, spinY;
-    GLfloat speedX, speedY;
+    GLfloat dx, dy, angle;
 }
 
 @property (readonly, nonatomic, getter=isAnimating) BOOL animating;
