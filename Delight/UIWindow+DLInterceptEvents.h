@@ -13,14 +13,8 @@
 @interface UIWindow (DLInterceptEvents)
 - (void)DLsetDelegate:(id<DLWindowDelegate>)delegate;
 - (void)DLsendEvent:(UIEvent *)event;
-- (void)DLmotionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event;
-@end
-
-@interface UIApplication (DLInterceptEvents)
-- (void)DLmotionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event;
 @end
 
 @protocol DLWindowDelegate <NSObject>
 - (void)window:(UIWindow *)window sendEvent:(UIEvent *)event;
-- (void)windowAccelerometerDidShake:(UIWindow *)window;
 @end

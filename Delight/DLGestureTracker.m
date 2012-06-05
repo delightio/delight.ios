@@ -350,11 +350,4 @@
     }
 }
 
-- (void)windowAccelerometerDidShake:(UIWindow *)window
-{
-    if ([delegate respondsToSelector:@selector(gestureTrackerDidShake:)]) {
-        [delegate gestureTrackerDidShake:self];
-    }
-}
-
 @end

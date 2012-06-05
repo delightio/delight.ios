@@ -28,7 +28,6 @@
 #define kDLMaximumSessionInactiveTime 60.0f*5
 
 #define kDLAlertViewTagStartUsabilityTest 1
-#define kDLAlertViewTagStopUsabilityTest 2
 #define kDLAlertViewDescriptionFieldTag 101
 
 static Delight *sharedInstance = nil;
@@ -44,16 +43,23 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
+typedef enum {
+    DLAnnotationNone,
+    DLAnnotationFrontVideoAndAudio,
+    DLAnnotationAudioOnly
+} DLAnnotation;
+
 @interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // Methods not yet ready for the public
++ (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
 + (void)startOpenGLWithAppToken:(NSString *)appToken;
-+ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken;
++ (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer;
 + (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-+ (void)startUsabilityTestWithAppToken:(NSString *)appToken;
 
 + (Delight *)sharedInstance;
 - (void)setAppToken:(NSString *)anAppToken;
+- (void)setAnnotation:(DLAnnotation)annotation;
 - (void)startRecording;
 - (void)stopRecording;
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
@@ -67,7 +73,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSTimeInterval lastScreenshotTime;
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
-    BOOL alertViewVisible;
     NSOperationQueue *screenshotQueue;
     NSLock *lock;
 
@@ -82,8 +87,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     // Configuration
     NSString *appToken;
-    BOOL recordsCamera;
-    BOOL usabilityTestEnabled;
+    DLAnnotation annotation;
     BOOL autoCaptureEnabled;
     CGFloat scaleFactor;
     NSUInteger maximumFrameRate;
@@ -103,36 +107,32 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)startWithAppToken:(NSString *)appToken
 {
-    Delight *delight = [self sharedInstance];
-    delight->taskController.sessionObjectName = @"app_session";
-    [delight setAppToken:appToken];
-	[delight tryCreateNewSession];
+    [self startWithAppToken:appToken annotation:DLAnnotationNone];
 }
 
-+ (void)startUsabilityTestWithAppToken:(NSString *)appToken
++ (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
     Delight *delight = [self sharedInstance];
-    delight->usabilityTestEnabled = YES;
-    [delight setRecordsCamera:YES];
-    [self startWithAppToken:appToken];
+    delight->taskController.sessionObjectName = @"app_session";
+    [delight setAnnotation:annotation];
+    [delight setAppToken:appToken];
+	[delight tryCreateNewSession];   
 }
 
 + (void)startOpenGLWithAppToken:(NSString *)appToken
+{
+    [self startOpenGLWithAppToken:appToken annotation:DLAnnotationNone];
+}
+
++ (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
     Delight *delight = [self sharedInstance];
     [delight setAutoCaptureEnabled:NO];
     delight->videoEncoder.encodesRawGLBytes = YES;
     delight->taskController.sessionObjectName = @"opengl_app_session";
+    [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
 	[delight tryCreateNewSession];
-}
-
-+ (void)startOpenGLUsabilityTestWithAppToken:(NSString *)appToken
-{
-    Delight *delight = [self sharedInstance];
-    delight->usabilityTestEnabled = YES;
-    [delight setRecordsCamera:YES];
-    [self startOpenGLWithAppToken:appToken];
 }
 
 + (void)stop
@@ -253,10 +253,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		taskController.sessionDelegate = self;
 		taskController.baseDirectory = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"com.pipely.delight"];
         
-        // Method swizzling to intercept touch/shake events
+        // Method swizzling to intercept touch events
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
-        Swizzle([UIWindow class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));
-        Swizzle([UIApplication class], @selector(motionEnded:withEvent:), @selector(DLmotionEnded:withEvent:));
         
         // Method swizzling to rewrite UIWebView layer rendering code to avoid crash
         Swizzle(NSClassFromString(@"TileHostLayer"), @selector(renderInContext:), @selector(DLrenderInContext:));
@@ -329,7 +327,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
         [videoEncoder startNewRecording];
         
-        if (recordsCamera) {
+        if (annotation != DLAnnotationNone) {    
+            if (!cameraManager) {
+                cameraManager = [[DLCamCaptureManager alloc] init];
+                cameraManager.delegate = self;
+            }
+
             cameraManager.outputPath = [NSString stringWithFormat:@"%@/%@_camera.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
             [cameraManager startRecording];
             recordingContext.cameraFilePath = cameraManager.outputPath;
@@ -391,25 +394,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
-- (void)setRecordsCamera:(BOOL)aRecordsCamera
+- (void)setAnnotation:(DLAnnotation)anAnnotation
 {
-    if (recordsCamera != aRecordsCamera) {
-        recordsCamera = aRecordsCamera;
-        
-        if (recordsCamera) {
-            cameraManager = [[DLCamCaptureManager alloc] init];
-            cameraManager.delegate = self;
-            if ([videoEncoder isRecording]) {
-                [cameraManager startRecording];
-            }
-        } else {
-            if ([cameraManager isRecording]) {
-                [cameraManager stopRecording];
-            }
-            [cameraManager release];
-            cameraManager = nil;
-        }
-    }
+    annotation = anAnnotation;
 }
 
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
@@ -491,9 +478,31 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
     [recordingContext release];
 	recordingContext = [ctx retain];
-	if (recordingContext.shouldRecordVideo && !usabilityTestEnabled) {
-		// start recording
-		[self startRecording];
+    
+	if (recordingContext.shouldRecordVideo) {
+        if (annotation == DLAnnotationNone) {
+            // Start recording immediately
+            [self startRecording];
+        } else {
+            // Show warning that user will be recorded
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
+                                                                message:@"Start usability test? Your face and voice may be recorded.\n\n\n"
+                                                               delegate:self
+                                                      cancelButtonTitle:@"Cancel"
+                                                      otherButtonTitles:@"Start", nil];
+            
+            UITextField *descriptionField = [[UITextField alloc] init];
+            descriptionField.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+            descriptionField.backgroundColor = [UIColor whiteColor];
+            descriptionField.placeholder = @"Description (Optional)";
+            descriptionField.tag = kDLAlertViewDescriptionFieldTag;
+            [alertView addSubview:descriptionField];
+            [descriptionField release];
+            
+            alertView.tag = kDLAlertViewTagStartUsabilityTest;        
+            [alertView show];
+            [alertView release];
+        }
 	} else {
 		// there's no need to record the session. Clean up video encoder?
 		recordingContext.startTime = [NSDate date];
@@ -579,44 +588,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return [screenshotController locationIsInPrivateView:location privateViewFrame:frame];
 }
 
-- (void)gestureTrackerDidShake:(DLGestureTracker *)gestureTracker
-{
-    if (usabilityTestEnabled && recordingContext.shouldRecordVideo && !alertViewVisible) {
-        if (![videoEncoder isRecording]) {
-            // Start usability test mode
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
-                                                                message:@"Start usability test?\n\n\n"
-                                                               delegate:self
-                                                      cancelButtonTitle:@"Cancel"
-                                                      otherButtonTitles:@"Start", nil];
-            
-            UITextField *descriptionField = [[UITextField alloc] init];
-            descriptionField.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-            descriptionField.backgroundColor = [UIColor whiteColor];
-            descriptionField.placeholder = @"Description (Optional)";
-            descriptionField.tag = kDLAlertViewDescriptionFieldTag;
-            [alertView addSubview:descriptionField];
-            [descriptionField release];
-
-            alertView.tag = kDLAlertViewTagStartUsabilityTest;        
-            [alertView show];
-            [alertView release];
-            alertViewVisible = YES;
-        } else {
-            // Stop usability test mode
-            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"delight.io"
-                                                                message:@"Stop usability test?"
-                                                               delegate:self
-                                                      cancelButtonTitle:@"Cancel"
-                                                      otherButtonTitles:@"Stop", nil];
-            alertView.tag = kDLAlertViewTagStopUsabilityTest;
-            [alertView show];
-            [alertView release];   
-            alertViewVisible = YES;
-        }
-    }
-}
-
 #pragma mark - UIAlertViewDelegate
 
 - (void)willPresentAlertView:(UIAlertView *)alertView
@@ -629,20 +600,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    alertViewVisible = NO;
-    
+{    
     switch (alertView.tag) {
         case kDLAlertViewTagStartUsabilityTest:
             if (buttonIndex == 1 && recordingContext.shouldRecordVideo) {
                 UITextField *descriptionField = (UITextField *)[alertView viewWithTag:kDLAlertViewDescriptionFieldTag];
                 recordingContext.usabilityTestDescription = descriptionField.text;
                 [self startRecording];
-            }
-            break;
-        case kDLAlertViewTagStopUsabilityTest:
-            if (buttonIndex == 1) {
-                [self stopRecording];
             }
             break;
         default:
