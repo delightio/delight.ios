@@ -48,7 +48,7 @@
 	return self;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [[self session] removeOutput:[self movieFileOutput]];
 	[session release];
@@ -57,24 +57,24 @@
     [super dealloc];
 }
 
--(BOOL)recordsVideo
+- (BOOL)recordsVideo
 {
 	AVCaptureConnection *videoConnection = [DLCamRecorder connectionWithMediaType:AVMediaTypeVideo fromConnections:[[self movieFileOutput] connections]];
 	return [videoConnection isActive];
 }
 
--(BOOL)recordsAudio
+- (BOOL)recordsAudio
 {
 	AVCaptureConnection *audioConnection = [DLCamRecorder connectionWithMediaType:AVMediaTypeAudio fromConnections:[[self movieFileOutput] connections]];
 	return [audioConnection isActive];
 }
 
--(BOOL)isRecording
+- (BOOL)isRecording
 {
     return [[self movieFileOutput] isRecording];
 }
 
--(void)startRecordingWithOrientation:(AVCaptureVideoOrientation)videoOrientation;
+- (void)startRecordingWithOrientation:(AVCaptureVideoOrientation)videoOrientation;
 {
     AVCaptureConnection *videoConnection = [DLCamRecorder connectionWithMediaType:AVMediaTypeVideo fromConnections:[[self movieFileOutput] connections]];
     if ([videoConnection isVideoOrientationSupported])

@@ -38,6 +38,8 @@
 @synthesize deviceDisconnectedObserver;
 @synthesize backgroundRecordingID;
 @synthesize recording;
+@synthesize audioOnly;
+@synthesize savesToPhotoAlbum;
 @synthesize outputPath;
 @synthesize delegate;
 
@@ -122,12 +124,12 @@
     [super dealloc];
 }
 
-- (void) startRecording
+- (void)startRecording
 {    
     [self setupSession];    
 }
 
-- (void) stopRecording
+- (void)stopRecording
 {
     [[self recorder] stopRecording];
     [[self session] stopRunning];
@@ -154,24 +156,29 @@
 
 @implementation DLCamCaptureManager (InternalUtilityMethods)
 
-- (BOOL) setupSession
+- (BOOL)setupSession
 {    
     AVCaptureDevice *cameraDevice = [self frontFacingCamera];
-    if (!cameraDevice) {
-        DLDebugLog(@"Front-facing camera not available. Camera will not be captured.");
+    AVCaptureDevice *audioDevice = [self audioDevice];
+    
+    if (audioDevice && !cameraDevice && !audioOnly) {
+        DLLog(@"[Delight] No front-facing camera available. Only audio will be captured.");
+        self.audioOnly = YES;
+    } if (!cameraDevice && !audioDevice) {
+        DLLog(@"[Delight] No front-facing camera or microphone available.");
         return NO;
     }
     
     // Init the device inputs
-    AVCaptureDeviceInput *newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:cameraDevice error:nil];
-    AVCaptureDeviceInput *newAudioInput = [[AVCaptureDeviceInput alloc] initWithDevice:[self audioDevice] error:nil];
+    AVCaptureDeviceInput *newVideoInput = (audioOnly ? nil : [[AVCaptureDeviceInput alloc] initWithDevice:cameraDevice error:nil]);
+    AVCaptureDeviceInput *newAudioInput = [[AVCaptureDeviceInput alloc] initWithDevice:audioDevice error:nil];
     
     // Create session
     AVCaptureSession *newCaptureSession = [[AVCaptureSession alloc] init];
     newCaptureSession.sessionPreset = AVCaptureSessionPresetLow;
     
     // Add inputs and output to the capture session
-    if ([newCaptureSession canAddInput:newVideoInput]) {
+    if (newVideoInput && [newCaptureSession canAddInput:newVideoInput]) {
         [newCaptureSession addInput:newVideoInput];
     }
     if ([newCaptureSession canAddInput:newAudioInput]) {
@@ -190,20 +197,6 @@
     NSURL *outputFileURL = [self tempFileURL];
     DLCamRecorder *newRecorder = [[DLCamRecorder alloc] initWithSession:[self session] outputFileURL:outputFileURL];
     [newRecorder setDelegate:self];
-	
-	// Send an error to the delegate if video recording is unavailable
-	if (![newRecorder recordsVideo] && [newRecorder recordsAudio]) {
-		NSString *localizedDescription = NSLocalizedString(@"Video recording unavailable", @"Video recording unavailable description");
-		NSString *localizedFailureReason = NSLocalizedString(@"Movies recorded on this device will only contain audio. They will be accessible through iTunes file sharing.", @"Video recording unavailable failure reason");
-		NSDictionary *errorDict = [NSDictionary dictionaryWithObjectsAndKeys:
-								   localizedDescription, NSLocalizedDescriptionKey, 
-								   localizedFailureReason, NSLocalizedFailureReasonErrorKey, 
-								   nil];
-		NSError *noVideoError = [NSError errorWithDomain:@"DLCam" code:0 userInfo:errorDict];
-		if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-			[[self delegate] captureManager:self didFailWithError:noVideoError];
-		}
-	}
 	
 	[self setRecorder:newRecorder];
     [newRecorder release];
@@ -304,14 +297,14 @@
 #pragma mark -
 @implementation DLCamCaptureManager (RecorderDelegate)
 
--(void)recorderRecordingDidBegin:(DLCamRecorder *)recorder
+- (void)recorderRecordingDidBegin:(DLCamRecorder *)recorder
 {
     if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingBegan:)]) {
         [[self delegate] captureManagerRecordingBegan:self];
     }
 }
 
--(void)recorder:(DLCamRecorder *)recorder recordingDidFinishToOutputFileURL:(NSURL *)outputFileURL error:(NSError *)error
+- (void)recorder:(DLCamRecorder *)recorder recordingDidFinishToOutputFileURL:(NSURL *)outputFileURL error:(NSError *)error
 {
     if (error && [error code] != -11818) {
         // Not the regular "recording stopped" "error"
@@ -320,24 +313,30 @@
         }
     }
     
-    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-    [library writeVideoAtPathToSavedPhotosAlbum:outputFileURL
-                                completionBlock:^(NSURL *assetURL, NSError *error) {
-                                    if (error) {
-                                        if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-                                            [[self delegate] captureManager:self didFailWithError:error];
-                                        }											
-                                    }
-                                    
-                                    if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
-                                        [[self delegate] captureManagerRecordingFinished:self];
-                                    }
-                                    
-                                    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-                                        [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
-                                    }
-                                }];
-    [library release];
+    if (audioOnly || !savesToPhotoAlbum) {
+        if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
+            [[self delegate] captureManagerRecordingFinished:self];
+        }
+    } else {
+        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+        [library writeVideoAtPathToSavedPhotosAlbum:outputFileURL
+                                    completionBlock:^(NSURL *assetURL, NSError *error) {
+                                        if (error) {
+                                            if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
+                                                [[self delegate] captureManager:self didFailWithError:error];
+                                            }											
+                                        }
+                                        
+                                        if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
+                                            [[self delegate] captureManagerRecordingFinished:self];
+                                        }
+                                        
+                                        if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+                                            [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
+                                        }
+                                    }];
+        [library release];
+    }
 }
 
 @end

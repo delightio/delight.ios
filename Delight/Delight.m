@@ -327,6 +327,8 @@ typedef enum {
         if (annotation != DLAnnotationNone) {    
             if (!cameraManager) {
                 cameraManager = [[DLCamCaptureManager alloc] init];
+                cameraManager.audioOnly = (annotation == DLAnnotationAudioOnly);
+                cameraManager.savesToPhotoAlbum = videoEncoder.savesToPhotoAlbum;
                 cameraManager.delegate = self;
             }
 
@@ -560,7 +562,11 @@ typedef enum {
 
 - (void)captureManagerRecordingBegan:(DLCamCaptureManager *)captureManager
 {
-    DLDebugLog(@"Began camera recording");
+    if (captureManager.audioOnly) {
+        DLDebugLog(@"Began microphone recording");
+    } else {
+        DLDebugLog(@"Began camera recording");
+    }
 }
 
 - (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
