@@ -115,7 +115,7 @@
 - (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
 	
-	if ( !firstReachabilityNotificationReceived ) {
+	if ( !firstReachabilityNotificationReceived || [_wifiReachability currentReachabilityStatus] == NotReachable ) {
 		// signal the flag to make a connection
 		pendingRequestSessionForFirstReachabilityNotification = YES;
 		self.appToken = aToken;

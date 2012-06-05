@@ -7,6 +7,7 @@
 
 #import "AccountsViewController.h"
 #import "Account.h"
+#import "PrivateRegionsViewController.h"
 #import <Delight/Delight.h>
 
 @implementation AccountsViewController
@@ -47,6 +48,7 @@
 
     self.title = @"Accounts";
     self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addAccount:)] autorelease];
+	self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(showPrivateTestView:)] autorelease];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -60,6 +62,12 @@
     addAccountViewController.delegate = self;
     [self.navigationController pushViewController:addAccountViewController animated:YES];
     [addAccountViewController release];
+}
+
+- (void)showPrivateTestView:(id)sender {
+	PrivateRegionsViewController * ctrl = [[PrivateRegionsViewController alloc] initWithNibName:@"PrivateRegionsViewController" bundle:nil];
+	[self.navigationController pushViewController:ctrl animated:YES];
+	[ctrl release];
 }
 
 #pragma mark - UITableViewDataSource
