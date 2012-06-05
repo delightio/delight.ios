@@ -74,7 +74,6 @@ typedef enum {
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
     NSOperationQueue *screenshotQueue;
-    NSLock *lock;
 
     // Helper classes
 	DLTaskController *taskController;
@@ -233,7 +232,6 @@ typedef enum {
         screenshotQueue = [[NSOperationQueue alloc] init];
         screenshotQueue.maxConcurrentOperationCount = 1;
 
-        lock = [[NSLock alloc] init];
         userProperties = [[NSMutableDictionary alloc] init];
         metrics = [[DLMetrics alloc] init];
         
@@ -280,7 +278,6 @@ typedef enum {
     [cameraManager release];
 	[screenshotQueue release];	
 	[taskController release];
-    [lock release];
     [userProperties release];
     [metrics release];
     
@@ -354,9 +351,8 @@ typedef enum {
     }
     
     if (videoEncoder.recording) {
-        [lock lock];
         [videoEncoder stopRecording];
-        [lock unlock];
+
 		recordingContext.touches = gestureTracker.touches;
         recordingContext.touchBounds = gestureTracker.touchView.bounds;
         recordingContext.orientationChanges = gestureTracker.orientationChanges;
@@ -428,11 +424,7 @@ typedef enum {
         [videoEncoder encodeRawBytesWithBackingWidth:backingWidth backingHeight:backingHeight];
     } else {
         UIImage *screenshot = [screenshotController screenshot];
-        [lock lock];
-        if (videoEncoder.recording) {
-            [videoEncoder writeFrameImage:screenshot];
-        }
-        [lock unlock];
+        [videoEncoder writeFrameImage:screenshot];
     }
         
     if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {

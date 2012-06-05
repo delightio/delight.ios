@@ -64,6 +64,7 @@
 
 - (void)stopRecording
 {
+    [lock lock];
     if (recording) {
         recording = NO;
         [self completeRecordingSession];
@@ -72,6 +73,7 @@
             UISaveVideoAtPathToSavedPhotosAlbum([self outputPath], nil, nil, nil);
         }
     }
+    [lock unlock];
 }
 
 - (void)writeFrameImage:(UIImage *)frameImage
@@ -226,7 +228,6 @@
         status = videoWriter.status;
     }
     
-    [lock lock];
     BOOL success = [videoWriter finishWriting];
     if (success) {
         DLDebugLog(@"Completed screen capture, file is stored at: %@", outputPath);
@@ -241,7 +242,6 @@
     }
         
     [self cleanupWriter];        
-    [lock unlock];
     
     [pool drain];
 }
