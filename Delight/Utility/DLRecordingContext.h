@@ -13,12 +13,13 @@
 typedef enum {
 	DLFinishedUpdateSession = 1,
 	DLFinishedUploadVideoFile,
-	DLFinishedUploadCameraFile,
+	DLFinishedUploadFrontCameraFile,
 	DLFinishedUploadTouchesFile,
 	DLFinishedUploadOrientationFile,
 	DLFinishedPostVideo,
 	DLFinishedPostTouches,
-	DLFinishedPostOrientation
+	DLFinishedPostOrientation,
+	DLFinishedPostFrontCamera,
 } DLFinishedTaskIdentifier;
 
 /*!

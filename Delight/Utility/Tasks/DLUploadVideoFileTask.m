@@ -68,6 +68,8 @@
 		[self.recordingContext setTaskFinished:DLFinishedUploadTouchesFile];
 	} else if ( [_trackName isEqualToString:@"orientation_track"] ) {
 		[self.recordingContext setTaskFinished:DLFinishedUploadOrientationFile];
+	} else if ( [_trackName isEqualToString:@"front_track"] ) {
+		[self.recordingContext setTaskFinished:DLFinishedUploadFrontCameraFile];
 	}
 	// delete video file
 	NSError * err = nil;

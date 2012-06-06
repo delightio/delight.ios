@@ -127,6 +127,10 @@
 				[_sourceFilePaths removeObjectForKey:@"orientation_track"];
 				break;
 				
+			case DLFinishedPostFrontCamera:
+				[_sourceFilePaths removeObjectForKey:@"front_track"];
+				break;
+				
 			default:
 				break;
 		}
@@ -138,11 +142,13 @@
 		// create the index set object
 		_finishedTaskIndex = [[NSMutableIndexSet alloc] init];
 		if ( _shouldRecordVideo ) {
+			
 			// this is a recording session. need to fulfill 3 upload tasks
-			[_finishedTaskIndex addIndex:DLFinishedPostVideo];
 			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
 			[_finishedTaskIndex addIndex:DLFinishedUploadTouchesFile];
 			[_finishedTaskIndex addIndex:DLFinishedUploadVideoFile];
+			[_finishedTaskIndex addIndex:DLFinishedPostVideo];
+			[_finishedTaskIndex addIndex:DLFinishedPostTouches];
 		} else {
 			// only upload the info
 			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
@@ -171,7 +177,7 @@
 	if ( _sourceFilePaths == nil ) {
 		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:4];
 	}
-	[_finishedTaskIndex addIndex:DLFinishedUploadCameraFile];
+	[_finishedTaskIndex addIndex:DLFinishedUploadFrontCameraFile];
 	[_sourceFilePaths setObject:aPath forKey:DLFrontTrackKey];
 }
 
