@@ -335,6 +335,10 @@
         if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
             [[self delegate] captureManagerRecordingFinished:self];
         }
+        
+        if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+            [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
+        }
     }
 }
 
