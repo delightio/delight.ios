@@ -133,7 +133,6 @@
 {
     [[self recorder] stopRecording];
     [[self session] stopRunning];
-    self.recorder = nil;
     self.session = nil;
     recording = NO;
 }
