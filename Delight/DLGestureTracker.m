@@ -143,7 +143,7 @@
     
     for (DLGesture *gesture in allGestures) {
         CGRect privateViewFrame;
-        BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue] privateViewFrame:&privateViewFrame];
+        BOOL startLocationIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:[[gesture.locations objectAtIndex:0] CGPointValue] inView:touchView privateViewFrame:&privateViewFrame];
 
         if (startLocationIsInPrivateView) {
             // Gesture is in a private view. Don't draw it, that could leak private information. Just flash the view it's in.
@@ -341,7 +341,7 @@
         for (UITouch *touch in [event allTouches]) {
 			CGRect privateViewFrame;
 			CGPoint location = [touch locationInView:touchView];
-            BOOL touchIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location privateViewFrame:&privateViewFrame];
+            BOOL touchIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location inView:touchView privateViewFrame:&privateViewFrame];
             
             DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView privateViewFrame:privateViewFrame];
             [touches addObject:ourTouch];

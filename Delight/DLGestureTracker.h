@@ -39,5 +39,5 @@
 @end
 
 @protocol DLGestureTrackerDelegate <NSObject>
-- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location privateViewFrame:(CGRect *)frame;
+- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location inView:(UIView *)view privateViewFrame:(CGRect *)frame;
 @end

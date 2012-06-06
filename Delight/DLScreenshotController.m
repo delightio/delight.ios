@@ -368,14 +368,12 @@
     }
 }
 
-- (BOOL)locationIsInPrivateView:(CGPoint)location privateViewFrame:(CGRect *)frame
-{
-    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
-    
+- (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)locationView privateViewFrame:(CGRect *)frame
+{    
     for (UIView *view in privateViews) {
-        CGRect frameInWindow = [view convertRect:view.bounds toView:keyWindow];
+        CGRect frameInWindow = [view convertRect:view.bounds toView:locationView];
             
-        if (CGRectContainsPoint(frameInWindow, location)) {
+        if (CGRectContainsPoint(frameInWindow, location) && view.superview && !view.hidden) {
             if (frame) {
                 *frame = frameInWindow;
             }

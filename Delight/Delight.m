@@ -604,9 +604,9 @@ typedef enum {
 
 #pragma mark - DLGestureTrackerDelegate
 
-- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location privateViewFrame:(CGRect *)frame
+- (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location inView:(UIView *)view privateViewFrame:(CGRect *)frame
 {
-    return [screenshotController locationIsInPrivateView:location privateViewFrame:frame];
+    return [screenshotController locationIsInPrivateView:location inView:view privateViewFrame:frame];
 }
 
 #pragma mark - UIAlertViewDelegate
