@@ -113,7 +113,12 @@ typedef enum {
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
     Delight *delight = [self sharedInstance];
-    delight->taskController.sessionObjectName = @"app_session";
+	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
+		delight->taskController.sessionObjectName = @"usability_app_session";
+	} else {
+		delight->taskController.sessionObjectName = @"app_session";
+	}
+	
     [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
 	[delight tryCreateNewSession];   
@@ -129,7 +134,11 @@ typedef enum {
     Delight *delight = [self sharedInstance];
     [delight setAutoCaptureEnabled:NO];
     delight->videoEncoder.encodesRawGLBytes = YES;
-    delight->taskController.sessionObjectName = @"opengl_app_session";
+	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
+		delight->taskController.sessionObjectName = @"opengl_usability_app_session";
+	} else {
+		delight->taskController.sessionObjectName = @"opengl_app_session";
+	}
     [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
 	[delight tryCreateNewSession];
