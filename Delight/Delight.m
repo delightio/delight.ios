@@ -89,6 +89,7 @@ typedef enum {
     DLAnnotation annotation;
     BOOL autoCaptureEnabled;
 	BOOL delaySessionUploadForCamera;
+	BOOL cameraDidStop;
     CGFloat scaleFactor;
     NSUInteger maximumFrameRate;
     NSTimeInterval maximumRecordingDuration;
@@ -359,7 +360,6 @@ typedef enum {
 - (void)stopRecording 
 {
     if (cameraManager.recording) {
-		delaySessionUploadForCamera = YES;
         [cameraManager stopRecording];
     }
     
@@ -527,7 +527,8 @@ typedef enum {
     recordingContext.endTime = [NSDate date];
 	recordingContext.userProperties = userProperties;
     recordingContext.metrics = metrics;
-	if ( delaySessionUploadForCamera ) {
+	if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
+		delaySessionUploadForCamera = NO;
 		[taskController prepareSessionUpload:recordingContext];
 	}
 #endif
@@ -553,7 +554,7 @@ typedef enum {
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
 			recordingContext.userProperties = userProperties;
             recordingContext.metrics = metrics;
-			if ( delaySessionUploadForCamera ) {
+			if ( !delaySessionUploadForCamera ) {
 				[taskController prepareSessionUpload:recordingContext];
 			}
             [self tryCreateNewSession];
@@ -577,6 +578,7 @@ typedef enum {
 
 - (void)captureManagerRecordingBegan:(DLCamCaptureManager *)captureManager
 {
+	delaySessionUploadForCamera = YES;
     if (captureManager.audioOnly) {
         DLDebugLog(@"Began microphone recording");
     } else {
@@ -586,9 +588,9 @@ typedef enum {
 
 - (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
 {
-	if ( delaySessionUploadForCamera ) {
-		delaySessionUploadForCamera = NO;
-		[taskController prepareSessionUpload:recordingContext];
+	cameraDidStop = YES;
+	if ( !delaySessionUploadForCamera ) {
+		[taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:recordingContext waitUntilDone:NO];
 	}
     DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
 }
