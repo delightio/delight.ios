@@ -554,7 +554,8 @@ typedef enum {
             recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
 			recordingContext.userProperties = userProperties;
             recordingContext.metrics = metrics;
-			if ( !delaySessionUploadForCamera ) {
+			if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
+				delaySessionUploadForCamera = NO;
 				[taskController prepareSessionUpload:recordingContext];
 			}
             [self tryCreateNewSession];
@@ -579,6 +580,7 @@ typedef enum {
 - (void)captureManagerRecordingBegan:(DLCamCaptureManager *)captureManager
 {
 	delaySessionUploadForCamera = YES;
+	cameraDidStop = NO;
     if (captureManager.audioOnly) {
         DLDebugLog(@"Began microphone recording");
     } else {
