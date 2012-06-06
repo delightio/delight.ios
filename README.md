@@ -64,6 +64,11 @@ Viewing Recordings
 
 Log in to your control panel at [delight.io](http://delight.io) to view your recordings. You can filter your recordings by version and build, as defined in your application's Info.plist file. If you have turned on [saving to Photo Album](#saving-to-photo-album) you may also view recordings by launching the Photos app on the device.
 
+App Development Frameworks
+--------------------------
+
+It is possible to integrate Delight with certain app development frameworks such as PhoneGap and Clutch.io. Please refer to the [developer documentation](http://delight.io/docs) for more information.
+
 Troubleshooting
 ---------------
 
