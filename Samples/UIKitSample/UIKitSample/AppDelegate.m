@@ -34,7 +34,7 @@
     [window makeKeyAndVisible];
 
     [Delight setDebugLogEnabled:YES];
-    [Delight startWithAppToken:@"c1dfc6ab03a1c3480668ae0615"];
+    [Delight startWithAppToken:@"Get your token at http://delight.io"];
     
     return YES;
 }
