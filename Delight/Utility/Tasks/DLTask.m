@@ -112,8 +112,8 @@ NSString * const DLOrientationTrackKey = @"orientation_track";
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-	[str release];
+//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+//	[str release];
 	// check if there's error
 	if ( ![self responseContainsError] ) {
 		DLDebugLog(@"[Delight] Received data from server successfully");
