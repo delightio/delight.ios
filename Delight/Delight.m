@@ -623,6 +623,7 @@ typedef enum {
             if (buttonIndex == 1 && recordingContext.shouldRecordVideo) {
                 UITextField *descriptionField = (UITextField *)[alertView viewWithTag:kDLAlertViewDescriptionFieldTag];
                 recordingContext.usabilityTestDescription = descriptionField.text;
+                [userProperties setObject:descriptionField.text forKey:@"description"];
                 [self startRecording];
             }
             break;
