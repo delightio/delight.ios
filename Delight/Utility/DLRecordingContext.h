@@ -55,6 +55,8 @@ typedef enum {
 @property (nonatomic, readonly) BOOL loadedFromArchive;
 @property (nonatomic, retain) DLMetrics *metrics;
 
+- (BOOL)shouldUploadFileForTrackName:(NSString *)trkName;
+- (BOOL)shouldPostTrackForName:(NSString *)trkName;
 - (BOOL)shouldCompleteTask:(DLFinishedTaskIdentifier)idfr;
 - (BOOL)allTasksFinished;
 - (void)setTaskFinished:(DLFinishedTaskIdentifier)idfr;
