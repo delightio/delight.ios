@@ -133,7 +133,6 @@
 {
     [[self recorder] stopRecording];
     [[self session] stopRunning];
-    self.recorder = nil;
     self.session = nil;
     recording = NO;
 }
@@ -334,6 +333,10 @@
     } else {
         if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
             [[self delegate] captureManagerRecordingFinished:self];
+        }
+        
+        if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+            [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
         }
     }
 }
