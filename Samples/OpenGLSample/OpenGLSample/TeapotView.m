@@ -148,7 +148,7 @@
     /******************************
      * Delight code inserted here *
      ******************************/
-    [Delight takeOpenGLScreenshot:self colorRenderbuffer:viewRenderbuffer];
+    [Delight takeOpenGLScreenshot:self];
     
 	[context presentRenderbuffer:GL_RENDERBUFFER_OES];
 }

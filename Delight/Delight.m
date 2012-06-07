@@ -52,10 +52,7 @@ typedef enum {
 @interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // Methods not yet ready for the public
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-+ (void)startOpenGLWithAppToken:(NSString *)appToken;
 + (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer;
-+ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 
 + (Delight *)sharedInstance;
 - (void)setAppToken:(NSString *)anAppToken;
@@ -153,16 +150,16 @@ typedef enum {
 
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer
 {
-    GLint backingWidth, backingHeight;
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderbuffer);
-    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
-    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
-
-    [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
+    [self takeOpenGLScreenshot:glView];
 }
 
-+ (void)takeOpenGLScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
++ (void)takeOpenGLScreenshot:(UIView *)glView
 {
+    GLint backingWidth, backingHeight;
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
+    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
+    
     [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
 }
 

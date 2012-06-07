@@ -41,6 +41,11 @@ You can attach arbitrary metadata to recordings by calling `[Delight setProperty
 
 By default, debug log statements from the delight.io framework are suppressed. To turn them on, call `[Delight setDebugLogEnabled:YES]`.
 
+OpenGL ES
+---------
+
+To record applications that use OpenGL ES, call `[Delight startOpenGLWithAppToken:]` instead of `[Delight startWithAppToken:]`. You must also call either `[Delight takeOpenGLScreenshot:]` or `[Delight takeOpenGLScreenshot:colorRenderbuffer:]` inside your render loop (after drawing but before `-[EAGLContext presentRenderbuffer:]`).
+
 Private Views
 -------------
 
