@@ -119,7 +119,7 @@ NSString * const DLMaximumRecordingDurationElementName = @"maximum_recording_dur
 	} else if ( [elementName isEqualToString:DLScaleFactorElementName] ) {
         self.recordingContext.scaleFactor = [_contentOfCurrentProperty floatValue];
     } else if ( [elementName isEqualToString:DLMaximumFrameRateElementName] ) {
-        self.recordingContext.maximumFrameRate = [_contentOfCurrentProperty integerValue];
+        self.recordingContext.maximumFrameRate = [_contentOfCurrentProperty doubleValue];
     } else if ( [elementName isEqualToString:DLAverageBitRateElementName] ) {
         self.recordingContext.averageBitRate = [_contentOfCurrentProperty doubleValue];
     } else if ( [elementName isEqualToString:DLMaximumKeyFrameIntervalElementName] ) {

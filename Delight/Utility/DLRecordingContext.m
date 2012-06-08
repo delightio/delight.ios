@@ -44,7 +44,7 @@
 	_shouldRecordVideo = [aDecoder decodeBoolForKey:@"shouldRecordVideo"];
 	_wifiUploadOnly = [aDecoder decodeBoolForKey:@"wifiUploadOnly"];
     _scaleFactor = [aDecoder decodeFloatForKey:@"scaleFactor"];
-    _maximumFrameRate = [aDecoder decodeIntegerForKey:@"maximumFrameRate"];
+    _maximumFrameRate = [aDecoder decodeDoubleForKey:@"maximumFrameRate"];
     _averageBitRate = [aDecoder decodeDoubleForKey:@"averageBitRate"];
     _maximumKeyFrameInterval = [aDecoder decodeIntegerForKey:@"maximumKeyFrameInterval"];
     _maximumRecordingDuration = [aDecoder decodeDoubleForKey:@"maximumRecordingDuration"];
@@ -70,7 +70,7 @@
 	[aCoder encodeBool:_shouldRecordVideo forKey:@"shouldRecordVideo"];
 	[aCoder encodeBool:_wifiUploadOnly forKey:@"wifiUploadOnly"];
     [aCoder encodeFloat:_scaleFactor forKey:@"scaleFactor"];
-    [aCoder encodeInteger:_maximumFrameRate forKey:@"maximumFrameRate"];
+    [aCoder encodeDouble:_maximumFrameRate forKey:@"maximumFrameRate"];
     [aCoder encodeDouble:_averageBitRate forKey:@"averageBitRate"];
     [aCoder encodeInt:_maximumKeyFrameInterval forKey:@"maximumKeyFrameInterval"];
     [aCoder encodeDouble:_maximumRecordingDuration forKey:@"maximumRecordingDuration"];

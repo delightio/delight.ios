@@ -88,7 +88,7 @@ typedef enum {
 	BOOL delaySessionUploadForCamera;
 	BOOL cameraDidStop;
     CGFloat scaleFactor;
-    NSUInteger maximumFrameRate;
+    double maximumFrameRate;
     NSTimeInterval maximumRecordingDuration;
     NSMutableDictionary *userProperties;
 }
@@ -317,15 +317,15 @@ typedef enum {
             // Set recording properties from server
             if (recordingContext.maximumFrameRate > 0) {
                 maximumFrameRate = recordingContext.maximumFrameRate;
-                DLDebugLog(@"Maximum frame rate: %i", recordingContext.maximumFrameRate);                
+                DLDebugLog(@"Maximum frame rate: %.2f", recordingContext.maximumFrameRate);                
             }
             if (recordingContext.scaleFactor > 0) {
                 [self setScaleFactor:recordingContext.scaleFactor];
-                DLDebugLog(@"Scale factor: %f", recordingContext.scaleFactor);
+                DLDebugLog(@"Scale factor: %.3f", recordingContext.scaleFactor);
             }
             if (recordingContext.averageBitRate > 0) {
                 videoEncoder.averageBitRate = recordingContext.averageBitRate;
-                DLDebugLog(@"Average bit rate: %f", recordingContext.averageBitRate);
+                DLDebugLog(@"Average bit rate: %.2f", recordingContext.averageBitRate);
             }
             if (recordingContext.maximumKeyFrameInterval > 0) {
                 videoEncoder.maximumKeyFrameInterval = recordingContext.maximumKeyFrameInterval;

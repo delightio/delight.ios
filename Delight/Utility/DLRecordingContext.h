@@ -37,7 +37,7 @@ typedef enum {
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic) float scaleFactor;
-@property (nonatomic) NSUInteger maximumFrameRate;
+@property (nonatomic) double maximumFrameRate;
 @property (nonatomic) double averageBitRate;
 @property (nonatomic) NSUInteger maximumKeyFrameInterval;
 @property (nonatomic) NSTimeInterval maximumRecordingDuration;
