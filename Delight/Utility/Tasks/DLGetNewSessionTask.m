@@ -19,7 +19,7 @@ NSString * const DLScaleFactorElementName = @"scale_factor";
 NSString * const DLMaximumFrameRateElementName = @"maximum_frame_rate";
 NSString * const DLAverageBitRateElementName = @"average_bit_rate";
 NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_interval";
-NSString * const DLMaximumRecordingDurationElementName = @"maximum_recording_duration";
+NSString * const DLMaximumRecordingDurationElementName = @"maximum_duration";
 
 @interface DLGetNewSessionTask ()
 - (NSString *)parameterStringForProperties:(NSDictionary *)properties;
