@@ -9,6 +9,7 @@
 #import "DLRecordingContext.h"
 #import "DLTask.h"
 #import "DLMetrics.h"
+#import "Delight.h"
 
 @implementation DLRecordingContext
 @synthesize sessionID = _sessionID;
@@ -104,17 +105,17 @@
 }
 
 - (BOOL)shouldPostTrackForName:(NSString *)trkName {
-	return ( [trkName isEqualToString:@"screen_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostVideo] ) ||
-	([trkName isEqualToString:@"touch_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostTouches] ) ||
-	([trkName isEqualToString:@"orientation_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostOrientation] ) ||
-	([trkName isEqualToString:@"front_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostFrontCamera] );
+	return ( [trkName isEqualToString:DLScreenTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostVideo] ) ||
+	([trkName isEqualToString:DLTouchTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostTouches] ) ||
+	([trkName isEqualToString:DLOrientationTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostOrientation] ) ||
+	([trkName isEqualToString:DLFrontTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostFrontCamera] );
 }
 
 - (BOOL)shouldUploadFileForTrackName:(NSString *)trkName {
-	return ( [trkName isEqualToString:@"screen_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadVideoFile] ) || 
-	([trkName isEqualToString:@"touch_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadTouchesFile] ) ||
-	([trkName isEqualToString:@"orientation_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadOrientationFile] ) ||
-	([trkName isEqualToString:@"front_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadFrontCameraFile] );
+	return ( [trkName isEqualToString:DLScreenTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadVideoFile] ) || 
+	([trkName isEqualToString:DLTouchTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadTouchesFile] ) ||
+	([trkName isEqualToString:DLOrientationTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadOrientationFile] ) ||
+	([trkName isEqualToString:DLFrontTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadFrontCameraFile] );
 }
 
 - (BOOL)allTasksFinished {
@@ -130,19 +131,19 @@
 		[self.finishedTaskIndex removeIndex:idfr];
 		switch (idfr) {
 			case DLFinishedPostVideo:
-				[_sourceFilePaths removeObjectForKey:@"screen_track"];
+				[_sourceFilePaths removeObjectForKey:DLScreenTrackKey];
 				break;
 				
 			case DLFinishedPostTouches:
-				[_sourceFilePaths removeObjectForKey:@"touch_track"];
+				[_sourceFilePaths removeObjectForKey:DLTouchTrackKey];
 				break;
 				
 			case DLFinishedPostOrientation:
-				[_sourceFilePaths removeObjectForKey:@"orientation_track"];
+				[_sourceFilePaths removeObjectForKey:DLOrientationTrackKey];
 				break;
 				
 			case DLFinishedPostFrontCamera:
-				[_sourceFilePaths removeObjectForKey:@"front_track"];
+				[_sourceFilePaths removeObjectForKey:DLFrontTrackKey];
 				break;
 				
 			default:
@@ -156,13 +157,18 @@
 		// create the index set object
 		_finishedTaskIndex = [[NSMutableIndexSet alloc] init];
 		if ( _shouldRecordVideo ) {
-			
 			// this is a recording session. need to fulfill 3 upload tasks
 			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
 			[_finishedTaskIndex addIndex:DLFinishedUploadTouchesFile];
 			[_finishedTaskIndex addIndex:DLFinishedUploadVideoFile];
+			[_finishedTaskIndex addIndex:DLFinishedUploadOrientationFile];
 			[_finishedTaskIndex addIndex:DLFinishedPostVideo];
 			[_finishedTaskIndex addIndex:DLFinishedPostTouches];
+			[_finishedTaskIndex addIndex:DLFinishedPostOrientation];
+			if ( [_sourceFilePaths objectForKey:DLFrontTrackKey] ) {
+				[_finishedTaskIndex addIndex:DLFinishedUploadFrontCameraFile];
+				[_finishedTaskIndex addIndex:DLFinishedPostFrontCamera];
+			}
 		} else {
 			// only upload the info
 			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
