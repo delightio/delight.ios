@@ -52,7 +52,7 @@ NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_inte
                                                               buildVer, @"app_build",
                                                               [[NSLocale currentLocale] localeIdentifier], @"app_locale",
                                                               self.taskController.networkStatusString, @"app_connectivity",
-                                                              @"2.0", @"delight_version",
+                                                              @"2.1.1", @"delight_version",
                                                               machineName, @"device_hw_version", 
                                                               theDevice.systemVersion, @"device_os_version",
                                                               nil]];
