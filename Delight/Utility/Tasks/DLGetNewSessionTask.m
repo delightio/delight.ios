@@ -19,6 +19,7 @@ NSString * const DLScaleFactorElementName = @"scale_factor";
 NSString * const DLMaximumFrameRateElementName = @"maximum_frame_rate";
 NSString * const DLAverageBitRateElementName = @"average_bit_rate";
 NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_interval";
+NSString * const DLMaximumRecordingDurationElementName = @"maximum_recording_duration";
 
 @interface DLGetNewSessionTask ()
 - (NSString *)parameterStringForProperties:(NSDictionary *)properties;
@@ -123,6 +124,8 @@ NSString * const DLMaximumKeyFrameIntervalElementName = @"maximum_key_frame_inte
         self.recordingContext.averageBitRate = [_contentOfCurrentProperty doubleValue];
     } else if ( [elementName isEqualToString:DLMaximumKeyFrameIntervalElementName] ) {
         self.recordingContext.maximumKeyFrameInterval = [_contentOfCurrentProperty integerValue];
+    } else if ( [elementName isEqualToString:DLMaximumRecordingDurationElementName] ) {
+        self.recordingContext.maximumRecordingDuration = [_contentOfCurrentProperty doubleValue];
     }
     
 	self.contentOfCurrentProperty = nil;

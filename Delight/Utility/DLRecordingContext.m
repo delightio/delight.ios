@@ -24,6 +24,7 @@
 @synthesize maximumFrameRate = _maximumFrameRate;
 @synthesize averageBitRate = _averageBitRate;
 @synthesize maximumKeyFrameInterval = _maximumKeyFrameInterval;
+@synthesize maximumRecordingDuration = _maximumRecordingDuration;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize chunkSize = _chunkSize;
@@ -46,6 +47,7 @@
     _maximumFrameRate = [aDecoder decodeIntegerForKey:@"maximumFrameRate"];
     _averageBitRate = [aDecoder decodeDoubleForKey:@"averageBitRate"];
     _maximumKeyFrameInterval = [aDecoder decodeIntegerForKey:@"maximumKeyFrameInterval"];
+    _maximumRecordingDuration = [aDecoder decodeDoubleForKey:@"maximumRecordingDuration"];
 	self.startTime = [aDecoder decodeObjectForKey:@"startTime"];
 	self.endTime = [aDecoder decodeObjectForKey:@"endTime"];
 	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
@@ -71,6 +73,7 @@
     [aCoder encodeInteger:_maximumFrameRate forKey:@"maximumFrameRate"];
     [aCoder encodeDouble:_averageBitRate forKey:@"averageBitRate"];
     [aCoder encodeInt:_maximumKeyFrameInterval forKey:@"maximumKeyFrameInterval"];
+    [aCoder encodeDouble:_maximumRecordingDuration forKey:@"maximumRecordingDuration"];
 	[aCoder encodeObject:_startTime forKey:@"startTime"];
 	[aCoder encodeObject:_endTime forKey:@"endTime"];
 	[aCoder encodeInteger:_chunkSize forKey:@"chunkSize"];

@@ -317,15 +317,23 @@ typedef enum {
             // Set recording properties from server
             if (recordingContext.maximumFrameRate > 0) {
                 maximumFrameRate = recordingContext.maximumFrameRate;
+                DLDebugLog(@"Maximum frame rate: %i", recordingContext.maximumFrameRate);                
             }
             if (recordingContext.scaleFactor > 0) {
                 [self setScaleFactor:recordingContext.scaleFactor];
+                DLDebugLog(@"Scale factor: %f", recordingContext.scaleFactor);
             }
             if (recordingContext.averageBitRate > 0) {
                 videoEncoder.averageBitRate = recordingContext.averageBitRate;
+                DLDebugLog(@"Average bit rate: %f", recordingContext.averageBitRate);
             }
             if (recordingContext.maximumKeyFrameInterval > 0) {
                 videoEncoder.maximumKeyFrameInterval = recordingContext.maximumKeyFrameInterval;
+                DLDebugLog(@"Maximum keyframe interval: %i", recordingContext.maximumKeyFrameInterval);
+            }
+            if (recordingContext.maximumRecordingDuration > 0) {
+                maximumRecordingDuration = recordingContext.maximumRecordingDuration;
+                DLDebugLog(@"Maximum recording duration: %.1f", recordingContext.maximumRecordingDuration);
             }
         }
         

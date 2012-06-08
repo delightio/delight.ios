@@ -40,6 +40,7 @@ typedef enum {
 @property (nonatomic) NSUInteger maximumFrameRate;
 @property (nonatomic) double averageBitRate;
 @property (nonatomic) NSUInteger maximumKeyFrameInterval;
+@property (nonatomic) NSTimeInterval maximumRecordingDuration;
 @property (nonatomic, retain) NSDate * startTime;
 @property (nonatomic, retain) NSDate * endTime;
 @property (nonatomic) NSInteger chunkSize;
