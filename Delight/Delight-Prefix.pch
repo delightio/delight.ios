@@ -12,6 +12,11 @@
     #else
         #define DLDebugLog(format, args...)
     #endif
-#define DLLog(format, args...) if ( __DL_ENABLE_DEBUG_LOG ) NSLog(format, ## args)
-extern BOOL __DL_ENABLE_DEBUG_LOG;
+    
+    #define DLLog(format, args...) if ( __DL_ENABLE_DEBUG_LOG ) NSLog(format, ## args)
+    extern BOOL __DL_ENABLE_DEBUG_LOG;
+
+    // Don't edit the next line, change the value in Delight-Info.plist instead
+    #define DELIGHT_VERSION @"2.1.1"
+
 #endif

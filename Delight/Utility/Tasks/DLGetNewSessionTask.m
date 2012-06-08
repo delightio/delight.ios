@@ -53,11 +53,11 @@ NSString * const DLMaximumRecordingDurationElementName = @"maximum_duration";
                                                               buildVer, @"app_build",
                                                               [[NSLocale currentLocale] localeIdentifier], @"app_locale",
                                                               self.taskController.networkStatusString, @"app_connectivity",
-                                                              @"2.1.1", @"delight_version",
+                                                              DELIGHT_VERSION, @"delight_version",
                                                               machineName, @"device_hw_version", 
                                                               theDevice.systemVersion, @"device_os_version",
                                                               nil]];
-    
+
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
