@@ -90,7 +90,7 @@
         int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &pixelBuffer);
         if(status != 0){
             //could not get a buffer from the pool
-            DLDebugLog(@"Error creating pixel buffer:  status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+            DLLog(@"Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
         } else {
             // set image data into pixel buffer
             CVPixelBufferLockBaseAddress(pixelBuffer, 0);
@@ -143,7 +143,7 @@
     
     CMTime time = [self currentFrameTime];
     if (![avAdaptor appendPixelBuffer:pixel_buffer withPresentationTime:time]){
-        NSLog(@"Problem appending pixel buffer at time: %lld", time.value);
+        DLLog(@"[Delight] Problem appending pixel buffer at time: %lld", time.value);
     } 
     
     CVPixelBufferUnlockBaseAddress(pixel_buffer, 0);

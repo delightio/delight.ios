@@ -237,9 +237,9 @@
 		// check to see if each track has been uploaded
 		NSDictionary * theTracks = ctx.tracks;
 		for (NSString * theKey in theTracks) {
-			NSLog(@"checking track: %@", theKey);
+			DLDebugLog(@"checking track: %@", theKey);
 			if ( [ctx shouldUploadFileForTrackName:theKey] ) {
-				NSLog(@"uploading track: %@", theKey);
+				DLDebugLog(@"uploading track: %@", theKey);
 				// we haven't uploaded this track
 				NSDictionary * curTrack = [theTracks objectForKey:theKey];
 				if ( [ctx.sourceFilePaths objectForKey:theKey] && [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
