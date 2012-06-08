@@ -305,6 +305,10 @@
 {
     UIWindow *window = [notification object];
     [window DLsetDelegate:self];
+    
+    if (!touchView) {
+        self.touchView = window;
+    }
 }
 
 - (void)handleWindowDidBecomeHiddenNotification:(NSNotification *)notification
