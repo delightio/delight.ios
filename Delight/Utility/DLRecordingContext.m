@@ -103,6 +103,20 @@
 	return flag;
 }
 
+- (BOOL)shouldPostTrackForName:(NSString *)trkName {
+	return ( [trkName isEqualToString:@"screen_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostVideo] ) ||
+	([trkName isEqualToString:@"touch_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostTouches] ) ||
+	([trkName isEqualToString:@"orientation_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostOrientation] ) ||
+	([trkName isEqualToString:@"front_track"] && [_finishedTaskIndex containsIndex:DLFinishedPostFrontCamera] );
+}
+
+- (BOOL)shouldUploadFileForTrackName:(NSString *)trkName {
+	return ( [trkName isEqualToString:@"screen_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadVideoFile] ) || 
+	([trkName isEqualToString:@"touch_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadTouchesFile] ) ||
+	([trkName isEqualToString:@"orientation_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadOrientationFile] ) ||
+	([trkName isEqualToString:@"front_track"] && [_finishedTaskIndex containsIndex:DLFinishedUploadFrontCameraFile] );
+}
+
 - (BOOL)allTasksFinished {
 	BOOL val;
 	@synchronized (self) {

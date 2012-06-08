@@ -234,10 +234,11 @@
 		[sessTask release];
 	}
 	if ( ctx.shouldRecordVideo && (!ctx.wifiUploadOnly || (_wifiConnected && ctx.wifiUploadOnly)) ) {
-		if ( [ctx shouldCompleteTask:DLFinishedUploadVideoFile] ) {
-			// check if the link has expired
-			NSDictionary * theTracks = ctx.tracks;
-			for (NSString * theKey in theTracks) {
+		// check to see if each track has been uploaded
+		NSDictionary * theTracks = ctx.tracks;
+		for (NSString * theKey in theTracks) {
+			if ( [ctx shouldUploadFileForTrackName:theKey] ) {
+				// we haven't uploaded this track
 				NSDictionary * curTrack = [theTracks objectForKey:theKey];
 				if ( [ctx.sourceFilePaths objectForKey:theKey] && [[curTrack objectForKey:DLTrackExpiryDateKey] timeIntervalSinceNow] > 5.0 ) {
 					// uplaod URL is still valid. Continue to upload
@@ -257,20 +258,21 @@
 					// renew the upload URL
 					[self renewUploadURLForSession:ctx wtihTrack:theKey];
 				}
+			} else if ( [ctx shouldPostTrackForName:theKey] ) {
+				// we haven't posted the upload status to our server yet
+				DLPostVideoTask * postTask = [[DLPostVideoTask alloc] initWithTrack:nil appToken:_appToken];
+				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+					// task expires. clean it up if it has not finished yet
+					[postTask cancel];
+					[self saveRecordingContext];
+					[[UIApplication sharedApplication] endBackgroundTask:postTask.backgroundTaskIdentifier];
+				}];
+				postTask.taskController = self;
+				postTask.backgroundTaskIdentifier = bgIdf;
+				postTask.recordingContext = ctx;
+				[self.queue addOperation:postTask];
+				[postTask release];
 			}
-		} else if ( [ctx shouldCompleteTask:DLFinishedPostVideo] ) {
-			DLPostVideoTask * postTask = [[DLPostVideoTask alloc] initWithTrack:nil appToken:_appToken];
-			bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-				// task expires. clean it up if it has not finished yet
-				[postTask cancel];
-				[self saveRecordingContext];
-				[[UIApplication sharedApplication] endBackgroundTask:postTask.backgroundTaskIdentifier];
-			}];
-			postTask.taskController = self;
-			postTask.backgroundTaskIdentifier = bgIdf;
-			postTask.recordingContext = ctx;
-			[self.queue addOperation:postTask];
-			[postTask release];
 		}
 	}
 }
