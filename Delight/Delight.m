@@ -577,7 +577,7 @@ typedef enum {
 
 - (void)handleWillTerminate:(NSNotification *)notification
 {
-	[taskController saveRecordingContext];
+	[taskController saveUnfinishedRecordingContext:recordingContext];
 }
 
 #pragma mark - DLCamCaptureManagerDelegate
