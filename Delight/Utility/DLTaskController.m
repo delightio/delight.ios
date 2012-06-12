@@ -131,6 +131,12 @@
 
 - (void)prepareSessionUpload:(DLRecordingContext *)aSession {
 	if ( aSession == nil ) return;
+	if ( ![aSession allRequiredTracksExist] ) {
+		// discard this session. don't upload it.
+		[aSession discardAllTracks];
+		[self removeRecordingContext:aSession];
+		return;
+	}
 	BOOL backgroundSupported = NO;
 	UIDevice* device = [UIDevice currentDevice];
 	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
