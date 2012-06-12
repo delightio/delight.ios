@@ -52,8 +52,6 @@
 	self.endTime = [aDecoder decodeObjectForKey:@"endTime"];
 	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
 	_chunkOffset = [aDecoder decodeIntegerForKey:@"chunkOffset"];
-	self.screenFilePath = [aDecoder decodeObjectForKey:@"screenFilePath"];
-    self.cameraFilePath = [aDecoder decodeObjectForKey:@"cameraFilePath"];
     self.usabilityTestDescription = [aDecoder decodeObjectForKey:@"usabilityTestDescription"];
     self.userProperties = [aDecoder decodeObjectForKey:@"userProperties"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
