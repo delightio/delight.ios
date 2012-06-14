@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2615337E5C00003862 /* DLScreenshotController.h */; settings = {ATTRIBUTES = (); }; };
 		83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
+		832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 832D1DAC1589626D004F2BD6 /* DLConstants.h */; };
 		833B500D15670E690085552F /* DLMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 833B500B15670E690085552F /* DLMetrics.h */; };
 		833B500E15670E690085552F /* DLMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 833B500C15670E690085552F /* DLMetrics.m */; };
 		836ABF2B1548D47400926A71 /* DLCamCaptureManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF251548D47400926A71 /* DLCamCaptureManager.h */; settings = {ATTRIBUTES = (); }; };
@@ -65,6 +66,7 @@
 		83149B2715337E5C00003862 /* DLScreenshotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLScreenshotController.m; sourceTree = "<group>"; };
 		83149B2B15338CC500003862 /* DLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLVideoEncoder.h; sourceTree = "<group>"; };
 		83149B2C15338CC500003862 /* DLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLVideoEncoder.m; sourceTree = "<group>"; };
+		832D1DAC1589626D004F2BD6 /* DLConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLConstants.h; sourceTree = "<group>"; };
 		833B500B15670E690085552F /* DLMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLMetrics.h; sourceTree = "<group>"; };
 		833B500C15670E690085552F /* DLMetrics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLMetrics.m; sourceTree = "<group>"; };
 		836ABF251548D47400926A71 /* DLCamCaptureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamCaptureManager.h; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 				8385CA7B154768360057FC37 /* Gestures */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
+				832D1DAC1589626D004F2BD6 /* DLConstants.h */,
 				83149B2615337E5C00003862 /* DLScreenshotController.h */,
 				83149B2715337E5C00003862 /* DLScreenshotController.m */,
 				83149B2B15338CC500003862 /* DLVideoEncoder.h */,
@@ -302,6 +305,7 @@
 				8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */,
 				838187001563156400608514 /* UITextField+DLPrivateView.h in Headers */,
 				833B500D15670E690085552F /* DLMetrics.h in Headers */,
+				832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,7 +423,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DELIGHT_VERSION=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/Delight-Info.plist\")\nsed -i \"\" \"s/#define DELIGHT_VERSION.*/#define DELIGHT_VERSION @\\\"$DELIGHT_VERSION\\\"/\" \"$SRCROOT/Delight/Delight-Prefix.pch\"";
+			shellScript = "DELIGHT_VERSION=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/Delight-Info.plist\")\nsed -i \"\" \"s/#define DELIGHT_VERSION.*/#define DELIGHT_VERSION @\\\"$DELIGHT_VERSION\\\"/\" \"$SRCROOT/Delight/DLConstants.h\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

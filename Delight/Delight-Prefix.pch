@@ -4,6 +4,7 @@
 
 #ifdef __OBJC__
     #import <Foundation/Foundation.h>
+    #import "DLConstants.h"
 
     #define DL_MAKE_CATEGORIES_LOADABLE(UNIQUE_NAME) @interface FORCELOAD_##UNIQUE_NAME @end @implementation FORCELOAD_##UNIQUE_NAME @end
 
@@ -15,8 +16,5 @@
     
     #define DLLog(format, args...) if ( __DL_ENABLE_DEBUG_LOG ) NSLog(format, ## args)
     extern BOOL __DL_ENABLE_DEBUG_LOG;
-
-    // Don't edit the next line, change the value in Delight-Info.plist instead
-    #define DELIGHT_VERSION @"2.1.1"
 
 #endif
