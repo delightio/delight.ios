@@ -131,13 +131,19 @@
 
 - (void)prepareSessionUpload:(DLRecordingContext *)aSession {
 	if ( aSession == nil ) return;
+	if ( ![aSession allRequiredTracksExist] ) {
+		// discard this session. don't upload it.
+		[aSession discardAllTracks];
+		[self removeRecordingContext:aSession];
+		return;
+	}
 	BOOL backgroundSupported = NO;
 	UIDevice* device = [UIDevice currentDevice];
 	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
 	
 	if ( backgroundSupported ) {
 		bgTaskIdentifier = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-			[self saveRecordingContext];
+			[self saveUnfinishedRecordingContext:aSession];
 			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];
 		}];
 		[self.queue addOperationWithBlock:^{
@@ -224,7 +230,7 @@
 		bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			// task expires. clean it up if it has not finished yet
 			[sessTask cancel];
-			[self saveRecordingContext];
+			[self saveUnfinishedRecordingContext:ctx];
 			[[UIApplication sharedApplication] endBackgroundTask:sessTask.backgroundTaskIdentifier];
 		}];
 		sessTask.taskController = self;
@@ -248,7 +254,7 @@
 					bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 						// task expires. clean it up if it has not finished yet
 						[uploadTask cancel];
-						[self saveRecordingContext];
+						[self saveUnfinishedRecordingContext:ctx];
 						[[UIApplication sharedApplication] endBackgroundTask:uploadTask.backgroundTaskIdentifier];
 					}];
 					uploadTask.taskController = self;
@@ -266,7 +272,7 @@
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 					// task expires. clean it up if it has not finished yet
 					[postTask cancel];
-					[self saveRecordingContext];
+					[self saveUnfinishedRecordingContext:ctx];
 					[[UIApplication sharedApplication] endBackgroundTask:postTask.backgroundTaskIdentifier];
 				}];
 				postTask.taskController = self;
@@ -298,24 +304,24 @@
 	self.task = nil;
 }
 
-//- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx {
-//	if ( !ctx.loadedFromArchive && [ctx.finishedTaskIndex count] && !ctx.saved) {
-//		// contains incomplete task and require saving
-//		if ( _unfinishedContexts == nil ) {
-//			_unfinishedContexts = [[NSMutableArray alloc] initWithCapacity:4];
-//		}
-//		[self.unfinishedContexts addObject:ctx];
-//		NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
-//		ctx.saved = [NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
-//		_containsIncompleteSessions = YES;
-//	}
-//}
-
-- (void)saveRecordingContext {
-	NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
-	[NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
-	_containsIncompleteSessions = YES;
+- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx {
+	if ( !ctx.loadedFromArchive && [ctx.finishedTaskIndex count] && !ctx.saved) {
+		// contains incomplete task and require saving
+		if ( _unfinishedContexts == nil ) {
+			_unfinishedContexts = [[NSMutableArray alloc] initWithCapacity:4];
+		}
+		[self.unfinishedContexts addObject:ctx];
+		NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
+		ctx.saved = [NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
+		_containsIncompleteSessions = YES;
+	}
 }
+
+//- (void)saveRecordingContext {
+//	NSString * sessFilePath = [self unfinishedRecordingContextsArchiveFilePath];
+//	[NSKeyedArchiver archiveRootObject:_unfinishedContexts toFile:sessFilePath];
+//	_containsIncompleteSessions = YES;
+//}
 
 #pragma mark Notification
 - (void)handleReachabilityChangedNotification:(NSNotification *)aNotification {

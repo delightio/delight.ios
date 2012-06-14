@@ -53,7 +53,7 @@
 	UIBackgroundTaskIdentifier bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 		// task expires. clean it up if it has not finished yet
 		[postTask cancel];
-		[self.taskController saveRecordingContext];
+		[self.taskController saveUnfinishedRecordingContext:self.recordingContext];
 		[[UIApplication sharedApplication] endBackgroundTask:postTask.backgroundTaskIdentifier];
 	}];
 	postTask.taskController = self.taskController;

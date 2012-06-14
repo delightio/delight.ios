@@ -52,8 +52,6 @@
 	self.endTime = [aDecoder decodeObjectForKey:@"endTime"];
 	_chunkSize = [aDecoder decodeIntegerForKey:@"chunkSize"];
 	_chunkOffset = [aDecoder decodeIntegerForKey:@"chunkOffset"];
-	self.screenFilePath = [aDecoder decodeObjectForKey:@"screenFilePath"];
-    self.cameraFilePath = [aDecoder decodeObjectForKey:@"cameraFilePath"];
     self.usabilityTestDescription = [aDecoder decodeObjectForKey:@"usabilityTestDescription"];
     self.userProperties = [aDecoder decodeObjectForKey:@"userProperties"];
 	self.finishedTaskIndex = [aDecoder decodeObjectForKey:@"finishedTaskIndex"];
@@ -97,6 +95,27 @@
 	[_finishedTaskIndex release];
     [_metrics release];
 	[super dealloc];
+}
+
+- (BOOL)allRequiredTracksExist {
+	if ( _sourceFilePaths == nil ) return NO;
+	NSFileManager * fm = [NSFileManager defaultManager];
+	BOOL existFlag = YES;
+	for (NSString * fPath in _sourceFilePaths) {
+		if ( ![fm fileExistsAtPath:fPath] ) {
+			existFlag = NO;
+		}
+	}
+	return existFlag;
+}
+
+- (void)discardAllTracks {
+	if ( _sourceFilePaths == nil ) return;
+	NSFileManager * fm = [NSFileManager defaultManager];
+	for (NSString * fPath in _sourceFilePaths) {
+		[fm removeItemAtPath:fPath error:nil];
+	}
+	self.sourceFilePaths = nil;
 }
 
 - (BOOL)shouldCompleteTask:(DLFinishedTaskIdentifier)idfr {

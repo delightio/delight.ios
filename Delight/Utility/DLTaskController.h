@@ -47,7 +47,7 @@
 - (void)removeRecordingContext:(DLRecordingContext *)ctx;
 // task management
 - (void)handleSessionTaskCompletion:(DLTask *)aTask;
-//- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx;
-- (void)saveRecordingContext;
+- (void)saveUnfinishedRecordingContext:(DLRecordingContext *)ctx;
+//- (void)saveRecordingContext;
 
 @end
