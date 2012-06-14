@@ -101,8 +101,8 @@
 	if ( _sourceFilePaths == nil ) return NO;
 	NSFileManager * fm = [NSFileManager defaultManager];
 	BOOL existFlag = YES;
-	for (NSString * fPath in _sourceFilePaths) {
-		if ( ![fm fileExistsAtPath:fPath] ) {
+	for (NSString * theKey in _sourceFilePaths) {
+		if ( ![fm fileExistsAtPath:[_sourceFilePaths objectForKey:theKey]] ) {
 			existFlag = NO;
 		}
 	}
