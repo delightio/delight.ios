@@ -8,4 +8,4 @@
 
 // Don't change this value, it is auto-generated via a build script.
 // Change it in Delight-Info.plist instead
-#define DELIGHT_VERSION @"2.1.1"
+#define DELIGHT_VERSION @"2.1.2"
