@@ -268,7 +268,7 @@
 				}
 			} else if ( [ctx shouldPostTrackForName:theKey] ) {
 				// we haven't posted the upload status to our server yet
-				DLPostVideoTask * postTask = [[DLPostVideoTask alloc] initWithTrack:nil appToken:_appToken];
+				DLPostVideoTask * postTask = [[DLPostVideoTask alloc] initWithTrack:theKey appToken:_appToken];
 				bgIdf = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 					// task expires. clean it up if it has not finished yet
 					[postTask cancel];
