@@ -9,6 +9,8 @@
 #import "CALayer+DLThreadSafe.h"
 #import "Delight.h"
 
+DL_MAKE_CATEGORIES_LOADABLE(CALayer_DLThreadSafe);
+
 @implementation CALayer (DLThreadSafe)
 
 - (void)DLrenderInContext:(CGContextRef)context
