@@ -373,7 +373,7 @@
     for (UIView *view in privateViews) {
         CGRect frameInWindow = [view convertRect:view.bounds toView:locationView];
             
-        if (CGRectContainsPoint(frameInWindow, location) && view.superview && !view.hidden) {
+        if (CGRectContainsPoint(frameInWindow, location) && view.window && !view.hidden) {
             if (frame) {
                 *frame = frameInWindow;
             }

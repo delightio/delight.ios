@@ -10,6 +10,8 @@
 #import "Delight.h"
 #import </usr/include/objc/objc-runtime.h>
 
+DL_MAKE_CATEGORIES_LOADABLE(UITextField_DLPrivateView);
+
 @implementation UITextField (DLPrivateView)
 
 - (void)DLdidMoveToSuperview
