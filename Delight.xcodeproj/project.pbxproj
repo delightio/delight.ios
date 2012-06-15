@@ -97,7 +97,7 @@
 		83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLOpenGLVideoEncoder.m; sourceTree = "<group>"; };
 		83995A8C158AC08200A41326 /* DLImageVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLImageVideoEncoder.h; sourceTree = "<group>"; };
 		83995A8D158AC08200A41326 /* DLImageVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLImageVideoEncoder.m; sourceTree = "<group>"; };
-		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; name = Delight.framework; path = Delight; sourceTree = BUILT_PRODUCTS_DIR; };
+		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Delight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B8968514EAEC68006D93C2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		83B8968914EAEC68006D93C2 /* Delight-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Delight-Info.plist"; sourceTree = "<group>"; };
 		83B8968B14EAEC68006D93C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -532,6 +532,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
