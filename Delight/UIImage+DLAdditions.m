@@ -8,6 +8,23 @@
 
 #import "UIImage+DLAdditions.h"
 
+DL_MAKE_CATEGORIES_LOADABLE(UIImage_DLAdditions);
+
 @implementation UIImage (DLAdditions)
+
+- (UIImage *)scaledImageWithHeight:(CGFloat)newHeight
+{
+    if (self.size.height == 0.0) return self;
+    
+    CGFloat aspectRatio = self.size.width / self.size.height;
+    CGSize newSize = CGSizeMake(aspectRatio * newHeight, newHeight);
+
+    UIGraphicsBeginImageContext(newSize);
+    [self drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
 
 @end

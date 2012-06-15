@@ -10,4 +10,6 @@
 
 @interface UIImage (DLAdditions)
 
+- (UIImage *)scaledImageWithHeight:(CGFloat)newHeight;
+
 @end
