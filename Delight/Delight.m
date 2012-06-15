@@ -14,7 +14,8 @@
 #import <OpenGLES/ES1/glext.h>
 #import "DLTaskController.h"
 #import "DLScreenshotController.h"
-#import "DLVideoEncoder.h"
+#import "DLImageVideoEncoder.h"
+#import "DLOpenGLVideoEncoder.h"
 #import "DLGestureTracker.h"
 #import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
@@ -57,6 +58,7 @@ typedef enum {
 + (Delight *)sharedInstance;
 - (void)setAppToken:(NSString *)anAppToken;
 - (void)setAnnotation:(DLAnnotation)annotation;
+- (void)setOpenGL:(BOOL)openGL;
 - (void)startRecording;
 - (void)stopRecording;
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
@@ -84,6 +86,7 @@ typedef enum {
     // Configuration
     NSString *appToken;
     DLAnnotation annotation;
+    BOOL openGL;
     BOOL autoCaptureEnabled;
 	BOOL delaySessionUploadForCamera;
 	BOOL cameraDidStop;
@@ -119,6 +122,7 @@ typedef enum {
 	
     [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
+    [delight setOpenGL:NO];
 	[delight tryCreateNewSession];   
 }
 
@@ -131,7 +135,6 @@ typedef enum {
 {
     Delight *delight = [self sharedInstance];
     [delight setAutoCaptureEnabled:NO];
-    delight->videoEncoder.encodesRawGLBytes = YES;
 	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
 		delight->taskController.sessionObjectName = @"opengl_usability_app_session";
 	} else {
@@ -139,6 +142,7 @@ typedef enum {
 	}
     [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
+    [delight setOpenGL:YES];
 	[delight tryCreateNewSession];
 }
 
@@ -229,10 +233,7 @@ typedef enum {
     self = [super init];
     if (self) {        
         screenshotController = [[DLScreenshotController alloc] init];        
-        
-        videoEncoder = [[DLVideoEncoder alloc] init];
-        videoEncoder.delegate = self;
-        
+                
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.drawsGestures = NO;
         gestureTracker.delegate = self;
@@ -413,6 +414,19 @@ typedef enum {
     annotation = anAnnotation;
 }
 
+- (void)setOpenGL:(BOOL)anOpenGL
+{
+    openGL = anOpenGL;
+
+    [videoEncoder release];
+    if (openGL) {
+        videoEncoder = [[DLOpenGLVideoEncoder alloc] init];
+    } else {
+        videoEncoder = [[DLImageVideoEncoder alloc] init];
+    }
+    videoEncoder.delegate = self;
+}
+
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {    
     if (!videoEncoder.recording) return;
@@ -436,13 +450,14 @@ typedef enum {
     NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
     lastScreenshotTime = start;
         
-    if (videoEncoder.encodesRawGLBytes && glView) {
-        // Encode GL bytes directly
+    if (openGL) {
         gestureTracker.touchView = glView;
-        [videoEncoder encodeRawBytesWithBackingWidth:backingWidth backingHeight:backingHeight];
+        DLOpenGLVideoEncoder *openGLEncoder = (DLOpenGLVideoEncoder *)videoEncoder;
+        [openGLEncoder encodeGLPixelsWithBackingWidth:backingWidth backingHeight:backingHeight];
     } else {
         UIImage *screenshot = [screenshotController screenshot];
-        [videoEncoder writeFrameImage:screenshot];
+        DLImageVideoEncoder *imageEncoder = (DLImageVideoEncoder *)videoEncoder;
+        [imageEncoder encodeImage:screenshot];
     }
         
     if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {

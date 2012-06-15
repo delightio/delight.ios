@@ -26,6 +26,12 @@
 		8385CA80154768530057FC37 /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
 		8385CA831547688E0057FC37 /* DLOrientationChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA811547688D0057FC37 /* DLOrientationChange.h */; };
 		8385CA841547688E0057FC37 /* DLOrientationChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA821547688E0057FC37 /* DLOrientationChange.m */; };
+		83995A85158ABC6600A41326 /* UIImage+DLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A83158ABC6600A41326 /* UIImage+DLAdditions.h */; };
+		83995A86158ABC6600A41326 /* UIImage+DLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A84158ABC6600A41326 /* UIImage+DLAdditions.m */; };
+		83995A8A158ABEA600A41326 /* DLOpenGLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */; };
+		83995A8B158ABEA600A41326 /* DLOpenGLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */; };
+		83995A8E158AC08200A41326 /* DLImageVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A8C158AC08200A41326 /* DLImageVideoEncoder.h */; };
+		83995A8F158AC08200A41326 /* DLImageVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A8D158AC08200A41326 /* DLImageVideoEncoder.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
 		83B8968C14EAEC68006D93C2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
 		83B8969914EAECD6006D93C2 /* Delight.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969314EAECD6006D93C2 /* Delight.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -85,7 +91,13 @@
 		8385CA821547688E0057FC37 /* DLOrientationChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLOrientationChange.m; sourceTree = "<group>"; };
 		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGestureTracker.h; sourceTree = "<group>"; };
 		8391626E1537C21000549347 /* DLGestureTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGestureTracker.m; sourceTree = "<group>"; };
-		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Delight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		83995A83158ABC6600A41326 /* UIImage+DLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+DLAdditions.h"; sourceTree = "<group>"; };
+		83995A84158ABC6600A41326 /* UIImage+DLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+DLAdditions.m"; sourceTree = "<group>"; };
+		83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLOpenGLVideoEncoder.h; sourceTree = "<group>"; };
+		83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLOpenGLVideoEncoder.m; sourceTree = "<group>"; };
+		83995A8C158AC08200A41326 /* DLImageVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLImageVideoEncoder.h; sourceTree = "<group>"; };
+		83995A8D158AC08200A41326 /* DLImageVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLImageVideoEncoder.m; sourceTree = "<group>"; };
+		83B8968214EAEC68006D93C2 /* Delight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; name = Delight.framework; path = Delight; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B8968514EAEC68006D93C2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		83B8968914EAEC68006D93C2 /* Delight-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Delight-Info.plist"; sourceTree = "<group>"; };
 		83B8968B14EAEC68006D93C2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -161,6 +173,8 @@
 				83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */,
 				8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */,
 				8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */,
+				83995A83158ABC6600A41326 /* UIImage+DLAdditions.h */,
+				83995A84158ABC6600A41326 /* UIImage+DLAdditions.m */,
 				838186FE1563156400608514 /* UITextField+DLPrivateView.h */,
 				838186FF1563156400608514 /* UITextField+DLPrivateView.m */,
 			);
@@ -180,6 +194,19 @@
 				8385CA7E154768530057FC37 /* DLTouch.m */,
 			);
 			name = Gestures;
+			sourceTree = "<group>";
+		};
+		83995A90158AC17B00A41326 /* Encoder */ = {
+			isa = PBXGroup;
+			children = (
+				83149B2B15338CC500003862 /* DLVideoEncoder.h */,
+				83149B2C15338CC500003862 /* DLVideoEncoder.m */,
+				83995A8C158AC08200A41326 /* DLImageVideoEncoder.h */,
+				83995A8D158AC08200A41326 /* DLImageVideoEncoder.m */,
+				83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */,
+				83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */,
+			);
+			name = Encoder;
 			sourceTree = "<group>";
 		};
 		83B8967314EAEC68006D93C2 = {
@@ -222,14 +249,13 @@
 				836ABF241548D47400926A71 /* Camera */,
 				838293611558A054007C6CDA /* Categories */,
 				A9A9A3CC1536EA3600B6E4AB /* Utility */,
+				83995A90158AC17B00A41326 /* Encoder */,
 				8385CA7B154768360057FC37 /* Gestures */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
 				832D1DAC1589626D004F2BD6 /* DLConstants.h */,
 				83149B2615337E5C00003862 /* DLScreenshotController.h */,
 				83149B2715337E5C00003862 /* DLScreenshotController.m */,
-				83149B2B15338CC500003862 /* DLVideoEncoder.h */,
-				83149B2C15338CC500003862 /* DLVideoEncoder.m */,
 				83B8968814EAEC68006D93C2 /* Supporting Files */,
 			);
 			path = Delight;
@@ -306,6 +332,9 @@
 				838187001563156400608514 /* UITextField+DLPrivateView.h in Headers */,
 				833B500D15670E690085552F /* DLMetrics.h in Headers */,
 				832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */,
+				83995A85158ABC6600A41326 /* UIImage+DLAdditions.h in Headers */,
+				83995A8A158ABEA600A41326 /* DLOpenGLVideoEncoder.h in Headers */,
+				83995A8E158AC08200A41326 /* DLImageVideoEncoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -453,6 +482,9 @@
 				837E8A4D15658ACE00FB16E9 /* DLGesture.m in Sources */,
 				837E8A4F15658AD100FB16E9 /* DLGestureTracker.m in Sources */,
 				833B500E15670E690085552F /* DLMetrics.m in Sources */,
+				83995A86158ABC6600A41326 /* UIImage+DLAdditions.m in Sources */,
+				83995A8B158ABEA600A41326 /* DLOpenGLVideoEncoder.m in Sources */,
+				83995A8F158AC08200A41326 /* DLImageVideoEncoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
