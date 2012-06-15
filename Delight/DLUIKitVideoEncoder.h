@@ -1,5 +1,5 @@
 //
-//  DLImageVideoEncoder.h
+//  DLUIKitVideoEncoder.h
 //  Delight
 //
 //  Created by Chris Haugli on 6/14/12.
@@ -8,7 +8,7 @@
 
 #import "DLVideoEncoder.h"
 
-@interface DLImageVideoEncoder : DLVideoEncoder
+@interface DLUIKitVideoEncoder : DLVideoEncoder
 
 - (void)encodeImage:(UIImage *)frameImage;
 

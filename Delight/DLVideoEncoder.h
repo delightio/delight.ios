@@ -39,7 +39,6 @@
 - (void)stopRecording;
 - (void)setup;
 - (void)setupWriter;
-- (void)setupPixelBuffer;
 - (void)cleanup;
 - (NSURL *)tempFileURL;
 - (CMTime)currentFrameTime;

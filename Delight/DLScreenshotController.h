@@ -15,8 +15,6 @@
    DLScreenshotController takes and stores screenshots of a UIView.
  */
 @interface DLScreenshotController : NSObject {
-    UIImage *openGLImage;
-    UIView *openGLView;
     UIWindow *keyboardWindow;
     
     void *bitmapData;
@@ -31,7 +29,6 @@
 @property (nonatomic, readonly) NSMutableSet *privateViews;
 
 - (UIImage *)screenshot;
-- (UIImage *)openGLScreenshotForView:(UIView *)view backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 - (void)unregisterPrivateView:(UIView *)view;
 - (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)view privateViewFrame:(CGRect *)frame;

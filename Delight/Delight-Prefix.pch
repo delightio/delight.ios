@@ -4,7 +4,6 @@
 
 #ifdef __OBJC__
     #import <Foundation/Foundation.h>
-    #import "DLConstants.h"
 
     #define DL_MAKE_CATEGORIES_LOADABLE(UNIQUE_NAME) @interface FORCELOAD_##UNIQUE_NAME @end @implementation FORCELOAD_##UNIQUE_NAME @end
 

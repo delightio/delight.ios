@@ -69,7 +69,13 @@
 - (void)setup
 {
     [self setupWriter];
-    [self setupPixelBuffer];
+
+    NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kCVPixelFormatType_32ARGB], kCVPixelBufferPixelFormatTypeKey, nil];
+    avAdaptor = [[AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:videoWriterInput sourcePixelBufferAttributes:bufferAttributes] retain];
+    
+    [videoWriter addInput:videoWriterInput];
+    [videoWriter startWriting];
+    [videoWriter startSessionAtSourceTime:CMTimeMake(0, 1000)];
 }
 
 - (void)setupWriter
@@ -97,16 +103,6 @@
     videoWriterInput.expectsMediaDataInRealTime = YES;
     
     recordingStartTime = -1;
-}
-
-- (void)setupPixelBuffer
-{
-    NSDictionary *bufferAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kCVPixelFormatType_32ARGB], kCVPixelBufferPixelFormatTypeKey, nil];                                      
-    avAdaptor = [[AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:videoWriterInput sourcePixelBufferAttributes:bufferAttributes] retain];
-    
-    [videoWriter addInput:videoWriterInput];
-    [videoWriter startWriting];
-    [videoWriter startSessionAtSourceTime:CMTimeMake(0, 1000)];
 }
 
 - (void)cleanup 

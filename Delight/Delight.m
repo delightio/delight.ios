@@ -14,7 +14,7 @@
 #import <OpenGLES/ES1/glext.h>
 #import "DLTaskController.h"
 #import "DLScreenshotController.h"
-#import "DLImageVideoEncoder.h"
+#import "DLUIKitVideoEncoder.h"
 #import "DLOpenGLVideoEncoder.h"
 #import "DLGestureTracker.h"
 #import "DLMetrics.h"
@@ -422,7 +422,7 @@ typedef enum {
     if (openGL) {
         videoEncoder = [[DLOpenGLVideoEncoder alloc] init];
     } else {
-        videoEncoder = [[DLImageVideoEncoder alloc] init];
+        videoEncoder = [[DLUIKitVideoEncoder alloc] init];
     }
     videoEncoder.delegate = self;
 }
@@ -456,7 +456,7 @@ typedef enum {
         [openGLEncoder encodeGLPixelsWithBackingWidth:backingWidth backingHeight:backingHeight];
     } else {
         UIImage *screenshot = [screenshotController screenshot];
-        DLImageVideoEncoder *imageEncoder = (DLImageVideoEncoder *)videoEncoder;
+        DLUIKitVideoEncoder *imageEncoder = (DLUIKitVideoEncoder *)videoEncoder;
         [imageEncoder encodeImage:screenshot];
     }
         

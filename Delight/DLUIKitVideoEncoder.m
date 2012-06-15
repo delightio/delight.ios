@@ -1,14 +1,14 @@
 //
-//  DLImageVideoEncoder.m
+//  DLUIKitVideoEncoder.m
 //  Delight
 //
 //  Created by Chris Haugli on 6/14/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "DLImageVideoEncoder.h"
+#import "DLUIKitVideoEncoder.h"
 
-@implementation DLImageVideoEncoder
+@implementation DLUIKitVideoEncoder
 
 - (void)startNewRecording
 {
@@ -30,23 +30,21 @@
         CFDataRef image = CGDataProviderCopyData(CGImageGetDataProvider(cgImage));
         
         int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &pixelBuffer);
-        if (status != 0) {
-            //could not get a buffer from the pool
-            DLLog(@"Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+        if (status != kCVReturnSuccess) {
+            // Could not get a buffer from the pool
+            DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
         } else {
-            // set image data into pixel buffer
+            // Put image data into pixel buffer
             CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-            uint8_t* destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
-            CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image)), destPixels);  //XXX:  will work if the pixel buffer is contiguous and has the same bytesPerRow as the input data
+            uint8_t *destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
+            CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image)), destPixels);  // Will work if the pixel buffer is contiguous and has the same bytesPerRow as the input data
             
-            if(status == 0){
-                BOOL success = [avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time];
-                if (!success)
-                    DLDebugLog(@"Warning:  Unable to write buffer to video: %@", videoWriter.error);
+            if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]){
+                DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
             }
             
-            CVPixelBufferUnlockBaseAddress( pixelBuffer, 0 );
-            CVPixelBufferRelease( pixelBuffer );
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+            CVPixelBufferRelease(pixelBuffer);
         }
         
         CFRelease(image);

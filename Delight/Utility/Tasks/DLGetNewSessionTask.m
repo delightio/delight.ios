@@ -10,6 +10,7 @@
 #import "DLTaskController.h"
 #import <sys/utsname.h>
 #import "Delight.h"
+#import "DLConstants.h"
 
 NSString * const DLUploadURIElementName = @"upload_uris";
 NSString * const DLWifiOnlyElementName = @"uploading_on_wifi_only";
