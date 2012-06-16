@@ -10,6 +10,7 @@
 
 @interface DLOpenGLVideoEncoder : DLVideoEncoder {
     CVPixelBufferPoolRef pixelBufferPool;
+    BOOL encoding;
 }
 
 - (void)encodeGLPixelsWithBackingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;

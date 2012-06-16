@@ -63,9 +63,11 @@
         }
     }
     
-    if (![videoWriterInput isReadyForMoreMediaData] || !self.recording) {
+    if (![videoWriterInput isReadyForMoreMediaData] || !self.recording || encoding) {
         return;
     }
+    
+    encoding = YES;
     
     // Get a pixel buffer
     CVPixelBufferRef pixelBuffer = NULL;
@@ -83,40 +85,51 @@
         // Encode a scaled image
         glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
         
-        UIImage *image = [self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight];
-
-        CVPixelBufferRef avPixelBuffer = NULL;
-        int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &avPixelBuffer);
-        if (status != kCVReturnSuccess) {
-            // Could not get a buffer from the pool
-            DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
-        } else {
-            // Put image data into pixel buffer
-            CVPixelBufferLockBaseAddress(avPixelBuffer, 0);
-            uint8_t *destPixels = CVPixelBufferGetBaseAddress(avPixelBuffer);
-        
-            CFDataRef imageData = CGDataProviderCopyData(CGImageGetDataProvider(image.CGImage));
-            CFDataGetBytes(imageData, CFRangeMake(0, CFDataGetLength(imageData) - 1), destPixels + 1);      // + 1 to convert RGBA->ARGB
-            CFRelease(imageData);
+        UIImage *image = [[self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight] retain];
+                    
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            CVPixelBufferRef avPixelBuffer = NULL;
+            int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &avPixelBuffer);
+            if (status != kCVReturnSuccess) {
+                // Could not get a buffer from the pool
+                DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+            } else {
+                // Put image data into pixel buffer
+                CVPixelBufferLockBaseAddress(avPixelBuffer, 0);
+                uint8_t *destPixels = CVPixelBufferGetBaseAddress(avPixelBuffer);
             
-            if (![avAdaptor appendPixelBuffer:avPixelBuffer withPresentationTime:time]) {
-                DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
+                CFDataRef imageData = CGDataProviderCopyData(CGImageGetDataProvider(image.CGImage));
+                CFDataGetBytes(imageData, CFRangeMake(0, CFDataGetLength(imageData) - 1), destPixels + 1);      // + 1 to convert RGBA->ARGB
+                CFRelease(imageData);
+                
+                if (![avAdaptor appendPixelBuffer:avPixelBuffer withPresentationTime:time]) {
+                    DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
+                }
+                
+                CVPixelBufferUnlockBaseAddress(avPixelBuffer, 0);
+                CVPixelBufferRelease(avPixelBuffer);
             }
+            [image release];
             
-            CVPixelBufferUnlockBaseAddress(avPixelBuffer, 0);
-            CVPixelBufferRelease(avPixelBuffer);
-        }
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+            CVPixelBufferRelease(pixelBuffer);
+            encoding = NO;
+        });
+        
     } else {
         // Encode the raw GL bytes directly
         glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData + 1);    // + 1 to convert RGBA->ARGB
-        
-        if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
-            DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
-        }
+            
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{  
+            if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
+                DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
+            }
+            
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+            CVPixelBufferRelease(pixelBuffer);
+            encoding = NO;
+        });
     }
-
-    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
-    CVPixelBufferRelease(pixelBuffer);
 }
 
 #pragma mark - Private methods
