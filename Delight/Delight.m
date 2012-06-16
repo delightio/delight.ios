@@ -266,6 +266,7 @@ typedef enum {
         // Method swizzling to rewrite UIWebView layer rendering code to avoid crash
         Swizzle(NSClassFromString(@"TileHostLayer"), @selector(renderInContext:), @selector(DLrenderInContext:));
         Swizzle(NSClassFromString(@"WebLayer"), @selector(drawInContext:), @selector(DLdrawInContext:));
+        Swizzle(NSClassFromString(@"WebTiledLayer"), @selector(drawInContext:), @selector(DLdrawInContext:));
         
         // Method swizzling to automatically make secure UITextFields private views
         Swizzle([UITextField class], @selector(didMoveToSuperview), @selector(DLdidMoveToSuperview));

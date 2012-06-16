@@ -37,7 +37,7 @@ DL_MAKE_CATEGORIES_LOADABLE(CALayer_DLThreadSafe);
         // No thread safety problems if calling from main or web thread, proceed as normal
         [self DLdrawInContext:context];
     } else {
-        // If calling from background thread, trying to draw a UIWebView WebLayer will result in a crash.
+        // If calling from background thread, trying to draw a UIWebView WebLayer/WebTiledLayer will result in a crash.
         // Copy the layer to a plain CALayer and draw that instead.
         CALayer *layerCopy = [self copyWithPlainLayer];
         [layerCopy drawInContext:context];
