@@ -73,7 +73,7 @@
     CVPixelBufferRef pixelBuffer = NULL;
     CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, pixelBufferPool, &pixelBuffer);
     if ((pixelBuffer == NULL) || (status != kCVReturnSuccess)) {
-        DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+        DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, pixelBufferPool);
         return;
     }
     
@@ -92,7 +92,7 @@
             int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &avPixelBuffer);
             if (status != kCVReturnSuccess) {
                 // Could not get a buffer from the pool
-                DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+                DLLog(@"[Delight] Error creating scaled pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
             } else {
                 // Put image data into pixel buffer
                 CVPixelBufferLockBaseAddress(avPixelBuffer, 0);
