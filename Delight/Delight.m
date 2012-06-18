@@ -638,6 +638,7 @@ typedef enum {
         // Need to know the alert view size to position the text field properly
         UITextField *descriptionField = (UITextField *)[alertView viewWithTag:kDLAlertViewDescriptionFieldTag];
         descriptionField.frame = CGRectMake(20.0, alertView.frame.size.height - 97, 245.0, 25.0);
+        [descriptionField becomeFirstResponder];
     }
 }
 
