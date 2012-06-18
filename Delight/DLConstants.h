@@ -12,4 +12,4 @@
 
 // The maximum height that OpenGL recordings should have.
 // If a OpenGL backing height is beyond this value, each frame will be scaled down (slow).
-#define DL_OPENGL_MAX_VIDEO_HEIGHT 1024
+#define DL_OPENGL_MAX_VIDEO_HEIGHT 1080
