@@ -102,7 +102,7 @@
                 CFDataGetBytes(imageData, CFRangeMake(0, CFDataGetLength(imageData) - 1), destPixels + 1);      // + 1 to convert RGBA->ARGB
                 CFRelease(imageData);
                 
-                if (![avAdaptor appendPixelBuffer:avPixelBuffer withPresentationTime:time]) {
+                if (self.recording && ![avAdaptor appendPixelBuffer:avPixelBuffer withPresentationTime:time]) {
                     DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
                 }
                 
