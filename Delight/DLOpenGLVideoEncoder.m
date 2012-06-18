@@ -84,10 +84,10 @@
     if (backingHeight != self.videoSize.height) {
         // Encode a scaled image
         glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
-        
-        UIImage *image = [[self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight] retain];
-                    
+                            
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            UIImage *image = [self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight];
+
             CVPixelBufferRef avPixelBuffer = NULL;
             int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &avPixelBuffer);
             if (status != kCVReturnSuccess) {
@@ -109,7 +109,6 @@
                 CVPixelBufferUnlockBaseAddress(avPixelBuffer, 0);
                 CVPixelBufferRelease(avPixelBuffer);
             }
-            [image release];
             
             CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
             CVPixelBufferRelease(pixelBuffer);
