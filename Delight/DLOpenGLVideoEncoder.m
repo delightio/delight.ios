@@ -11,9 +11,21 @@
 
 @interface DLOpenGLVideoEncoder ()
 - (UIImage *)resizedImageForPixelData:(GLubyte *)pixelData backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
+- (void)convertPixelsTo32ARGB:(GLubyte *)pixels width:(GLint)width height:(GLint)height;
 @end
 
 @implementation DLOpenGLVideoEncoder
+
+@synthesize usesImplementationPixelFormat;
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        self.usesImplementationPixelFormat = YES;
+    }
+    return self;
+}
 
 - (void)setupWriter
 {
@@ -36,6 +48,14 @@
         // Backing size not too big, we can encode the GL bytes directly
         self.videoSize = CGSizeMake(backingWidth, backingHeight);
         rgbaShift = YES;
+    }
+    
+    if (usesImplementationPixelFormat) {
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &pixelFormat);
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &pixelType);
+    } else {
+        pixelFormat = GL_RGBA;
+        pixelType = GL_UNSIGNED_BYTE;
     }
     
     [self setup];
@@ -87,11 +107,15 @@
 
     if (backingHeight != self.videoSize.height) {
         // Encode a scaled image
-        glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
-                            
+        glReadPixels(0, 0, backingWidth, backingHeight, pixelFormat, pixelType, pixelBufferData);
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            if (usesImplementationPixelFormat) {
+                [self convertPixelsTo32ARGB:pixelBufferData width:backingWidth height:backingHeight];
+            }
+            
             UIImage *image = [self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight];
-            [self encodeImage:image atPresentationTime:time byteShift:1];
+            [self encodeImage:image atPresentationTime:time byteShift:(usesImplementationPixelFormat ? 0 : 1)];
             
             CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
             CVPixelBufferRelease(pixelBuffer);
@@ -100,9 +124,13 @@
         
     } else {
         // Encode the raw GL bytes directly
-        glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData + 1);    // + 1 to convert RGBA->ARGB
-            
+        glReadPixels(0, 0, backingWidth, backingHeight, pixelFormat, pixelType, pixelBufferData + (usesImplementationPixelFormat ? 0 : 1));
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{  
+            if (usesImplementationPixelFormat) {
+                [self convertPixelsTo32ARGB:pixelBufferData width:backingWidth height:backingHeight];
+            }
+            
             if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
                 DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
             }
@@ -147,6 +175,17 @@
     CGImageRelease(iref);    
     
     return image;
+}
+
+- (void)convertPixelsTo32ARGB:(GLubyte *)pixels width:(GLint)width height:(GLint)height
+{
+    if (pixelFormat == GL_RGB && pixelType == GL_UNSIGNED_SHORT_5_6_5) {
+/*        for (int i = width*height - 1; i >= 0; i--) {
+            GLbyte red = pixels[i*2] >> 3 * ((2^8 - 1) / (2^5 - 1));
+            GLbyte green = ((pixels[i*2] & 7) << 3 | pixels[i*2 + 1] >> 3) * 
+            pixels[i*4 + 1] = 0;
+        }*/
+    }
 }
 
 @end
