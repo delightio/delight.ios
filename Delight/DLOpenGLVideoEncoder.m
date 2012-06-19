@@ -11,7 +11,6 @@
 
 @interface DLOpenGLVideoEncoder ()
 - (UIImage *)resizedImageForPixelData:(GLubyte *)pixelData backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-- (void)encodeScaledImageForPixelData:(GLubyte *)pixelData backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight presentationTime:(CMTime)time;
 @end
 
 @implementation DLOpenGLVideoEncoder
@@ -91,7 +90,8 @@
         glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
                             
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self encodeScaledImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight presentationTime:time];
+            UIImage *image = [self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight];
+            [self encodeImage:image atPresentationTime:time byteShift:1];
             
             CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
             CVPixelBufferRelease(pixelBuffer);
@@ -147,33 +147,6 @@
     CGImageRelease(iref);    
     
     return image;
-}
-
-- (void)encodeScaledImageForPixelData:(GLubyte *)pixelBufferData backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight presentationTime:(CMTime)time
-{
-    UIImage *image = [self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight];
-    
-    CVPixelBufferRef avPixelBuffer = NULL;
-    int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &avPixelBuffer);
-    if (status != kCVReturnSuccess) {
-        // Could not get a buffer from the pool
-        DLLog(@"[Delight] Error creating scaled pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
-    } else {
-        // Put image data into pixel buffer
-        CVPixelBufferLockBaseAddress(avPixelBuffer, 0);
-        uint8_t *destPixels = CVPixelBufferGetBaseAddress(avPixelBuffer);
-        
-        CFDataRef imageData = CGDataProviderCopyData(CGImageGetDataProvider(image.CGImage));
-        CFDataGetBytes(imageData, CFRangeMake(0, CFDataGetLength(imageData) - 1), destPixels + 1);      // + 1 to convert RGBA->ARGB
-        CFRelease(imageData);
-        
-        if (self.recording && ![avAdaptor appendPixelBuffer:avPixelBuffer withPresentationTime:time]) {
-            DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
-        }
-        
-        CVPixelBufferUnlockBaseAddress(avPixelBuffer, 0);
-        CVPixelBufferRelease(avPixelBuffer);
-    }
 }
 
 @end

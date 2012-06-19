@@ -40,6 +40,7 @@
 - (void)setup;
 - (void)setupWriter;
 - (void)cleanup;
+- (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift;
 - (NSURL *)tempFileURL;
 - (CMTime)currentFrameTime;
 
