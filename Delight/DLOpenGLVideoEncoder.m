@@ -53,6 +53,7 @@
     if (usesImplementationPixelFormat) {
         glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &pixelFormat);
         glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &pixelType);
+        rgbaShift = NO;
     } else {
         pixelFormat = GL_RGBA;
         pixelType = GL_UNSIGNED_BYTE;
