@@ -112,6 +112,40 @@
     [videoWriter release]; videoWriter = nil;
 }
 
+- (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift
+{
+    if ([videoWriterInput isReadyForMoreMediaData] && self.recording) {        
+        [lock lock];
+        
+        CVPixelBufferRef pixelBuffer = NULL;
+        CGImageRef cgImage = CGImageCreateCopy([frameImage CGImage]);
+        CFDataRef image = CGDataProviderCopyData(CGImageGetDataProvider(cgImage));
+        
+        int status = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, avAdaptor.pixelBufferPool, &pixelBuffer);
+        if (status != kCVReturnSuccess) {
+            // Could not get a buffer from the pool
+            DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+        } else {
+            // Put image data into pixel buffer
+            CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+            uint8_t *destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
+            CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image) - byteShift), destPixels + byteShift);
+            
+            if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]){
+                DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
+            }
+            
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+            CVPixelBufferRelease(pixelBuffer);
+        }
+        
+        CFRelease(image);
+        CGImageRelease(cgImage);
+        
+        [lock unlock];
+    }
+}
+
 - (long)outputFileSize
 {
     NSError *error = nil;
