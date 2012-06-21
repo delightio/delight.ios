@@ -37,6 +37,8 @@ size_t CoreSurfaceBufferGetBytesPerElement(CoreSurfaceBufferRef surface);
 size_t CoreSurfaceBufferGetElementWidth(CoreSurfaceBufferRef surface);
 size_t CoreSurfaceBufferGetElementHeight(CoreSurfaceBufferRef surface);
 
+int CoreSurfaceBufferFlushProcessorCaches(CoreSurfaceBufferRef surface);
+    
 /* Set type to 0. */
 int CoreSurfaceAcceleratorCreate(CFAllocatorRef allocator, int type,
     CoreSurfaceAcceleratorRef *accel);

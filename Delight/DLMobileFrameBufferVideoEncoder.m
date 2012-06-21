@@ -58,15 +58,37 @@
         screenHeight = CoreSurfaceBufferGetHeight(surfaceBuffer);
         screenWidth = CoreSurfaceBufferGetWidth(surfaceBuffer);
         bytesPerRow = CoreSurfaceBufferGetBytesPerRow(surfaceBuffer);
-        
-        NSLog(@"Screen height: %i, width: %i, bytes per row: %i, size: %i", screenHeight, screenWidth, bytesPerRow, CoreSurfaceBufferGetAllocSize(surfaceBuffer));
-        
+                
         CoreSurfaceBufferLock(surfaceBuffer);
         frameBuffer = CoreSurfaceBufferGetBaseAddress(surfaceBuffer);
+        NSLog(@"Screen height: %i, width: %i, bytes per row: %i, size: %zu", screenHeight, screenWidth, bytesPerRow, CoreSurfaceBufferGetAllocSize(surfaceBuffer));
+        NSLog(@"Buffer address: %p", frameBuffer);
+        /*NSLog(@"Lines:");
+        for (int j = 527; j < 535; j++) {
+            for (int i = 195; i < 205; i++) {
+                printf("%3d ", frameBuffer[i*4 + j*screenWidth]);
+                printf("%3d ", frameBuffer[i*4 + 1 + j*screenWidth]);
+                printf("%3d ", frameBuffer[i*4 + 2 + j*screenWidth]);
+                printf("%3d ", frameBuffer[i*4 + 3 + j*screenWidth]);
+            }
+            printf("\n");
+        }*/
+
+//        // Write to file
+//        static int i = 0;
+//        if (i++ == 40) {
+//            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
+//            NSString *documentsDirectory = [paths objectAtIndex:0];
+//            NSString *file = [documentsDirectory stringByAppendingPathComponent:@"frame.bin"];
+//            [[NSFileManager defaultManager] removeItemAtPath:file error:NULL];
+//            NSMutableData *data = [NSMutableData data];
+//            [data appendBytes:frameBuffer length:CoreSurfaceBufferGetAllocSize(surfaceBuffer)];
+//            [data writeToFile:file atomically:YES];
+//        }        
+        
+        CoreSurfaceBufferFlushProcessorCaches(surfaceBuffer);
         memcpy(pixelBufferData, frameBuffer, screenHeight * bytesPerRow);
         CoreSurfaceBufferUnlock(surfaceBuffer);
-
-        //        memset(frameBuffer, 255, CoreSurfaceBufferGetAllocSize(surfaceBuffer));
         
         if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
             DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
