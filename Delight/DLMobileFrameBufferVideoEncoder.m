@@ -14,6 +14,35 @@
 
 @implementation DLMobileFrameBufferVideoEncoder
 
+static CoreSurfaceAcceleratorRef accelerator_;
+static CoreSurfaceBufferRef buffer_;
+static const size_t BytesPerPixel = 4;
+static CFDictionaryRef options_;
+
+- (void)setup
+{
+    [super setup];
+
+    CoreSurfaceAcceleratorCreate(NULL, NULL, &accelerator_);
+    options_ = (CFDictionaryRef) [[NSDictionary dictionaryWithObjectsAndKeys:
+                                   nil] retain];
+    
+    if (accelerator_ != NULL) {
+        buffer_ = CoreSurfaceBufferCreate((CFDictionaryRef) [NSDictionary dictionaryWithObjectsAndKeys:
+                                                             @"PurpleEDRAM", kCoreSurfaceBufferMemoryRegion,
+                                                             [NSNumber numberWithBool:YES], kCoreSurfaceBufferGlobal,
+                                                             [NSNumber numberWithInt:(self.videoSize.width * BytesPerPixel)], kCoreSurfaceBufferPitch,
+                                                             [NSNumber numberWithInt:self.videoSize.width], kCoreSurfaceBufferWidth,
+                                                             [NSNumber numberWithInt:self.videoSize.height], kCoreSurfaceBufferHeight,
+                                                             [NSNumber numberWithInt:'BGRA'], kCoreSurfaceBufferPixelFormat,
+                                                             [NSNumber numberWithInt:(self.videoSize.width * self.videoSize.height * BytesPerPixel)], kCoreSurfaceBufferAllocSize,
+                                                             nil]);
+    } else {
+        NSLog(@"Couldn't create accelerator!");
+    }
+}
+
+
 - (void)encode
 {
     if (!videoWriter) {
@@ -36,7 +65,7 @@
     CVPixelBufferLockBaseAddress(pixelBuffer, 0);
     void *pixelBufferData = (void *) CVPixelBufferGetBaseAddress(pixelBuffer);
 
-    dispatch_async(dispatch_get_main_queue(), ^{
+//    dispatch_async(dispatch_get_main_queue(), ^{
         IOMobileFramebufferConnection conn;
         CoreSurfaceBufferRef surfaceBuffer;
         int screenHeight, screenWidth, bytesPerRow;
@@ -58,37 +87,17 @@
         screenHeight = CoreSurfaceBufferGetHeight(surfaceBuffer);
         screenWidth = CoreSurfaceBufferGetWidth(surfaceBuffer);
         bytesPerRow = CoreSurfaceBufferGetBytesPerRow(surfaceBuffer);
-                
-        CoreSurfaceBufferLock(surfaceBuffer);
-        frameBuffer = CoreSurfaceBufferGetBaseAddress(surfaceBuffer);
         NSLog(@"Screen height: %i, width: %i, bytes per row: %i, size: %zu", screenHeight, screenWidth, bytesPerRow, CoreSurfaceBufferGetAllocSize(surfaceBuffer));
-        NSLog(@"Buffer address: %p", frameBuffer);
-        /*NSLog(@"Lines:");
-        for (int j = 527; j < 535; j++) {
-            for (int i = 195; i < 205; i++) {
-                printf("%3d ", frameBuffer[i*4 + j*screenWidth]);
-                printf("%3d ", frameBuffer[i*4 + 1 + j*screenWidth]);
-                printf("%3d ", frameBuffer[i*4 + 2 + j*screenWidth]);
-                printf("%3d ", frameBuffer[i*4 + 3 + j*screenWidth]);
-            }
-            printf("\n");
-        }*/
 
-//        // Write to file
-//        static int i = 0;
-//        if (i++ == 40) {
-//            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
-//            NSString *documentsDirectory = [paths objectAtIndex:0];
-//            NSString *file = [documentsDirectory stringByAppendingPathComponent:@"frame.bin"];
-//            [[NSFileManager defaultManager] removeItemAtPath:file error:NULL];
-//            NSMutableData *data = [NSMutableData data];
-//            [data appendBytes:frameBuffer length:CoreSurfaceBufferGetAllocSize(surfaceBuffer)];
-//            [data writeToFile:file atomically:YES];
-//        }        
-        
-        CoreSurfaceBufferFlushProcessorCaches(surfaceBuffer);
+        CoreSurfaceAcceleratorTransferSurface(accelerator_, surfaceBuffer, buffer_, options_);
+        frameBuffer = CoreSurfaceBufferGetBaseAddress(buffer_);
         memcpy(pixelBufferData, frameBuffer, screenHeight * bytesPerRow);
-        CoreSurfaceBufferUnlock(surfaceBuffer);
+        
+//        CoreSurfaceBufferLock(surfaceBuffer, 3);
+//        frameBuffer = CoreSurfaceBufferGetBaseAddress(surfaceBuffer);
+//        CoreSurfaceBufferFlushProcessorCaches(surfaceBuffer);
+//        memcpy(pixelBufferData, frameBuffer, screenHeight * bytesPerRow);
+//        CoreSurfaceBufferUnlock(surfaceBuffer);
         
         if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
             DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
@@ -98,7 +107,22 @@
         CVPixelBufferRelease(pixelBuffer);
         
         encoding = NO;
-    });
+//    });
+}
+
+- (void)writeBufferToFile:(CoreSurfaceBufferRef)surfaceBuffer
+{
+    // Write to file
+    static int i = 0;
+    if (i++ == 40) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        NSString *file = [documentsDirectory stringByAppendingPathComponent:@"frame.bin"];
+        [[NSFileManager defaultManager] removeItemAtPath:file error:NULL];
+        NSMutableData *data = [NSMutableData data];
+        [data appendBytes:CoreSurfaceBufferGetBaseAddress(surfaceBuffer) length:CoreSurfaceBufferGetAllocSize(surfaceBuffer)];
+        [data writeToFile:file atomically:YES];
+    }        
 }
 
 @end

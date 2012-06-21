@@ -25,7 +25,7 @@ unsigned int CoreSurfaceBufferGetPixelFormatType(CoreSurfaceBufferRef surface);
 unsigned int CoreSurfaceBufferGetID(CoreSurfaceBufferRef surface);
 unsigned int CoreSurfaceBufferGetPlaneCount(CoreSurfaceBufferRef surface);
 
-int CoreSurfaceBufferLock(CoreSurfaceBufferRef surface);
+int CoreSurfaceBufferLock(CoreSurfaceBufferRef surface, unsigned int lockType);
 int CoreSurfaceBufferUnlock(CoreSurfaceBufferRef surface);
 int CoreSurfaceBufferWrapClientMemory(CoreSurfaceBufferRef surface);
 void *CoreSurfaceBufferGetBaseAddress(CoreSurfaceBufferRef surface);
@@ -38,6 +38,7 @@ size_t CoreSurfaceBufferGetElementWidth(CoreSurfaceBufferRef surface);
 size_t CoreSurfaceBufferGetElementHeight(CoreSurfaceBufferRef surface);
 
 int CoreSurfaceBufferFlushProcessorCaches(CoreSurfaceBufferRef surface);
+int CoreSurfaceAcceleratorTransferSurface(CoreSurfaceAcceleratorRef accel, CoreSurfaceBufferRef src, CoreSurfaceBufferRef dst, CFDictionaryRef dict);
     
 /* Set type to 0. */
 int CoreSurfaceAcceleratorCreate(CFAllocatorRef allocator, int type,
