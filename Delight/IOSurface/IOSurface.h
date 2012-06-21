@@ -11,5 +11,6 @@
 
 #include "IOSurfaceBase.h"
 #include "IOSurfaceAPI.h"
+#include "IOSurfaceAccelerator.h"
 
 #endif

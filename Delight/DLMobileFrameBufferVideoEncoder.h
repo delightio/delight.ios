@@ -9,7 +9,6 @@
 #import "DLVideoEncoder.h"
 
 @interface DLMobileFrameBufferVideoEncoder : DLVideoEncoder {
-    BOOL encoding;
 }
 
 - (void)encode;

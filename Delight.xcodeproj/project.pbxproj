@@ -115,6 +115,7 @@
 		8385CA7E154768530057FC37 /* DLTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTouch.m; sourceTree = "<group>"; };
 		8385CA811547688D0057FC37 /* DLOrientationChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLOrientationChange.h; sourceTree = "<group>"; };
 		8385CA821547688E0057FC37 /* DLOrientationChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLOrientationChange.m; sourceTree = "<group>"; };
+		8386255F1593E49300F4660D /* IOSurfaceAccelerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IOSurfaceAccelerator.h; sourceTree = "<group>"; };
 		8391626D1537C21000549347 /* DLGestureTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGestureTracker.h; sourceTree = "<group>"; };
 		8391626E1537C21000549347 /* DLGestureTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGestureTracker.m; sourceTree = "<group>"; };
 		83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLOpenGLVideoEncoder.h; sourceTree = "<group>"; };
@@ -381,6 +382,7 @@
 				83EE860515916AF5003F7AFA /* IOSurface.h */,
 				83EE860615916AF5003F7AFA /* IOSurfaceAPI.h */,
 				83EE860715916AF5003F7AFA /* IOSurfaceBase.h */,
+				8386255F1593E49300F4660D /* IOSurfaceAccelerator.h */,
 			);
 			path = IOSurface;
 			sourceTree = "<group>";
