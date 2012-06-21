@@ -98,11 +98,15 @@
 }
 
 - (BOOL)allRequiredTracksExist {
-	if ( _sourceFilePaths == nil ) return NO;
+	if ( _sourceFilePaths == nil ) {
+		DLDebugLog(@"No recorded files to send to server at all!");
+		return NO;
+	}
 	NSFileManager * fm = [NSFileManager defaultManager];
 	BOOL existFlag = YES;
 	for (NSString * theKey in _sourceFilePaths) {
 		if ( ![fm fileExistsAtPath:[_sourceFilePaths objectForKey:theKey]] ) {
+			DLDebugLog(@"File not exist: %@", [_sourceFilePaths objectForKey:theKey]);
 			existFlag = NO;
 		}
 	}
