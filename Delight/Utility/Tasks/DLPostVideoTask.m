@@ -32,9 +32,11 @@
 }
 
 - (void)processResponse {
-//	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
-//	NSLog(@"posted video: %@", str);
-//	[str release];
+#ifdef DEBUG
+	NSString * str = [[NSString alloc] initWithData:self.receivedData encoding:NSUTF8StringEncoding];
+	NSLog(@"posted %@: %@", _trackName, str);
+	[str release];
+#endif
 	if ( [_trackName isEqualToString:@"screen_track"] ) {
 		[self.recordingContext setTaskFinished:DLFinishedPostVideo];
 	} else if ( [_trackName isEqualToString:@"touch_track"] ) {

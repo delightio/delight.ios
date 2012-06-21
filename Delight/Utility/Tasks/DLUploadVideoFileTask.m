@@ -71,6 +71,7 @@
 	} else if ( [_trackName isEqualToString:@"front_track"] ) {
 		[self.recordingContext setTaskFinished:DLFinishedUploadFrontCameraFile];
 	}
+	DLDebugLog(@"uploaded %@ to server", _trackName);
 	// delete video file
 	NSError * err = nil;
 	NSString * fPath = [self.recordingContext.sourceFilePaths objectForKey:_trackName];
