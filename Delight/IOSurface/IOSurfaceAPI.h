@@ -9,7 +9,9 @@
 #ifndef _IOSURFACE_API_H
 #define _IOSURFACE_API_H 1
 
-#include "IOKitLib.h"
+//#include "IOKitLib.h"
+typedef	kern_return_t		IOReturn;
+
 #include "IOSurfaceBase.h"
 
 __BEGIN_DECLS
