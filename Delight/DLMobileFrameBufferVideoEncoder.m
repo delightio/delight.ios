@@ -9,26 +9,46 @@
 #import "DLMobileFrameBufferVideoEncoder.h"
 #include "IOSurface/IOSurface.h"
 
+#define DL_MIN_SURFACE_DIMENSION 200
+
 @implementation DLMobileFrameBufferVideoEncoder
 
 static IOSurfaceAcceleratorRef accel = NULL;
-static IOSurfaceRef surf;
-static IOSurfaceRef ref;
+static IOSurfaceRef surf = NULL;
+static IOSurfaceRef ref = NULL;
 
 - (void)setup
 {
-    IOSurfaceID searchId = 1;
-    ref = IOSurfaceLookup(searchId);
     uint32_t aseed;
-    IOSurfaceLock(ref, kIOSurfaceLockReadOnly, &aseed);
-    uint32_t width = IOSurfaceGetWidth(ref);
-    uint32_t height = IOSurfaceGetHeight(ref);
+    uint32_t width, height;
+    
+    // Find our framebuffer surface
+    for (IOSurfaceID searchId = 0; searchId < 10; searchId++) {
+        IOSurfaceRef potentialSurface = IOSurfaceLookup(searchId);
+        IOSurfaceLock(potentialSurface, kIOSurfaceLockReadOnly, &aseed);
+        width = IOSurfaceGetWidth(potentialSurface);
+        height = IOSurfaceGetHeight(potentialSurface);
+        IOSurfaceUnlock(potentialSurface, kIOSurfaceLockReadOnly, &aseed);
 
-    IOSurfaceAcceleratorCreate(NULL, 0, &accel);
-    if (accel == nil) {
-        DLLog(@"[Delight] Error: Accelerator was not created");
+        if (width > DL_MIN_SURFACE_DIMENSION && height > DL_MIN_SURFACE_DIMENSION) {
+            ref = potentialSurface;
+            break;
+        }
     }
     
+    if (ref == NULL) {
+        DLLog(@"[Delight] Error: Couldn't find a surface");
+        return;
+    }
+    
+    IOSurfaceAcceleratorCreate(NULL, 0, &accel);
+    if (accel == NULL) {
+        DLLog(@"[Delight] Error: Accelerator was not created");
+        return;
+    }
+    
+    IOSurfaceLock(ref, kIOSurfaceLockReadOnly, &aseed);
+
     int pitch = width * 4, allocSize = 4 * width * height;
     int bPE = 4;
     char pixelFormat[4] = {'A', 'R', 'G', 'B'};
