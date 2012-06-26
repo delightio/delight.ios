@@ -23,6 +23,7 @@
 #import "UITextField+DLPrivateView.h"
 #import "DLCamCaptureManager.h"
 #import </usr/include/objc/objc-class.h>
+#import "IOKitLib.h"
 
 #define kDLDefaultScaleFactor 0.5f
 #define kDLDefaultMaximumFrameRate 15.0f
@@ -233,6 +234,23 @@ typedef enum {
 {
     self = [super init];
     if (self) {        
+		io_service_t srv = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
+		io_name_t devName;
+		IORegistryEntryGetName(srv, devName);
+		NSLog(@"%s", devName);
+		io_string_t pathName;
+		IORegistryEntryGetPath(srv, kIOServicePlane, pathName);
+		NSLog(@"%s", pathName);
+//		io_iterator_t ioIterator;
+//		IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceNameMatching("LCD"), &ioIterator);
+//		io_object_t ioObj;
+//		io_name_t ioObjName;
+//		while ( ( ioObj = IOIteratorNext(ioIterator) ) ) {
+//			IOObjectGetClass(ioObj, ioObjName);
+//			NSLog(@"%s", ioObjName);
+//			CFTypeRef theType = IORegistryEntryCreateCFProperty(ioObj, kIONameMatchKey, NULL, 0);
+//			IOObjectRelease(ioObj);
+//		}
         screenshotController = [[DLScreenshotController alloc] init];        
                 
         gestureTracker = [[DLGestureTracker alloc] init];
