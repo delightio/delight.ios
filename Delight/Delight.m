@@ -72,7 +72,7 @@ typedef enum {
     NSTimeInterval lastScreenshotTime;
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
-    BOOL stopped;
+    BOOL userStopped;
     NSOperationQueue *screenshotQueue;
 
     // Helper classes
@@ -151,6 +151,7 @@ typedef enum {
 {
     [[self sharedInstance] stopRecording];
     [self sharedInstance]->metrics.stopReason = DLMetricsStopReasonManual;
+    [self sharedInstance]->userStopped = YES;
 }
 
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer
@@ -366,9 +367,7 @@ typedef enum {
 }
 
 - (void)stopRecording 
-{
-    stopped = YES;
-    
+{    
     if (cameraManager.recording) {
         [cameraManager stopRecording];
     }
@@ -493,7 +492,7 @@ typedef enum {
 #pragma mark - Session
 
 - (void)tryCreateNewSession {
-    stopped = NO;
+    userStopped = NO;
     
 #ifdef DL_OFFLINE_RECORDING
     [self startRecording];
@@ -564,7 +563,7 @@ typedef enum {
 
 - (void)handleWillEnterForeground:(NSNotification *)notification
 {
-    if (!stopped) {
+    if (!userStopped) {
         [self tryCreateNewSession];
     }
 }
@@ -572,7 +571,7 @@ typedef enum {
 - (void)handleDidBecomeActive:(NSNotification *)notification
 {
     // In iOS 4, locking the screen does not trigger didEnterBackground: notification. Check if we've been inactive for a long time.
-    if (resignActiveTime > 0 && !appInBackground && !stopped && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
+    if (resignActiveTime > 0 && !appInBackground && !userStopped && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
         NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
         if (inactiveTime > kDLMaximumSessionInactiveTime) {
             // We've been inactive for a long time, stop the previous recording and create a new session
