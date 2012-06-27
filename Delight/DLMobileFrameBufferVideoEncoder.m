@@ -19,21 +19,41 @@ static IOSurfaceRef ref = NULL;
 
 - (void)setup
 {
-    uint32_t aseed;
-    uint32_t width, height;
-    
+    uint32_t aseed;    
     IOMobileFramebufferConnection connect;
     
-    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOMobileFramebuffer"));
-    if (!framebufferService) {
-        DLLog(@"[Delight] Error: Couldn't find a matching IOService");
-        return;
+    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2TVOut"));
+    if (framebufferService) {
+        DLDebugLog(@"Using AppleM2TVOut");
+    } else {
+        framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
+        if (framebufferService) {
+            DLDebugLog(@"Using AppleCLCD");
+        } else {
+            framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleH1CLCD"));
+            if (framebufferService) {
+                DLDebugLog(@"Using AppleHC1CLCD");
+            } else {
+                framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2CLCD"));
+                if (framebufferService) {
+                    DLDebugLog(@"Using AppleM2CLCD");
+                } else {
+                    framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOMobileFramebuffer"));
+                    if (framebufferService) {
+                        DLDebugLog(@"Using IOMobileFramebuffer");
+                    } else {
+                        DLLog(@"[Delight] Error: Couldn't find a matching IOService");
+                        return;
+                    }
+                }
+            }
+        }
     }
     
     IOMobileFramebufferOpen(framebufferService, mach_task_self(), 0, &connect);
     IOMobileFramebufferGetLayerDefaultSurface(connect, 0, &ref);    
-    width = IOSurfaceGetWidth(ref);
-    height = IOSurfaceGetHeight(ref);
+    uint32_t width = IOSurfaceGetWidth(ref);
+    uint32_t height = IOSurfaceGetHeight(ref);
     
     if (ref == NULL) {
         DLLog(@"[Delight] Error: Couldn't find a surface");
