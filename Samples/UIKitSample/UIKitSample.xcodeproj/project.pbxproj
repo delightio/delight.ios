@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		83186269159BAC7200CFB45D /* IOMobileFramebuffer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83186268159BAC7200CFB45D /* IOMobileFramebuffer.framework */; };
 		837C3A3A153F870600463CB3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A39153F870600463CB3 /* UIKit.framework */; };
 		837C3A3C153F870600463CB3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A3B153F870600463CB3 /* Foundation.framework */; };
 		837C3A3E153F870600463CB3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A3D153F870600463CB3 /* CoreGraphics.framework */; };
@@ -46,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		83186268159BAC7200CFB45D /* IOMobileFramebuffer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOMobileFramebuffer.framework; path = System/Library/PrivateFrameworks/IOMobileFramebuffer.framework; sourceTree = SDKROOT; };
 		837C3A35153F870600463CB3 /* UIKitSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIKitSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		837C3A39153F870600463CB3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		837C3A3B153F870600463CB3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -101,6 +103,7 @@
 				837C3A3A153F870600463CB3 /* UIKit.framework in Frameworks */,
 				837C3A3C153F870600463CB3 /* Foundation.framework in Frameworks */,
 				83E58A5215926DA400B01636 /* IOSurface.framework in Frameworks */,
+				83186269159BAC7200CFB45D /* IOMobileFramebuffer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +132,7 @@
 			children = (
 				838292FB15586257007C6CDA /* Delight.xcodeproj */,
 				A951E3EB15994194003C6038 /* libIOKit.dylib */,
+				83186268159BAC7200CFB45D /* IOMobileFramebuffer.framework */,
 				83E58A4F15926DA400B01636 /* IOSurface.framework */,
 				838292A315584DF1007C6CDA /* AssetsLibrary.framework */,
 				838897081545FABE00FCE2D5 /* SystemConfiguration.framework */,

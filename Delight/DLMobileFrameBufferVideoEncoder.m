@@ -8,8 +8,8 @@
 
 #import "DLMobileFrameBufferVideoEncoder.h"
 #include "IOSurface/IOSurface.h"
-
-#define DL_MIN_SURFACE_DIMENSION 200
+#include "IOKit/IOKitLib.h"
+#include "IOMobileFramebuffer/IOMobileFramebuffer.h"
 
 @implementation DLMobileFrameBufferVideoEncoder
 
@@ -22,19 +22,24 @@ static IOSurfaceRef ref = NULL;
     uint32_t aseed;
     uint32_t width, height;
     
-    // Find our framebuffer surface
-    for (IOSurfaceID searchId = 0; searchId < 10; searchId++) {
-        IOSurfaceRef potentialSurface = IOSurfaceLookup(searchId);
-        IOSurfaceLock(potentialSurface, kIOSurfaceLockReadOnly, &aseed);
-        width = IOSurfaceGetWidth(potentialSurface);
-        height = IOSurfaceGetHeight(potentialSurface);
-        IOSurfaceUnlock(potentialSurface, kIOSurfaceLockReadOnly, &aseed);
-
-        if (width > DL_MIN_SURFACE_DIMENSION && height > DL_MIN_SURFACE_DIMENSION) {
-            ref = potentialSurface;
-            break;
+    IOMobileFramebufferConnection connect;
+    
+    // Probe possible framebuffers
+    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleH1CLCD"));
+    if (!framebufferService) {
+        framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2CLCD"));
+        if (!framebufferService) {
+            framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
+            if (!framebufferService) {
+                DLLog(@"[Delight] Error: Couldn't find a matching IOService");
+            }
         }
     }
+    
+    IOMobileFramebufferOpen(framebufferService, mach_task_self(), 0, &connect);
+    IOMobileFramebufferGetLayerDefaultSurface(connect, 0, &ref);    
+    width = IOSurfaceGetWidth(ref);
+    height = IOSurfaceGetHeight(ref);
     
     if (ref == NULL) {
         DLLog(@"[Delight] Error: Couldn't find a surface");
@@ -73,7 +78,6 @@ static IOSurfaceRef ref = NULL;
     IOSurfaceUnlock(ref, kIOSurfaceLockReadOnly, &aseed);
     
     self.videoSize = CGSizeMake(width, height);
-    
     [super setup];
 }
 

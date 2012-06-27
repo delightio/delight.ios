@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		83149B2815337E5C00003862 /* DLScreenshotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2615337E5C00003862 /* DLScreenshotController.h */; settings = {ATTRIBUTES = (); }; };
 		83149B2915337E5C00003862 /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
+		83186258159BA98300CFB45D /* IOMobileFramebuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 83186257159BA98300CFB45D /* IOMobileFramebuffer.h */; };
+		8318625B159BAACD00CFB45D /* IOMobileFramebuffer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8318625A159BAACD00CFB45D /* IOMobileFramebuffer.framework */; };
 		832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 832D1DAC1589626D004F2BD6 /* DLConstants.h */; };
 		833B500D15670E690085552F /* DLMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 833B500B15670E690085552F /* DLMetrics.h */; };
 		833B500E15670E690085552F /* DLMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 833B500C15670E690085552F /* DLMetrics.m */; };
@@ -143,6 +145,8 @@
 		83149B2715337E5C00003862 /* DLScreenshotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLScreenshotController.m; sourceTree = "<group>"; };
 		83149B2B15338CC500003862 /* DLVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLVideoEncoder.h; sourceTree = "<group>"; };
 		83149B2C15338CC500003862 /* DLVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLVideoEncoder.m; sourceTree = "<group>"; };
+		83186257159BA98300CFB45D /* IOMobileFramebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOMobileFramebuffer.h; sourceTree = "<group>"; };
+		8318625A159BAACD00CFB45D /* IOMobileFramebuffer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOMobileFramebuffer.framework; path = System/Library/PrivateFrameworks/IOMobileFramebuffer.framework; sourceTree = SDKROOT; };
 		832D1DAC1589626D004F2BD6 /* DLConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLConstants.h; sourceTree = "<group>"; };
 		833B500B15670E690085552F /* DLMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLMetrics.h; sourceTree = "<group>"; };
 		833B500C15670E690085552F /* DLMetrics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLMetrics.m; sourceTree = "<group>"; };
@@ -294,12 +298,21 @@
 				83B896B414EAEFBF006D93C2 /* QuartzCore.framework in Frameworks */,
 				83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */,
 				83E58A4C15926D8000B01636 /* IOSurface.framework in Frameworks */,
+				8318625B159BAACD00CFB45D /* IOMobileFramebuffer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		83186256159BA98300CFB45D /* IOMobileFramebuffer */ = {
+			isa = PBXGroup;
+			children = (
+				83186257159BA98300CFB45D /* IOMobileFramebuffer.h */,
+			);
+			path = IOMobileFramebuffer;
+			sourceTree = "<group>";
+		};
 		836ABF241548D47400926A71 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
@@ -343,6 +356,7 @@
 			isa = PBXGroup;
 			children = (
 				A951E34D1599405A003C6038 /* IOKit */,
+				83186256159BA98300CFB45D /* IOMobileFramebuffer */,
 				83EE860415916AF5003F7AFA /* IOSurface */,
 				83149B2B15338CC500003862 /* DLVideoEncoder.h */,
 				83149B2C15338CC500003862 /* DLVideoEncoder.m */,
@@ -377,6 +391,7 @@
 			isa = PBXGroup;
 			children = (
 				A951E3DF1599408C003C6038 /* libIOKit.dylib */,
+				8318625A159BAACD00CFB45D /* IOMobileFramebuffer.framework */,
 				83E58A4915926D8000B01636 /* IOSurface.framework */,
 				A980945E1542B221002B2BCE /* SystemConfiguration.framework */,
 				A9A9A3D715371A3E00B6E4AB /* UIKit.framework */,
@@ -727,6 +742,7 @@
 				A951E3DC1599405A003C6038 /* IOUSBLib.h in Headers */,
 				A951E3DD1599405A003C6038 /* USB.h in Headers */,
 				A951E3DE1599405A003C6038 /* USBSpec.h in Headers */,
+				83186258159BA98300CFB45D /* IOMobileFramebuffer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
