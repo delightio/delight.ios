@@ -110,7 +110,6 @@
 		837C3A2A153F870600463CB3 = {
 			isa = PBXGroup;
 			children = (
-				A951E3EB15994194003C6038 /* libIOKit.dylib */,
 				837C3A3F153F870600463CB3 /* UIKitSample */,
 				837C3A38153F870600463CB3 /* Frameworks */,
 				837C3A36153F870600463CB3 /* Products */,
@@ -129,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				838292FB15586257007C6CDA /* Delight.xcodeproj */,
+				A951E3EB15994194003C6038 /* libIOKit.dylib */,
 				83E58A4F15926DA400B01636 /* IOSurface.framework */,
 				838292A315584DF1007C6CDA /* AssetsLibrary.framework */,
 				838897081545FABE00FCE2D5 /* SystemConfiguration.framework */,
