@@ -24,16 +24,10 @@ static IOSurfaceRef ref = NULL;
     
     IOMobileFramebufferConnection connect;
     
-    // Probe possible framebuffers
-    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleH1CLCD"));
+    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOMobileFramebuffer"));
     if (!framebufferService) {
-        framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2CLCD"));
-        if (!framebufferService) {
-            framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
-            if (!framebufferService) {
-                DLLog(@"[Delight] Error: Couldn't find a matching IOService");
-            }
-        }
+        DLLog(@"[Delight] Error: Couldn't find a matching IOService");
+        return;
     }
     
     IOMobileFramebufferOpen(framebufferService, mach_task_self(), 0, &connect);
