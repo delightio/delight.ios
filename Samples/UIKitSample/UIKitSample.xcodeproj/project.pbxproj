@@ -30,6 +30,7 @@
 		838694E9156EC84400EBDB14 /* icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 838694E5156EC84400EBDB14 /* icon~ipad.png */; };
 		838897091545FABE00FCE2D5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 838897081545FABE00FCE2D5 /* SystemConfiguration.framework */; };
 		83E58A5215926DA400B01636 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E58A4F15926DA400B01636 /* IOSurface.framework */; };
+		A951E3EC15994194003C6038 /* libIOKit.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A951E3EB15994194003C6038 /* libIOKit.dylib */; };
 		A9C4D2ED15781D2D008297A9 /* PrivateRegionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9C4D2EB15781D2D008297A9 /* PrivateRegionsViewController.m */; };
 		A9C4D2EE15781D2D008297A9 /* PrivateRegionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A9C4D2EC15781D2D008297A9 /* PrivateRegionsViewController.xib */; };
 /* End PBXBuildFile section */
@@ -76,6 +77,7 @@
 		838694E5156EC84400EBDB14 /* icon~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon~ipad.png"; sourceTree = "<group>"; };
 		838897081545FABE00FCE2D5 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		83E58A4F15926DA400B01636 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/PrivateFrameworks/IOSurface.framework; sourceTree = SDKROOT; };
+		A951E3EB15994194003C6038 /* libIOKit.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libIOKit.dylib; path = usr/lib/libIOKit.dylib; sourceTree = SDKROOT; };
 		A9C4D2EA15781D2D008297A9 /* PrivateRegionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivateRegionsViewController.h; sourceTree = "<group>"; };
 		A9C4D2EB15781D2D008297A9 /* PrivateRegionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivateRegionsViewController.m; sourceTree = "<group>"; };
 		A9C4D2EC15781D2D008297A9 /* PrivateRegionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PrivateRegionsViewController.xib; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A951E3EC15994194003C6038 /* libIOKit.dylib in Frameworks */,
 				8382932A155863A5007C6CDA /* Delight.framework in Frameworks */,
 				838292A415584DF1007C6CDA /* AssetsLibrary.framework in Frameworks */,
 				838897091545FABE00FCE2D5 /* SystemConfiguration.framework in Frameworks */,
@@ -107,6 +110,7 @@
 		837C3A2A153F870600463CB3 = {
 			isa = PBXGroup;
 			children = (
+				A951E3EB15994194003C6038 /* libIOKit.dylib */,
 				837C3A3F153F870600463CB3 /* UIKitSample */,
 				837C3A38153F870600463CB3 /* Frameworks */,
 				837C3A36153F870600463CB3 /* Products */,
