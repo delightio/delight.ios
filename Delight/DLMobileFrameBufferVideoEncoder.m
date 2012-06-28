@@ -22,29 +22,24 @@ static IOSurfaceRef ref = NULL;
     uint32_t aseed;    
     IOMobileFramebufferConnection connect;
     
-    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2TVOut"));
+    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
     if (framebufferService) {
-        DLDebugLog(@"Using AppleM2TVOut");
+        DLDebugLog(@"Using AppleCLCD");
     } else {
-        framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
+        framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleH1CLCD"));
         if (framebufferService) {
-            DLDebugLog(@"Using AppleCLCD");
+            DLDebugLog(@"Using AppleH1CLCD");
         } else {
-            framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleH1CLCD"));
+            framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2CLCD"));
             if (framebufferService) {
-                DLDebugLog(@"Using AppleHC1CLCD");
+                DLDebugLog(@"Using AppleM2CLCD");
             } else {
-                framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2CLCD"));
+                framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOMobileFramebuffer"));
                 if (framebufferService) {
-                    DLDebugLog(@"Using AppleM2CLCD");
+                    DLDebugLog(@"Using IOMobileFramebuffer");
                 } else {
-                    framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOMobileFramebuffer"));
-                    if (framebufferService) {
-                        DLDebugLog(@"Using IOMobileFramebuffer");
-                    } else {
-                        DLLog(@"[Delight] Error: Couldn't find a matching IOService");
-                        return;
-                    }
+                    DLLog(@"[Delight] Error: Couldn't find a matching IOService");
+                    return;
                 }
             }
         }
