@@ -92,7 +92,7 @@ static IOSurfaceRef ref = NULL;
 
 - (void)encode
 {
-    if (!videoWriter) {
+    if (ref == NULL) {
         [self setup];
     }
     
