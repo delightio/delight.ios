@@ -7,20 +7,17 @@
 //
 
 #import "Delight.h"
+#import "Delight_Private.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
-#import "DLTaskController.h"
-#import "DLScreenshotController.h"
 #import "DLUIKitVideoEncoder.h"
 #import "DLOpenGLVideoEncoder.h"
-#import "DLGestureTracker.h"
 #import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
-#import "DLCamCaptureManager.h"
 #import </usr/include/objc/objc-class.h>
 
 #define kDLDefaultScaleFactor 0.5f
@@ -44,58 +41,35 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
-typedef enum {
-    DLAnnotationNone,
-    DLAnnotationFrontVideoAndAudio,
-    DLAnnotationAudioOnly
-} DLAnnotation;
-
-@interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
-// Methods not yet ready for the public
-+ (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-+ (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-
-+ (Delight *)sharedInstance;
-- (void)setAppToken:(NSString *)anAppToken;
-- (void)setAnnotation:(DLAnnotation)annotation;
-- (void)setOpenGL:(BOOL)openGL;
-- (void)startRecording;
-- (void)stopRecording;
-- (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-- (void)scheduleScreenshot;
-- (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
-@end
-
 @implementation Delight {
     NSUInteger frameCount;
     NSTimeInterval elapsedTime;
     NSTimeInterval lastScreenshotTime;
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
-    BOOL userStopped;
     NSOperationQueue *screenshotQueue;
-
-    // Helper classes
-	DLTaskController *taskController;
-	DLRecordingContext *recordingContext;
-    DLScreenshotController *screenshotController;
-    DLVideoEncoder *videoEncoder;
-    DLGestureTracker *gestureTracker;
-	DLCamCaptureManager *cameraManager;
-    DLMetrics *metrics;
     
     // Configuration
-    NSString *appToken;
-    DLAnnotation annotation;
-    BOOL openGL;
-    BOOL autoCaptureEnabled;
 	BOOL delaySessionUploadForCamera;
 	BOOL cameraDidStop;
-    CGFloat scaleFactor;
     double maximumFrameRate;
     NSTimeInterval maximumRecordingDuration;
-    NSMutableDictionary *userProperties;
 }
+
+@synthesize taskController = _taskController;
+@synthesize recordingContext = _recordingContext;
+@synthesize screenshotController = _screenshotController;
+@synthesize videoEncoder = _videoEncoder;
+@synthesize gestureTracker = _gestureTracker;
+@synthesize cameraManager = _cameraManager;
+@synthesize metrics = _metrics;
+@synthesize appToken = _appToken;
+@synthesize annotation = _annotation;
+@synthesize userStopped = _userStopped;
+@synthesize scaleFactor = _scaleFactor;
+@synthesize autoCaptureEnabled = _autoCaptureEnabled;
+@synthesize openGL = _openGL;
+@synthesize userProperties = _userProperties;
 
 #pragma mark - Class methods
 
@@ -115,10 +89,10 @@ typedef enum {
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
     Delight *delight = [self sharedInstance];
-	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
-		delight->taskController.sessionObjectName = @"usability_app_session";
+	if (annotation == DLAnnotationFrontVideoAndAudio) {
+		delight.taskController.sessionObjectName = @"usability_app_session";
 	} else {
-		delight->taskController.sessionObjectName = @"app_session";
+		delight.taskController.sessionObjectName = @"app_session";
 	}
 	
     [delight setAnnotation:annotation];
@@ -136,10 +110,10 @@ typedef enum {
 {
     Delight *delight = [self sharedInstance];
     [delight setAutoCaptureEnabled:NO];
-	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
-		delight->taskController.sessionObjectName = @"opengl_usability_app_session";
+	if (annotation == DLAnnotationFrontVideoAndAudio) {
+		delight.taskController.sessionObjectName = @"opengl_usability_app_session";
 	} else {
-		delight->taskController.sessionObjectName = @"opengl_app_session";
+		delight.taskController.sessionObjectName = @"opengl_app_session";
 	}
     [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
@@ -150,8 +124,8 @@ typedef enum {
 + (void)stop
 {
     [[self sharedInstance] stopRecording];
-    [self sharedInstance]->metrics.stopReason = DLMetricsStopReasonManual;
-    [self sharedInstance]->userStopped = YES;
+    [self sharedInstance].metrics.stopReason = DLMetricsStopReasonManual;
+    [self sharedInstance].userStopped = YES;
 }
 
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer
@@ -171,12 +145,12 @@ typedef enum {
 
 + (BOOL)savesToPhotoAlbum
 {
-    return [self sharedInstance]->videoEncoder.savesToPhotoAlbum;
+    return [self sharedInstance].videoEncoder.savesToPhotoAlbum;
 }
 
 + (void)setSavesToPhotoAlbum:(BOOL)savesToPhotoAlbum
 {
-    [self sharedInstance]->videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
+    [self sharedInstance].videoEncoder.savesToPhotoAlbum = savesToPhotoAlbum;
 }
 
 + (BOOL)debugLogEnabled
@@ -191,32 +165,32 @@ typedef enum {
 
 + (BOOL)hidesKeyboardInRecording
 {
-    return [self sharedInstance]->screenshotController.hidesKeyboard;
+    return [self sharedInstance].screenshotController.hidesKeyboard;
 }
 
 + (void)setHidesKeyboardInRecording:(BOOL)hidesKeyboardInRecording
 {
-    [self sharedInstance]->screenshotController.hidesKeyboard = hidesKeyboardInRecording;
+    [self sharedInstance].screenshotController.hidesKeyboard = hidesKeyboardInRecording;
     if (hidesKeyboardInRecording) {
-        [self sharedInstance]->metrics.keyboardHiddenCount++;
+        [self sharedInstance].metrics.keyboardHiddenCount++;
     }
 }
 
 + (void)registerPrivateView:(UIView *)view description:(NSString *)description
 {
-    [[self sharedInstance]->screenshotController registerPrivateView:view description:description];
+    [[self sharedInstance].screenshotController registerPrivateView:view description:description];
     
-    [self sharedInstance]->metrics.privateViewCount++;
+    [self sharedInstance].metrics.privateViewCount++;
 }
 
 + (void)unregisterPrivateView:(UIView *)view
 {
-    [[self sharedInstance]->screenshotController unregisterPrivateView:view];
+    [[self sharedInstance].screenshotController unregisterPrivateView:view];
 }
 
 + (NSSet *)privateViews
 {
-    return [self sharedInstance]->screenshotController.privateViews;
+    return [self sharedInstance].screenshotController.privateViews;
 }
 
 + (void)setPropertyValue:(id)value forKey:(NSString *)key
@@ -224,7 +198,7 @@ typedef enum {
     if (![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSNumber class]]) {
         DLLog(@"[Delight] Ignoring property for key %@ - value must be an NSString or an NSNumber.", key);
     } else {
-        [[self sharedInstance]->userProperties setObject:value forKey:key];
+        [[self sharedInstance].userProperties setObject:value forKey:key];
     }
 }
 
@@ -234,17 +208,17 @@ typedef enum {
 {
     self = [super init];
     if (self) {        
-        screenshotController = [[DLScreenshotController alloc] init];        
+        self.screenshotController = [[[DLScreenshotController alloc] init] autorelease];
                 
-        gestureTracker = [[DLGestureTracker alloc] init];
-        gestureTracker.drawsGestures = NO;
-        gestureTracker.delegate = self;
+        self.gestureTracker = [[[DLGestureTracker alloc] init] autorelease];
+        self.gestureTracker.drawsGestures = NO;
+        self.gestureTracker.delegate = self;
         
         screenshotQueue = [[NSOperationQueue alloc] init];
         screenshotQueue.maxConcurrentOperationCount = 1;
 
-        userProperties = [[NSMutableDictionary alloc] init];
-        metrics = [[DLMetrics alloc] init];
+        self.userProperties = [NSMutableDictionary dictionary];
+        self.metrics = [[[DLMetrics alloc] init] autorelease];
         
         [self setScaleFactor:kDLDefaultScaleFactor];
         [self setAutoCaptureEnabled:YES];
@@ -258,9 +232,9 @@ typedef enum {
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
 
 		// create task controller
-		taskController = [[DLTaskController alloc] init];
-		taskController.sessionDelegate = self;
-		taskController.baseDirectory = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"com.pipely.delight"];
+		self.taskController = [[[DLTaskController alloc] init] autorelease];
+		self.taskController.sessionDelegate = self;
+		self.taskController.baseDirectory = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"com.pipely.delight"];
         
         // Method swizzling to intercept touch events
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
@@ -283,15 +257,15 @@ typedef enum {
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    [appToken release];
-    [screenshotController release];
-    [videoEncoder release];
-    [gestureTracker release];
-    [cameraManager release];
+    [_appToken release];
+    [_screenshotController release];
+    [_videoEncoder release];
+    [_gestureTracker release];
+    [_cameraManager release];
+	[_taskController release];
+    [_metrics release];
+    [_userProperties release];
 	[screenshotQueue release];	
-	[taskController release];
-    [userProperties release];
-    [metrics release];
     
     [super dealloc];
 }
@@ -306,7 +280,7 @@ typedef enum {
 
 - (void)startRecording
 {    
-    if (!videoEncoder.recording) {
+    if (!self.videoEncoder.recording) {
         // Identify and create the cache directory if it doesn't already exist
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *cachePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"com.pipely.delight"];
@@ -317,50 +291,50 @@ typedef enum {
             [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:YES attributes:nil error:&error];
         }
         
-        if (recordingContext) {
+        if (self.recordingContext) {
             // Set recording properties from server
-            if (recordingContext.maximumFrameRate > 0) {
-                maximumFrameRate = recordingContext.maximumFrameRate;
-                DLDebugLog(@"Maximum frame rate: %.2f", recordingContext.maximumFrameRate);                
+            if (self.recordingContext.maximumFrameRate > 0) {
+                maximumFrameRate = self.recordingContext.maximumFrameRate;
+                DLDebugLog(@"Maximum frame rate: %.2f", self.recordingContext.maximumFrameRate);                
             }
-            if (recordingContext.scaleFactor > 0) {
-                [self setScaleFactor:recordingContext.scaleFactor];
-                DLDebugLog(@"Scale factor: %.3f", recordingContext.scaleFactor);
+            if (self.recordingContext.scaleFactor > 0) {
+                [self setScaleFactor:self.recordingContext.scaleFactor];
+                DLDebugLog(@"Scale factor: %.3f", self.recordingContext.scaleFactor);
             }
-            if (recordingContext.averageBitRate > 0) {
-                videoEncoder.averageBitRate = recordingContext.averageBitRate;
-                DLDebugLog(@"Average bit rate: %.2f", recordingContext.averageBitRate);
+            if (self.recordingContext.averageBitRate > 0) {
+                self.videoEncoder.averageBitRate = self.recordingContext.averageBitRate;
+                DLDebugLog(@"Average bit rate: %.2f", self.recordingContext.averageBitRate);
             }
-            if (recordingContext.maximumKeyFrameInterval > 0) {
-                videoEncoder.maximumKeyFrameInterval = recordingContext.maximumKeyFrameInterval;
-                DLDebugLog(@"Maximum keyframe interval: %i", recordingContext.maximumKeyFrameInterval);
+            if (self.recordingContext.maximumKeyFrameInterval > 0) {
+                self.videoEncoder.maximumKeyFrameInterval = self.recordingContext.maximumKeyFrameInterval;
+                DLDebugLog(@"Maximum keyframe interval: %i", self.recordingContext.maximumKeyFrameInterval);
             }
-            if (recordingContext.maximumRecordingDuration > 0) {
-                maximumRecordingDuration = recordingContext.maximumRecordingDuration;
-                DLDebugLog(@"Maximum recording duration: %.1f", recordingContext.maximumRecordingDuration);
+            if (self.recordingContext.maximumRecordingDuration > 0) {
+                maximumRecordingDuration = self.recordingContext.maximumRecordingDuration;
+                DLDebugLog(@"Maximum recording duration: %.1f", self.recordingContext.maximumRecordingDuration);
             }
         }
         
-        videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
-        [videoEncoder startNewRecording];
+        self.videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (self.recordingContext ? self.recordingContext.sessionID : @"output")];
+        [self.videoEncoder startNewRecording];
         
-        if (annotation != DLAnnotationNone) {    
-            if (!cameraManager) {
-                cameraManager = [[DLCamCaptureManager alloc] init];
-                cameraManager.audioOnly = (annotation == DLAnnotationAudioOnly);
-                cameraManager.savesToPhotoAlbum = videoEncoder.savesToPhotoAlbum;
-                cameraManager.delegate = self;
+        if (self.annotation != DLAnnotationNone) {    
+            if (!self.cameraManager) {
+                self.cameraManager = [[[DLCamCaptureManager alloc] init] autorelease];
+                self.cameraManager.audioOnly = (self.annotation == DLAnnotationAudioOnly);
+                self.cameraManager.savesToPhotoAlbum = self.videoEncoder.savesToPhotoAlbum;
+                self.cameraManager.delegate = self;
             }
 
-            cameraManager.outputPath = [NSString stringWithFormat:@"%@/%@_camera.mp4", cachePath, (recordingContext ? recordingContext.sessionID : @"output")];
-            [cameraManager startRecording];
-            recordingContext.cameraFilePath = cameraManager.outputPath;
+            self.cameraManager.outputPath = [NSString stringWithFormat:@"%@/%@_camera.mp4", cachePath, (self.recordingContext ? self.recordingContext.sessionID : @"output")];
+            [self.cameraManager startRecording];
+            self.recordingContext.cameraFilePath = self.cameraManager.outputPath;
         }
         
-        recordingContext.startTime = [NSDate date];
-        recordingContext.screenFilePath = videoEncoder.outputPath;
+        self.recordingContext.startTime = [NSDate date];
+        self.recordingContext.screenFilePath = self.videoEncoder.outputPath;
         
-        if (autoCaptureEnabled) {
+        if (self.autoCaptureEnabled) {
             [self scheduleScreenshot];
         }
     }
@@ -368,71 +342,57 @@ typedef enum {
 
 - (void)stopRecording 
 {    
-    if (cameraManager.recording) {
-        [cameraManager stopRecording];
+    if (self.cameraManager.recording) {
+        [self.cameraManager stopRecording];
     }
     
-    if (videoEncoder.recording) {
-        [videoEncoder stopRecording];
+    if (self.videoEncoder.recording) {
+        [self.videoEncoder stopRecording];
 
-		recordingContext.touches = gestureTracker.touches;
-        recordingContext.touchBounds = gestureTracker.touchView.bounds;
-        recordingContext.orientationChanges = gestureTracker.orientationChanges;
-    }
-}
-
-- (void)setAppToken:(NSString *)anAppToken
-{
-    if (appToken != anAppToken) {
-        [appToken release];
-        appToken = [anAppToken retain];
+		self.recordingContext.touches = self.gestureTracker.touches;
+        self.recordingContext.touchBounds = self.gestureTracker.touchView.bounds;
+        self.recordingContext.orientationChanges = self.gestureTracker.orientationChanges;
     }
 }
 
 - (void)setScaleFactor:(CGFloat)aScaleFactor
 {    
-    if (videoEncoder.recording) {
+    if (self.videoEncoder.recording) {
         [NSException raise:@"Screen capture exception" format:@"Cannot change scale factor while recording is in progress."];
     }
     
-    scaleFactor = aScaleFactor;
-    screenshotController.scaleFactor = scaleFactor;
-    videoEncoder.videoSize = screenshotController.imageSize;
-    gestureTracker.scaleFactor = scaleFactor;
+    _scaleFactor = aScaleFactor;
+    self.screenshotController.scaleFactor = aScaleFactor;
+    self.videoEncoder.videoSize = self.screenshotController.imageSize;
+    self.gestureTracker.scaleFactor = aScaleFactor;
 }
 
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
 {
-    if (autoCaptureEnabled != isAutoCaptureEnabled) {
-        autoCaptureEnabled = isAutoCaptureEnabled;
+    if (_autoCaptureEnabled != isAutoCaptureEnabled) {
+        _autoCaptureEnabled = isAutoCaptureEnabled;
         
-        if (autoCaptureEnabled && videoEncoder.recording && screenshotQueue.operationCount == 0) {
+        if (isAutoCaptureEnabled && self.videoEncoder.recording && screenshotQueue.operationCount == 0) {
             [self scheduleScreenshot];
         }
     }
 }
 
-- (void)setAnnotation:(DLAnnotation)anAnnotation
-{
-    annotation = anAnnotation;
-}
-
 - (void)setOpenGL:(BOOL)anOpenGL
 {
-    openGL = anOpenGL;
-
-    [videoEncoder release];
-    if (openGL) {
-        videoEncoder = [[DLOpenGLVideoEncoder alloc] init];
+    _openGL = anOpenGL;
+    
+    if (_openGL) {
+        self.videoEncoder = [[[DLOpenGLVideoEncoder alloc] init] autorelease];
     } else {
-        videoEncoder = [[DLUIKitVideoEncoder alloc] init];
+        self.videoEncoder = [[[DLUIKitVideoEncoder alloc] init] autorelease];
     }
-    videoEncoder.delegate = self;
+    self.videoEncoder.delegate = self;
 }
 
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {    
-    if (!videoEncoder.recording) return;
+    if (!self.videoEncoder.recording) return;
     
     // Need to set up an autorelease pool since this method gets called from a background thread
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -453,21 +413,21 @@ typedef enum {
     NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
     lastScreenshotTime = start;
         
-    if (openGL) {
-        gestureTracker.touchView = glView;
-        DLOpenGLVideoEncoder *openGLEncoder = (DLOpenGLVideoEncoder *)videoEncoder;
+    if (self.openGL) {
+        self.gestureTracker.touchView = glView;
+        DLOpenGLVideoEncoder *openGLEncoder = (DLOpenGLVideoEncoder *)self.videoEncoder;
         [openGLEncoder encodeGLPixelsWithBackingWidth:backingWidth backingHeight:backingHeight];
     } else {
-        UIImage *screenshot = [screenshotController screenshot];
-        DLUIKitVideoEncoder *imageEncoder = (DLUIKitVideoEncoder *)videoEncoder;
+        UIImage *screenshot = [self.screenshotController screenshot];
+        DLUIKitVideoEncoder *imageEncoder = (DLUIKitVideoEncoder *)self.videoEncoder;
         [imageEncoder encodeImage:screenshot];
     }
         
-    if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
+    if (self.recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:self.recordingContext.startTime] >= maximumRecordingDuration) {
         // We've exceeded the maximum recording duration
         [self stopRecording];
-        metrics.stopReason = DLMetricsStopReasonTimeLimit;
-    } else if (autoCaptureEnabled) {
+        self.metrics.stopReason = DLMetricsStopReasonTimeLimit;
+    } else if (self.autoCaptureEnabled) {
         [self scheduleScreenshot];
     }
     
@@ -492,25 +452,24 @@ typedef enum {
 #pragma mark - Session
 
 - (void)tryCreateNewSession {
-    userStopped = NO;
+    self.userStopped = NO;
     
 #ifdef DL_OFFLINE_RECORDING
     [self startRecording];
 #else
-    if (!videoEncoder.recording) {
-        [taskController requestSessionIDWithAppToken:appToken];
+    if (!self.videoEncoder.recording) {
+        [self.taskController requestSessionIDWithAppToken:self.appToken];
     }
 #endif
     
-    [metrics reset];
+    [self.metrics reset];
 }
 
 - (void)taskController:(DLTaskController *)ctrl didGetNewSessionContext:(DLRecordingContext *)ctx {
-    [recordingContext release];
-	recordingContext = [ctx retain];
+    self.recordingContext = ctx;
     
-	if (recordingContext.shouldRecordVideo) {
-        if (annotation == DLAnnotationNone) {
+	if (self.recordingContext.shouldRecordVideo) {
+        if (self.annotation == DLAnnotationNone) {
             // Start recording immediately
             [self startRecording];
         } else {
@@ -535,7 +494,7 @@ typedef enum {
         }
 	} else {
 		// there's no need to record the session. Clean up video encoder?
-		recordingContext.startTime = [NSDate date];
+		self.recordingContext.startTime = [NSDate date];
 	}
 }
 
@@ -546,15 +505,15 @@ typedef enum {
 #ifdef DL_OFFLINE_RECORDING
     [self stopRecording];
 #else
-	if ( recordingContext.shouldRecordVideo ) {
+	if (self.recordingContext.shouldRecordVideo) {
 		[self stopRecording];
 	}
-    recordingContext.endTime = [NSDate date];
-	recordingContext.userProperties = userProperties;
-    recordingContext.metrics = metrics;
+    self.recordingContext.endTime = [NSDate date];
+	self.recordingContext.userProperties = self.userProperties;
+    self.recordingContext.metrics = self.metrics;
 	if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
 		delaySessionUploadForCamera = NO;
-		[taskController prepareSessionUpload:recordingContext];
+		[self.taskController prepareSessionUpload:self.recordingContext];
 	}
 #endif
     
@@ -563,7 +522,7 @@ typedef enum {
 
 - (void)handleWillEnterForeground:(NSNotification *)notification
 {
-    if (!userStopped) {
+    if (!self.userStopped) {
         [self tryCreateNewSession];
     }
 }
@@ -571,19 +530,19 @@ typedef enum {
 - (void)handleDidBecomeActive:(NSNotification *)notification
 {
     // In iOS 4, locking the screen does not trigger didEnterBackground: notification. Check if we've been inactive for a long time.
-    if (resignActiveTime > 0 && !appInBackground && !userStopped && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
+    if (resignActiveTime > 0 && !appInBackground && !self.userStopped && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
         NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
         if (inactiveTime > kDLMaximumSessionInactiveTime) {
             // We've been inactive for a long time, stop the previous recording and create a new session
-            if (recordingContext.shouldRecordVideo) {
+            if (self.recordingContext.shouldRecordVideo) {
                 [self stopRecording];
             }
-            recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
-			recordingContext.userProperties = userProperties;
-            recordingContext.metrics = metrics;
+            self.recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
+			self.recordingContext.userProperties = self.userProperties;
+            self.recordingContext.metrics = self.metrics;
 			if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
 				delaySessionUploadForCamera = NO;
-				[taskController prepareSessionUpload:recordingContext];
+				[self.taskController prepareSessionUpload:self.recordingContext];
 			}
             [self tryCreateNewSession];
         }
@@ -599,7 +558,7 @@ typedef enum {
 
 - (void)handleWillTerminate:(NSNotification *)notification
 {
-	[taskController saveUnfinishedRecordingContext:recordingContext];
+	[self.taskController saveUnfinishedRecordingContext:self.recordingContext];
 }
 
 #pragma mark - DLCamCaptureManagerDelegate
@@ -619,7 +578,7 @@ typedef enum {
 {
 	cameraDidStop = YES;
 	if ( !delaySessionUploadForCamera ) {
-		[taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:recordingContext waitUntilDone:NO];
+		[self.taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:self.recordingContext waitUntilDone:NO];
 	}
     DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
 }
@@ -633,7 +592,7 @@ typedef enum {
 
 - (BOOL)gestureTracker:(DLGestureTracker *)gestureTracker locationIsPrivate:(CGPoint)location inView:(UIView *)view privateViewFrame:(CGRect *)frame
 {
-    return [screenshotController locationIsInPrivateView:location inView:view privateViewFrame:frame];
+    return [self.screenshotController locationIsInPrivateView:location inView:view privateViewFrame:frame];
 }
 
 #pragma mark - UIAlertViewDelegate
@@ -652,11 +611,11 @@ typedef enum {
 {    
     switch (alertView.tag) {
         case kDLAlertViewTagStartUsabilityTest:
-            if (buttonIndex == 1 && recordingContext.shouldRecordVideo) {
+            if (buttonIndex == 1 && self.recordingContext.shouldRecordVideo) {
                 UITextField *descriptionField = (UITextField *)[alertView viewWithTag:kDLAlertViewDescriptionFieldTag];
-                recordingContext.usabilityTestDescription = descriptionField.text;
+                self.recordingContext.usabilityTestDescription = descriptionField.text;
                 if ([descriptionField.text length]) {
-                    [userProperties setObject:descriptionField.text forKey:@"description"];
+                    [self.userProperties setObject:descriptionField.text forKey:@"description"];
                 }
                 [self startRecording];
             }
@@ -670,12 +629,12 @@ typedef enum {
 
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
 {
-    [gestureTracker startRecordingGesturesWithStartUptime:startTime];
+    [self.gestureTracker startRecordingGesturesWithStartUptime:startTime];
 }
 
 - (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder
 {
-    [gestureTracker stopRecordingGestures];
+    [self.gestureTracker stopRecordingGestures];
 }
 
 @end
