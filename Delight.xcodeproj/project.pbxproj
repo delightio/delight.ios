@@ -18,8 +18,6 @@
 		836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* DLCamRecorder.m */; };
 		837E8A4D15658ACE00FB16E9 /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
 		837E8A4F15658AD100FB16E9 /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
-		8380098215A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.h in Headers */ = {isa = PBXBuildFile; fileRef = 8380098015A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.h */; };
-		8380098315A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.m in Sources */ = {isa = PBXBuildFile; fileRef = 8380098115A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.m */; };
 		838187001563156400608514 /* UITextField+DLPrivateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 838186FE1563156400608514 /* UITextField+DLPrivateView.h */; };
 		838187011563156400608514 /* UITextField+DLPrivateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 838186FF1563156400608514 /* UITextField+DLPrivateView.m */; };
 		8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */; };
@@ -79,8 +77,6 @@
 		836ABF261548D47400926A71 /* DLCamCaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamCaptureManager.m; sourceTree = "<group>"; };
 		836ABF271548D47400926A71 /* DLCamRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamRecorder.h; sourceTree = "<group>"; };
 		836ABF281548D47400926A71 /* DLCamRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamRecorder.m; sourceTree = "<group>"; };
-		8380098015A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImagePickerController+DLAvoidRendering.h"; sourceTree = "<group>"; };
-		8380098115A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImagePickerController+DLAvoidRendering.m"; sourceTree = "<group>"; };
 		8380098515A22A6F002E9133 /* Delight_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delight_Private.h; sourceTree = "<group>"; };
 		838186FE1563156400608514 /* UITextField+DLPrivateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+DLPrivateView.h"; sourceTree = "<group>"; };
 		838186FF1563156400608514 /* UITextField+DLPrivateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+DLPrivateView.m"; sourceTree = "<group>"; };
@@ -176,8 +172,6 @@
 				8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */,
 				838186FE1563156400608514 /* UITextField+DLPrivateView.h */,
 				838186FF1563156400608514 /* UITextField+DLPrivateView.m */,
-				8380098015A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.h */,
-				8380098115A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -336,7 +330,6 @@
 				832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */,
 				83995A8A158ABEA600A41326 /* DLOpenGLVideoEncoder.h in Headers */,
 				83995A8E158AC08200A41326 /* DLUIKitVideoEncoder.h in Headers */,
-				8380098215A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -486,7 +479,6 @@
 				833B500E15670E690085552F /* DLMetrics.m in Sources */,
 				83995A8B158ABEA600A41326 /* DLOpenGLVideoEncoder.m in Sources */,
 				83995A8F158AC08200A41326 /* DLUIKitVideoEncoder.m in Sources */,
-				8380098315A222F7002E9133 /* UIImagePickerController+DLAvoidRendering.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
