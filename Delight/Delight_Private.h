@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
+#import "Delight.h"
 #import "DLTaskController.h"
 #import "DLScreenshotController.h"
 #import "DLVideoEncoder.h"

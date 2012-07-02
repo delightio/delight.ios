@@ -18,6 +18,7 @@
 #import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
+#import "UIImagePickerController+DLAvoidRendering.h"
 #import </usr/include/objc/objc-class.h>
 
 #define kDLDefaultScaleFactor 0.5f
@@ -249,6 +250,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         Swizzle([UITextField class], @selector(setSecureTextEntry:), @selector(DLsetSecureTextEntry:));
         Swizzle([UITextField class], @selector(becomeFirstResponder), @selector(DLbecomeFirstResponder));
         Swizzle([UITextField class], @selector(resignFirstResponder), @selector(DLresignFirstResponder));
+        
+        // Method swizzling to disable rendering when UIImagePickerController is visible (UIImagePickerController breaks otherwise)
+        Swizzle([UIImagePickerController class], @selector(viewWillAppear:), @selector(DLviewWillAppear:));
+        Swizzle([UIImagePickerController class], @selector(viewDidDisappear:), @selector(DLviewDidDisappear:));
     }
     return self;
 }
