@@ -9,17 +9,31 @@
 #import "DLMobileFrameBufferVideoEncoder.h"
 #include "IOKit/IOKitLib.h"
 #include "IOMobileFramebuffer/IOMobileFramebuffer.h"
+#include <dlfcn.h>
 
 #define kDLMaxSurfaceID 200
 #define kDLMinSurfaceScale 0.5
 #define kDLMaxSearchIterations 8
 
+// Dynamically-loaded functions
+static IOSurfaceRef (*DLIOSurfaceCreate)(CFDictionaryRef);
+static IOReturn (*DLIOSurfaceLock)(IOSurfaceRef, uint32_t, uint32_t *);
+static IOReturn (*DLIOSurfaceUnlock)(IOSurfaceRef, uint32_t, uint32_t *);
+static IOSurfaceAcceleratorReturn (*DLIOSurfaceAcceleratorCreate)(CFAllocatorRef, uint32_t, IOSurfaceAcceleratorRef *);
+static IOSurfaceAcceleratorReturn (*DLIOSurfaceAcceleratorTransferSurface)(IOSurfaceAcceleratorRef, IOSurfaceRef, IOSurfaceRef, CFDictionaryRef, void *);
+static IOSurfaceRef (*DLIOSurfaceLookup)(IOSurfaceID);
+static void * (*DLIOSurfaceGetBaseAddress)(IOSurfaceRef);
+static size_t (*DLIOSurfaceGetAllocSize)(IOSurfaceRef);
+static size_t (*DLIOSurfaceGetWidth)(IOSurfaceRef);
+static size_t (*DLIOSurfaceGetHeight)(IOSurfaceRef);
+static uint32_t (*DLIOSurfaceGetSeed)(IOSurfaceRef);
+
 int calculateHash(IOSurfaceID surfaceID)
 {
-    IOSurfaceRef surface = IOSurfaceLookup(surfaceID);
-    size_t size = IOSurfaceGetAllocSize(surface) / sizeof(uint32_t);
-    uint32_t *baseAddress = IOSurfaceGetBaseAddress(surface);
-    uint32_t hash = IOSurfaceGetSeed(surface);
+    IOSurfaceRef surface = DLIOSurfaceLookup(surfaceID);
+    size_t size = DLIOSurfaceGetAllocSize(surface) / sizeof(uint32_t);
+    uint32_t *baseAddress = DLIOSurfaceGetBaseAddress(surface);
+    uint32_t hash = DLIOSurfaceGetSeed(surface);
     
     for (size_t i = 0; i < size; i += 37) {
         uint32_t pixelValue = baseAddress[i];
@@ -43,6 +57,21 @@ int calculateHash(IOSurfaceID surfaceID)
     self = [super init];
     if (self) {
         foundSurfaceID = -1;
+        
+        // Load the dynamic functions we need
+        void *handle = dlopen("/System/Library/PrivateFrameworks/IOSurface.framework/IOSurface", RTLD_LAZY);
+        DLIOSurfaceCreate = dlsym(handle, "IOSurfaceCreate");
+        DLIOSurfaceLock = dlsym(handle, "IOSurfaceLock");
+        DLIOSurfaceUnlock = dlsym(handle, "IOSurfaceUnlock");
+        DLIOSurfaceAcceleratorCreate = dlsym(handle, "IOSurfaceAcceleratorCreate");
+        DLIOSurfaceAcceleratorTransferSurface = dlsym(handle, "IOSurfaceAcceleratorTransferSurface");
+        DLIOSurfaceLookup = dlsym(handle, "IOSurfaceLookup");
+        DLIOSurfaceGetBaseAddress = dlsym(handle, "IOSurfaceGetBaseAddress");
+        DLIOSurfaceGetAllocSize = dlsym(handle, "IOSurfaceGetAllocSize");
+        DLIOSurfaceGetWidth = dlsym(handle, "IOSurfaceGetWidth");
+        DLIOSurfaceGetHeight = dlsym(handle, "IOSurfaceGetHeight");
+        DLIOSurfaceGetSeed = dlsym(handle, "IOSurfaceGetSeed");
+        dlclose(handle);
     }
     return self;
 }
@@ -58,37 +87,33 @@ int calculateHash(IOSurfaceID surfaceID)
 
 - (void)setup
 {
-    IOSurfaceRef surface = IOSurfaceLookup(foundSurfaceID);
-    size_t width = IOSurfaceGetWidth(surface);
-    size_t height = IOSurfaceGetHeight(surface);
+    IOSurfaceRef surface = DLIOSurfaceLookup(foundSurfaceID);
+    size_t width = DLIOSurfaceGetWidth(surface);
+    size_t height = DLIOSurfaceGetHeight(surface);
     self.videoSize = CGSizeMake(width, height);
     
-    IOSurfaceAcceleratorCreate(NULL, 0, &accelerator);
+    // Create an accelerator to transfer surfaces quickly
+    DLIOSurfaceAcceleratorCreate(NULL, 0, &accelerator);
     if (accelerator == NULL) {
         DLLog(@"[Delight] Error: Accelerator was not created");
     }
     
+    // Create a BGRA surface that we will transfer the surface to
     int pitch = width * 4, allocSize = 4 * width * height;
     int bPE = 4;
     char pixelFormat[4] = {'A', 'R', 'G', 'B'};
     CFMutableDictionaryRef dict;
     dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
                                      &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    CFDictionarySetValue(dict, kIOSurfaceIsGlobal, kCFBooleanTrue);
-    CFDictionarySetValue(dict, kIOSurfaceBytesPerRow,
-                         CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &pitch));
-    CFDictionarySetValue(dict, kIOSurfaceBytesPerElement,
-                         CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &bPE));
-    CFDictionarySetValue(dict, kIOSurfaceWidth,
-                         CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &width));
-    CFDictionarySetValue(dict, kIOSurfaceHeight,
-                         CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &height));
-    CFDictionarySetValue(dict, kIOSurfacePixelFormat,
-                         CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, pixelFormat));
-    CFDictionarySetValue(dict, kIOSurfaceAllocSize,
-                         CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &allocSize));
-    bgraSurface = IOSurfaceCreate(dict);
-
+    CFDictionarySetValue(dict, @"IOSurfaceIsGlobal", kCFBooleanTrue);
+    CFDictionarySetValue(dict, @"IOSurfaceBytesPerRow", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &pitch));
+    CFDictionarySetValue(dict, @"IOSurfaceBytesPerElement", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &bPE));
+    CFDictionarySetValue(dict, @"IOSurfaceWidth", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &width));
+    CFDictionarySetValue(dict, @"IOSurfaceHeight", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &height));
+    CFDictionarySetValue(dict, @"IOSurfacePixelFormat", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, pixelFormat));
+    CFDictionarySetValue(dict, @"IOSurfaceAllocSize", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &allocSize));
+    bgraSurface = DLIOSurfaceCreate(dict);
+    
     [super setup];
 }
 
@@ -126,12 +151,12 @@ int calculateHash(IOSurfaceID surfaceID)
     CFDictionaryRef ed = (CFDictionaryRef) [[NSDictionary dictionaryWithObjectsAndKeys:nil] retain];
     uint32_t aseed;
     
-    IOSurfaceRef surface = IOSurfaceLookup(foundSurfaceID);
-    IOSurfaceLock(surface, kIOSurfaceLockReadOnly, &aseed);
-    IOSurfaceAcceleratorTransferSurface(accelerator, surface, bgraSurface, ed, NULL);
-    IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, &aseed);
+    IOSurfaceRef surface = DLIOSurfaceLookup(foundSurfaceID);
+    DLIOSurfaceLock(surface, kIOSurfaceLockReadOnly, &aseed);
+    DLIOSurfaceAcceleratorTransferSurface(accelerator, surface, bgraSurface, ed, NULL);
+    DLIOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, &aseed);
 
-    void *frameBuffer = IOSurfaceGetBaseAddress(bgraSurface);
+    void *frameBuffer = DLIOSurfaceGetBaseAddress(bgraSurface);
     memcpy(pixelBufferData, frameBuffer, self.videoSize.height * self.videoSize.width * 4);
 
     if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
@@ -153,10 +178,10 @@ int calculateHash(IOSurfaceID surfaceID)
     
     // Loop through all surface IDs finding surfaces that are potentially big enough
     for (int i = 0; i < kDLMaxSurfaceID; i++) {
-        IOSurfaceRef surface = IOSurfaceLookup(i);
+        IOSurfaceRef surface = DLIOSurfaceLookup(i);
         if (surface) {
-            size_t width = IOSurfaceGetWidth(surface);
-            size_t height = IOSurfaceGetHeight(surface);
+            size_t width = DLIOSurfaceGetWidth(surface);
+            size_t height = DLIOSurfaceGetHeight(surface);
             
             if ((width >= screenWidth * kDLMinSurfaceScale && height >= screenHeight * kDLMinSurfaceScale) ||
                  (height >= screenWidth * kDLMinSurfaceScale && width >= screenHeight * kDLMinSurfaceScale)) {                    

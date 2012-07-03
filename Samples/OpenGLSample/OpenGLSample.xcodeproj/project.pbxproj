@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		837C3A24153F7DEB00463CB3 /* TeapotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 837C3A23153F7DEB00463CB3 /* TeapotViewController.m */; };
 		837C3A29153F804900463CB3 /* TeapotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 837C3A28153F7EC100463CB3 /* TeapotView.m */; };
-		838009D115A257DB002E9133 /* libIOKit.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 838009CE15A257DB002E9133 /* libIOKit.dylib */; };
-		838009D215A257DB002E9133 /* IOMobileFramebuffer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 838009CF15A257DB002E9133 /* IOMobileFramebuffer.framework */; };
-		838009D315A257DC002E9133 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 838009D015A257DB002E9133 /* IOSurface.framework */; };
 		8382931C15586358007C6CDA /* Delight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8382931B1558634E007C6CDA /* Delight.framework */; };
 		8383861615549A6000A83AE9 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8383861415549A6000A83AE9 /* AssetsLibrary.framework */; };
 		8383861715549A6000A83AE9 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8383861515549A6000A83AE9 /* SystemConfiguration.framework */; };
@@ -22,7 +19,6 @@
 		83F73EEF153E31B40094BD16 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EEE153E31B40094BD16 /* UIKit.framework */; };
 		83F73EF1153E31B40094BD16 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF0153E31B40094BD16 /* Foundation.framework */; };
 		83F73EF3153E31B40094BD16 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF2153E31B40094BD16 /* CoreGraphics.framework */; };
-		83F73EF5153E31B40094BD16 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF4153E31B40094BD16 /* GLKit.framework */; };
 		83F73EF7153E31B40094BD16 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF6153E31B40094BD16 /* OpenGLES.framework */; };
 		83F73EFD153E31B40094BD16 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83F73EFB153E31B40094BD16 /* InfoPlist.strings */; };
 		83F73EFF153E31B40094BD16 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 83F73EFE153E31B40094BD16 /* main.m */; };
@@ -49,9 +45,6 @@
 		837C3A25153F7E6A00463CB3 /* teapot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = teapot.h; sourceTree = "<group>"; };
 		837C3A27153F7EC000463CB3 /* TeapotView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TeapotView.h; sourceTree = "<group>"; };
 		837C3A28153F7EC100463CB3 /* TeapotView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TeapotView.m; sourceTree = "<group>"; };
-		838009CE15A257DB002E9133 /* libIOKit.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libIOKit.dylib; path = usr/lib/libIOKit.dylib; sourceTree = SDKROOT; };
-		838009CF15A257DB002E9133 /* IOMobileFramebuffer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOMobileFramebuffer.framework; path = System/Library/PrivateFrameworks/IOMobileFramebuffer.framework; sourceTree = SDKROOT; };
-		838009D015A257DB002E9133 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/PrivateFrameworks/IOSurface.framework; sourceTree = SDKROOT; };
 		838293131558634E007C6CDA /* Delight.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Delight.xcodeproj; path = ../../Delight.xcodeproj; sourceTree = "<group>"; };
 		8383861415549A6000A83AE9 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		8383861515549A6000A83AE9 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -63,7 +56,6 @@
 		83F73EEE153E31B40094BD16 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		83F73EF0153E31B40094BD16 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		83F73EF2153E31B40094BD16 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		83F73EF4153E31B40094BD16 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		83F73EF6153E31B40094BD16 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		83F73EFA153E31B40094BD16 /* OpenGLSample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "OpenGLSample-Info.plist"; sourceTree = "<group>"; };
 		83F73EFC153E31B40094BD16 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -92,11 +84,7 @@
 				83F73EEF153E31B40094BD16 /* UIKit.framework in Frameworks */,
 				83F73EF1153E31B40094BD16 /* Foundation.framework in Frameworks */,
 				83F73EF3153E31B40094BD16 /* CoreGraphics.framework in Frameworks */,
-				83F73EF5153E31B40094BD16 /* GLKit.framework in Frameworks */,
 				83F73EF7153E31B40094BD16 /* OpenGLES.framework in Frameworks */,
-				838009D115A257DB002E9133 /* libIOKit.dylib in Frameworks */,
-				838009D215A257DB002E9133 /* IOMobileFramebuffer.framework in Frameworks */,
-				838009D315A257DC002E9133 /* IOSurface.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,9 +129,6 @@
 			children = (
 				838293131558634E007C6CDA /* Delight.xcodeproj */,
 				8383861515549A6000A83AE9 /* SystemConfiguration.framework */,
-				838009CE15A257DB002E9133 /* libIOKit.dylib */,
-				838009CF15A257DB002E9133 /* IOMobileFramebuffer.framework */,
-				838009D015A257DB002E9133 /* IOSurface.framework */,
 				8383861415549A6000A83AE9 /* AssetsLibrary.framework */,
 				83F73F1D153E32BF0094BD16 /* AVFoundation.framework */,
 				83F73F1E153E32BF0094BD16 /* CoreMedia.framework */,
@@ -152,7 +137,6 @@
 				83F73EEE153E31B40094BD16 /* UIKit.framework */,
 				83F73EF0153E31B40094BD16 /* Foundation.framework */,
 				83F73EF2153E31B40094BD16 /* CoreGraphics.framework */,
-				83F73EF4153E31B40094BD16 /* GLKit.framework */,
 				83F73EF6153E31B40094BD16 /* OpenGLES.framework */,
 			);
 			name = Frameworks;
