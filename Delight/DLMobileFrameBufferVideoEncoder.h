@@ -21,6 +21,7 @@ int calculateHash(IOSurfaceID surfaceID);
 }
 
 @property (nonatomic, retain) NSMutableSet *potentialSurfaces;
+@property (nonatomic, assign) BOOL usesLayerDefaultSurface;
 
 - (void)encode;
 

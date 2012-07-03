@@ -22,11 +22,16 @@ static IOReturn (*DLIOSurfaceUnlock)(IOSurfaceRef, uint32_t, uint32_t *);
 static IOSurfaceAcceleratorReturn (*DLIOSurfaceAcceleratorCreate)(CFAllocatorRef, uint32_t, IOSurfaceAcceleratorRef *);
 static IOSurfaceAcceleratorReturn (*DLIOSurfaceAcceleratorTransferSurface)(IOSurfaceAcceleratorRef, IOSurfaceRef, IOSurfaceRef, CFDictionaryRef, void *);
 static IOSurfaceRef (*DLIOSurfaceLookup)(IOSurfaceID);
+static IOSurfaceID (*DLIOSurfaceGetID)(IOSurfaceRef);
 static void * (*DLIOSurfaceGetBaseAddress)(IOSurfaceRef);
 static size_t (*DLIOSurfaceGetAllocSize)(IOSurfaceRef);
 static size_t (*DLIOSurfaceGetWidth)(IOSurfaceRef);
 static size_t (*DLIOSurfaceGetHeight)(IOSurfaceRef);
 static uint32_t (*DLIOSurfaceGetSeed)(IOSurfaceRef);
+static io_service_t (*DLIOServiceGetMatchingService)(mach_port_t, CFDictionaryRef);
+static CFMutableDictionaryRef (*DLIOServiceMatching)(const char *);
+static IOMobileFramebufferReturn (*DLIOMobileFramebufferOpen)(IOMobileFramebufferService, task_port_t, unsigned int, IOMobileFramebufferConnection *);
+static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(IOMobileFramebufferConnection, int, IOSurfaceRef *);
 
 int calculateHash(IOSurfaceID surfaceID)
 {
@@ -44,6 +49,7 @@ int calculateHash(IOSurfaceID surfaceID)
 }
 
 @interface DLMobileFrameBufferVideoEncoder ()
+- (void)findLayerDefaultSurface;
 - (void)findPotentialSurfaces;
 - (void)updatePotentialSurfaces;
 @end
@@ -51,6 +57,7 @@ int calculateHash(IOSurfaceID surfaceID)
 @implementation DLMobileFrameBufferVideoEncoder
 
 @synthesize potentialSurfaces = _potentialSurfaces;
+@synthesize usesLayerDefaultSurface = _usesLayerDefaultSurface;
 
 - (id)init
 {
@@ -59,19 +66,30 @@ int calculateHash(IOSurfaceID surfaceID)
         foundSurfaceID = -1;
         
         // Load the dynamic functions we need
-        void *handle = dlopen("/System/Library/PrivateFrameworks/IOSurface.framework/IOSurface", RTLD_LAZY);
-        DLIOSurfaceCreate = dlsym(handle, "IOSurfaceCreate");
-        DLIOSurfaceLock = dlsym(handle, "IOSurfaceLock");
-        DLIOSurfaceUnlock = dlsym(handle, "IOSurfaceUnlock");
-        DLIOSurfaceAcceleratorCreate = dlsym(handle, "IOSurfaceAcceleratorCreate");
-        DLIOSurfaceAcceleratorTransferSurface = dlsym(handle, "IOSurfaceAcceleratorTransferSurface");
-        DLIOSurfaceLookup = dlsym(handle, "IOSurfaceLookup");
-        DLIOSurfaceGetBaseAddress = dlsym(handle, "IOSurfaceGetBaseAddress");
-        DLIOSurfaceGetAllocSize = dlsym(handle, "IOSurfaceGetAllocSize");
-        DLIOSurfaceGetWidth = dlsym(handle, "IOSurfaceGetWidth");
-        DLIOSurfaceGetHeight = dlsym(handle, "IOSurfaceGetHeight");
-        DLIOSurfaceGetSeed = dlsym(handle, "IOSurfaceGetSeed");
-        dlclose(handle);
+        void *ioSurfaceHandle = dlopen("/System/Library/PrivateFrameworks/IOSurface.framework/IOSurface", RTLD_LAZY);
+        DLIOSurfaceCreate = dlsym(ioSurfaceHandle, "IOSurfaceCreate");
+        DLIOSurfaceLock = dlsym(ioSurfaceHandle, "IOSurfaceLock");
+        DLIOSurfaceUnlock = dlsym(ioSurfaceHandle, "IOSurfaceUnlock");
+        DLIOSurfaceAcceleratorCreate = dlsym(ioSurfaceHandle, "IOSurfaceAcceleratorCreate");
+        DLIOSurfaceAcceleratorTransferSurface = dlsym(ioSurfaceHandle, "IOSurfaceAcceleratorTransferSurface");
+        DLIOSurfaceLookup = dlsym(ioSurfaceHandle, "IOSurfaceLookup");
+        DLIOSurfaceGetID = dlsym(ioSurfaceHandle, "IOSurfaceGetID");
+        DLIOSurfaceGetBaseAddress = dlsym(ioSurfaceHandle, "IOSurfaceGetBaseAddress");
+        DLIOSurfaceGetAllocSize = dlsym(ioSurfaceHandle, "IOSurfaceGetAllocSize");
+        DLIOSurfaceGetWidth = dlsym(ioSurfaceHandle, "IOSurfaceGetWidth");
+        DLIOSurfaceGetHeight = dlsym(ioSurfaceHandle, "IOSurfaceGetHeight");
+        DLIOSurfaceGetSeed = dlsym(ioSurfaceHandle, "IOSurfaceGetSeed");
+        dlclose(ioSurfaceHandle);
+        
+        void *ioKitHandle = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit", RTLD_LAZY);
+        DLIOServiceGetMatchingService = dlsym(ioKitHandle, "IOServiceGetMatchingService");
+        DLIOServiceMatching = dlsym(ioKitHandle, "IOServiceMatching");
+        dlclose(ioKitHandle);
+        
+        void *ioMobileFramebufferHandle = dlopen("/System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/IOMobileFramebuffer", RTLD_LAZY);
+        DLIOMobileFramebufferOpen = dlsym(ioMobileFramebufferHandle, "IOMobileFramebufferOpen");
+        DLIOMobileFramebufferGetLayerDefaultSurface = dlsym(ioMobileFramebufferHandle, "IOMobileFramebufferGetLayerDefaultSurface");
+        dlclose(ioMobileFramebufferHandle);
     }
     return self;
 }
@@ -169,8 +187,48 @@ int calculateHash(IOSurfaceID surfaceID)
 
 #pragma mark - Private methods
 
+- (void)findLayerDefaultSurface
+{
+    IOMobileFramebufferConnection connect;
+    IOSurfaceRef defaultSurface;
+    
+    io_service_t framebufferService = DLIOServiceGetMatchingService(0, DLIOServiceMatching("AppleCLCD"));
+    if (framebufferService) {
+        DLDebugLog(@"Using AppleCLCD");
+    } else {
+        framebufferService = DLIOServiceGetMatchingService(0, DLIOServiceMatching("AppleH1CLCD"));
+        if (framebufferService) {
+            DLDebugLog(@"Using AppleH1CLCD");
+        } else {
+            framebufferService = DLIOServiceGetMatchingService(0, DLIOServiceMatching("AppleM2CLCD"));
+            if (framebufferService) {
+                DLDebugLog(@"Using AppleM2CLCD");
+            } else {
+                framebufferService = DLIOServiceGetMatchingService(0, DLIOServiceMatching("IOMobileFramebuffer"));
+                if (framebufferService) {
+                    DLDebugLog(@"Using IOMobileFramebuffer");
+                } else {
+                    DLLog(@"[Delight] Error: Couldn't find a matching IOService");
+                    return;
+                }
+            }
+        }
+    }
+    
+    DLIOMobileFramebufferOpen(framebufferService, mach_task_self(), 0, &connect);
+    DLIOMobileFramebufferGetLayerDefaultSurface(connect, 0, &defaultSurface);
+    foundSurfaceID = DLIOSurfaceGetID(defaultSurface);
+    
+    surfaceFound = YES;
+}
+
 - (void)findPotentialSurfaces
 {    
+    if (self.usesLayerDefaultSurface) {
+        [self findLayerDefaultSurface];
+        return;
+    }
+    
     NSMutableSet *potentialSurfaceSet = [NSMutableSet set];
     CGFloat screenScale = [UIScreen mainScreen].scale;
     CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width * screenScale;
