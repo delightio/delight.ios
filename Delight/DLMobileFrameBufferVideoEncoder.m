@@ -7,62 +7,67 @@
 //
 
 #import "DLMobileFrameBufferVideoEncoder.h"
-#include "IOSurface/IOSurface.h"
 #include "IOKit/IOKitLib.h"
 #include "IOMobileFramebuffer/IOMobileFramebuffer.h"
 
+#define kDLMaxSurfaceID 200
+#define kDLMinSurfaceScale 0.5
+#define kDLMaxSearchIterations 8
+
+int calculateHash(IOSurfaceID surfaceID)
+{
+    IOSurfaceRef surface = IOSurfaceLookup(surfaceID);
+    size_t size = IOSurfaceGetAllocSize(surface) / sizeof(uint32_t);
+    uint32_t *baseAddress = IOSurfaceGetBaseAddress(surface);
+    uint32_t hash = IOSurfaceGetSeed(surface);
+    
+    for (size_t i = 0; i < size; i += 37) {
+        uint32_t pixelValue = baseAddress[i];
+        hash += pixelValue;
+    }
+    
+    return hash;
+}
+
+@interface DLMobileFrameBufferVideoEncoder ()
+- (void)findPotentialSurfaces;
+- (void)updatePotentialSurfaces;
+@end
+
 @implementation DLMobileFrameBufferVideoEncoder
 
-static IOSurfaceAcceleratorRef accel = NULL;
-static IOSurfaceRef surf = NULL;
-static IOSurfaceRef ref = NULL;
+@synthesize potentialSurfaces = _potentialSurfaces;
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        foundSurfaceID = -1;
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    CFRelease(accelerator);
+    CFRelease(bgraSurface);
+    [_potentialSurfaces release];
+    
+    [super dealloc];
+}
 
 - (void)setup
 {
-    uint32_t aseed;    
-    IOMobileFramebufferConnection connect;
+    IOSurfaceRef surface = IOSurfaceLookup(foundSurfaceID);
+    size_t width = IOSurfaceGetWidth(surface);
+    size_t height = IOSurfaceGetHeight(surface);
+    self.videoSize = CGSizeMake(width, height);
     
-    io_service_t framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
-    if (framebufferService) {
-        DLDebugLog(@"Using AppleCLCD");
-    } else {
-        framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleH1CLCD"));
-        if (framebufferService) {
-            DLDebugLog(@"Using AppleH1CLCD");
-        } else {
-            framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleM2CLCD"));
-            if (framebufferService) {
-                DLDebugLog(@"Using AppleM2CLCD");
-            } else {
-                framebufferService = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOMobileFramebuffer"));
-                if (framebufferService) {
-                    DLDebugLog(@"Using IOMobileFramebuffer");
-                } else {
-                    DLLog(@"[Delight] Error: Couldn't find a matching IOService");
-                    return;
-                }
-            }
-        }
-    }
-    
-    IOMobileFramebufferOpen(framebufferService, mach_task_self(), 0, &connect);
-    IOMobileFramebufferGetLayerDefaultSurface(connect, 0, &ref);    
-    uint32_t width = IOSurfaceGetWidth(ref);
-    uint32_t height = IOSurfaceGetHeight(ref);
-    
-    if (ref == NULL) {
-        DLLog(@"[Delight] Error: Couldn't find a surface");
-        return;
-    }
-    
-    IOSurfaceAcceleratorCreate(NULL, 0, &accel);
-    if (accel == NULL) {
+    IOSurfaceAcceleratorCreate(NULL, 0, &accelerator);
+    if (accelerator == NULL) {
         DLLog(@"[Delight] Error: Accelerator was not created");
-        return;
     }
     
-    IOSurfaceLock(ref, kIOSurfaceLockReadOnly, &aseed);
-
     int pitch = width * 4, allocSize = 4 * width * height;
     int bPE = 4;
     char pixelFormat[4] = {'A', 'R', 'G', 'B'};
@@ -82,20 +87,27 @@ static IOSurfaceRef ref = NULL;
                          CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, pixelFormat));
     CFDictionarySetValue(dict, kIOSurfaceAllocSize,
                          CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &allocSize));
-    surf = IOSurfaceCreate(dict);
-    
-    IOSurfaceUnlock(ref, kIOSurfaceLockReadOnly, &aseed);
-    
-    self.videoSize = CGSizeMake(width, height);
+    bgraSurface = IOSurfaceCreate(dict);
+
     [super setup];
 }
 
 - (void)encode
 {
-    if (ref == NULL) {
-        [self setup];
+    if (!surfaceFound) {
+        if (self.potentialSurfaces) {
+            [self updatePotentialSurfaces];
+        } else {
+            [self findPotentialSurfaces];
+        }
+        
+        if (surfaceFound) {
+            [self setup];
+        } else {
+            return;
+        }
     }
-    
+        
     if (![videoWriterInput isReadyForMoreMediaData] || !self.recording) {
         return;
     }
@@ -113,19 +125,80 @@ static IOSurfaceRef ref = NULL;
     
     CFDictionaryRef ed = (CFDictionaryRef) [[NSDictionary dictionaryWithObjectsAndKeys:nil] retain];
     uint32_t aseed;
-    IOSurfaceLock(ref, kIOSurfaceLockReadOnly, &aseed);
-    IOSurfaceAcceleratorTransferSurface(accel, ref, surf, ed, NULL);
-    IOSurfaceUnlock(ref, kIOSurfaceLockReadOnly, &aseed);
     
-    void *frameBuffer = IOSurfaceGetBaseAddress(surf);
+    IOSurfaceRef surface = IOSurfaceLookup(foundSurfaceID);
+    IOSurfaceLock(surface, kIOSurfaceLockReadOnly, &aseed);
+    IOSurfaceAcceleratorTransferSurface(accelerator, surface, bgraSurface, ed, NULL);
+    IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, &aseed);
+
+    void *frameBuffer = IOSurfaceGetBaseAddress(bgraSurface);
     memcpy(pixelBufferData, frameBuffer, self.videoSize.height * self.videoSize.width * 4);
-    
+
     if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
         DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
     }
     
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
     CVPixelBufferRelease(pixelBuffer);
+}
+
+#pragma mark - Private methods
+
+- (void)findPotentialSurfaces
+{    
+    NSMutableSet *potentialSurfaceSet = [NSMutableSet set];
+    CGFloat screenScale = [UIScreen mainScreen].scale;
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width * screenScale;
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height * screenScale;
+    
+    // Loop through all surface IDs finding surfaces that are potentially big enough
+    for (int i = 0; i < kDLMaxSurfaceID; i++) {
+        IOSurfaceRef surface = IOSurfaceLookup(i);
+        if (surface) {
+            size_t width = IOSurfaceGetWidth(surface);
+            size_t height = IOSurfaceGetHeight(surface);
+            
+            if ((width >= screenWidth * kDLMinSurfaceScale && height >= screenHeight * kDLMinSurfaceScale) ||
+                 (height >= screenWidth * kDLMinSurfaceScale && width >= screenHeight * kDLMinSurfaceScale)) {                    
+                    NSMutableDictionary *surfaceDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                        [NSNumber numberWithInt:i], @"surfaceID",
+                                                        [NSNumber numberWithInt:calculateHash(i)], @"lastHash", nil];
+                    [potentialSurfaceSet addObject:surfaceDict];
+                }
+        }
+    }
+    
+    self.potentialSurfaces = potentialSurfaceSet;
+    surfaceFound = NO;
+    searchIterations = 0;
+}
+
+- (void)updatePotentialSurfaces
+{
+    NSMutableSet *surfacesToRemove = [NSMutableSet set];
+    
+    for (NSMutableDictionary *surfaceDict in self.potentialSurfaces) {
+        IOSurfaceID surfaceID = [[surfaceDict objectForKey:@"surfaceID"] intValue];
+        int lastHash = [[surfaceDict objectForKey:@"lastHash"] intValue];
+        int newHash = calculateHash(surfaceID);
+        [surfaceDict setObject:[NSNumber numberWithInt:newHash] forKey:@"lastHash"];
+        
+        if (lastHash == newHash) {
+            // Surface is out of the running
+            [surfacesToRemove addObject:surfaceDict];
+        }
+    }
+    
+    [self.potentialSurfaces minusSet:surfacesToRemove];
+    
+    if ([self.potentialSurfaces count] == 0) {
+        [self findPotentialSurfaces];
+        DLLog(@"[Delight] No surfaces found, retrying");
+    } else if ([self.potentialSurfaces count] == 1 || ++searchIterations > kDLMaxSearchIterations) {
+        foundSurfaceID = [[[self.potentialSurfaces anyObject] objectForKey:@"surfaceID"] intValue];
+        surfaceFound = YES;        
+        DLLog(@"[Delight] Using surface #%i", foundSurfaceID);
+    }    
 }
 
 @end

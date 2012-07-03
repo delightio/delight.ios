@@ -145,11 +145,6 @@
  
 	glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
     
-    /******************************
-     * Delight code inserted here *
-     ******************************/
-    [Delight takeOpenGLScreenshot:self];
-    
 	[context presentRenderbuffer:GL_RENDERBUFFER_OES];
 }
 

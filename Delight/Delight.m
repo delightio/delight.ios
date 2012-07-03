@@ -136,7 +136,7 @@ typedef enum {
 + (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
     Delight *delight = [self sharedInstance];
-    [delight setAutoCaptureEnabled:NO];
+    [delight setAutoCaptureEnabled:YES];
 	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
 		delight->taskController.sessionObjectName = @"opengl_usability_app_session";
 	} else {
@@ -233,24 +233,7 @@ typedef enum {
 - (id)init
 {
     self = [super init];
-    if (self) {        
-		io_service_t srv = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("AppleCLCD"));
-		io_name_t devName;
-		IORegistryEntryGetName(srv, devName);
-		NSLog(@"%s", devName);
-		io_string_t pathName;
-		IORegistryEntryGetPath(srv, kIOServicePlane, pathName);
-		NSLog(@"%s", pathName);
-//		io_iterator_t ioIterator;
-//		IOServiceGetMatchingServices(kIOMasterPortDefault, IOServiceNameMatching("LCD"), &ioIterator);
-//		io_object_t ioObj;
-//		io_name_t ioObjName;
-//		while ( ( ioObj = IOIteratorNext(ioIterator) ) ) {
-//			IOObjectGetClass(ioObj, ioObjName);
-//			NSLog(@"%s", ioObjName);
-//			CFTypeRef theType = IORegistryEntryCreateCFProperty(ioObj, kIONameMatchKey, NULL, 0);
-//			IOObjectRelease(ioObj);
-//		}
+    if (self) {
         screenshotController = [[DLScreenshotController alloc] init];        
                 
         gestureTracker = [[DLGestureTracker alloc] init];
@@ -439,12 +422,11 @@ typedef enum {
     openGL = anOpenGL;
 
     [videoEncoder release];
-//    if (openGL) {
-//        videoEncoder = [[DLOpenGLVideoEncoder alloc] init];
-//    } else {
-//        videoEncoder = [[DLUIKitVideoEncoder alloc] init];
-//    }
-    videoEncoder = [[DLMobileFrameBufferVideoEncoder alloc] init];
+    if (openGL) {
+        videoEncoder = [[DLMobileFrameBufferVideoEncoder alloc] init];
+    } else {
+        videoEncoder = [[DLUIKitVideoEncoder alloc] init];
+    }
     videoEncoder.delegate = self;
 }
 
@@ -471,16 +453,15 @@ typedef enum {
     NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
     lastScreenshotTime = start;
         
-//    if (openGL) {
+    if (openGL) {
 //        gestureTracker.touchView = glView;
-//        DLOpenGLVideoEncoder *openGLEncoder = (DLOpenGLVideoEncoder *)videoEncoder;
-//        [openGLEncoder encodeGLPixelsWithBackingWidth:backingWidth backingHeight:backingHeight];
-//    } else {
-//        UIImage *screenshot = [screenshotController screenshot];
-//        DLUIKitVideoEncoder *imageEncoder = (DLUIKitVideoEncoder *)videoEncoder;
-//        [imageEncoder encodeImage:screenshot];
-//    }
-    [(DLMobileFrameBufferVideoEncoder *)videoEncoder encode];
+        DLMobileFrameBufferVideoEncoder *openGLEncoder = (DLMobileFrameBufferVideoEncoder *)videoEncoder;
+        [openGLEncoder encode];
+    } else {
+        UIImage *screenshot = [screenshotController screenshot];
+        DLUIKitVideoEncoder *imageEncoder = (DLUIKitVideoEncoder *)videoEncoder;
+        [imageEncoder encodeImage:screenshot];
+    }
     
     if (recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:recordingContext.startTime] >= maximumRecordingDuration) {
         // We've exceeded the maximum recording duration
