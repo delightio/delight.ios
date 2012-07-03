@@ -135,6 +135,9 @@ typedef enum {
 
 + (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
+#if TARGET_IPHONE_SIMULATOR
+    DLLog(@"[Delight] OpenGL recording not supported in simulator");
+#else
     Delight *delight = [self sharedInstance];
     [delight setAutoCaptureEnabled:YES];
 	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
@@ -146,6 +149,7 @@ typedef enum {
     [delight setAppToken:appToken];
     [delight setOpenGL:YES];
 	[delight tryCreateNewSession];
+#endif
 }
 
 + (void)stop
