@@ -11,9 +11,9 @@
 #include "IOMobileFramebuffer/IOMobileFramebuffer.h"
 #include <dlfcn.h>
 
-#define kDLMaxSurfaceID 200
+#define kDLMaxSurfaceID 250
 #define kDLMinSurfaceScale 0.5
-#define kDLMaxSearchIterations 8
+#define kDLMaxSearchIterations 10
 
 // Dynamically-loaded functions
 static IOSurfaceRef (*DLIOSurfaceCreate)(CFDictionaryRef);
