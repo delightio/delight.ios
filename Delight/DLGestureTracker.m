@@ -22,6 +22,7 @@
 
 @synthesize scaleFactor;
 @synthesize touchView;
+@synthesize shouldRotateTouches;
 @synthesize drawsGestures;
 @synthesize touches;
 @synthesize orientationChanges;
@@ -38,6 +39,7 @@
         lock = [[NSLock alloc] init];
 
         scaleFactor = 1.0f;
+        transform = CGAffineTransformIdentity;
         bitmapData = NULL;
         startTime = -1;
         drawsGestures = YES;
@@ -122,6 +124,18 @@
 - (void)stopRecordingGestures
 {
     startTime = -1;
+}
+
+- (void)setShouldRotateTouches:(BOOL)aShouldRotateTouches
+{
+    shouldRotateTouches = aShouldRotateTouches;
+    
+    if (shouldRotateTouches && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        BOOL leftRotation = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight);
+        transform = CGAffineTransformMakeRotation(leftRotation ? -M_PI / 2 : M_PI / 2);
+    } else {
+        transform = CGAffineTransformIdentity;
+    }
 }
 
 #pragma mark - Private methods
@@ -299,6 +313,13 @@
     [gesturesJustCompleted release];
 }
 
+- (CGRect)touchBounds
+{
+    CGRect touchBounds = CGRectApplyAffineTransform(self.touchView.bounds, transform);
+    touchBounds.origin = CGPointMake(0, 0);
+    return touchBounds;
+}
+
 #pragma mark - Notifications
 
 - (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
@@ -330,6 +351,11 @@
                                                                                       timeInSession:timeInSession];
     [orientationChanges addObject:orientationChange];
     [orientationChange release];    
+    
+    if (shouldRotateTouches) {
+        // Force update the transform property
+        [self setShouldRotateTouches:YES];
+    }
 }
 
 #pragma mark - DLWindowDelegate
@@ -346,6 +372,14 @@
 			CGRect privateViewFrame;
 			CGPoint location = [touch locationInView:touchView];
             BOOL touchIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location inView:touchView privateViewFrame:&privateViewFrame];
+
+            // If there's a transform property set, apply it. Add an offset to keep the origin at (0, 0).
+            if (!CGAffineTransformEqualToTransform(transform, CGAffineTransformIdentity)) {
+                CGRect transformedBounds = CGRectApplyAffineTransform(self.touchView.bounds, transform);
+                location = CGPointApplyAffineTransform(location, transform);
+                location.x -= transformedBounds.origin.x;
+                location.y -= transformedBounds.origin.y;
+            }
             
             DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView privateViewFrame:privateViewFrame];
             [touches addObject:ourTouch];

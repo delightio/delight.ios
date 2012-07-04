@@ -380,7 +380,7 @@ typedef enum {
         [videoEncoder stopRecording];
 
 		recordingContext.touches = gestureTracker.touches;
-        recordingContext.touchBounds = gestureTracker.touchView.bounds;
+        recordingContext.touchBounds = [gestureTracker touchBounds];
         recordingContext.orientationChanges = gestureTracker.orientationChanges;
     }
 }
@@ -668,8 +668,13 @@ typedef enum {
 
 #pragma mark - DLVideoEncoderDelegate
 
-- (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
+- (void)videoEncoder:(DLVideoEncoder *)aVideoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
 {
+    if (openGL && aVideoEncoder.videoSize.width > aVideoEncoder.videoSize.height && [UIScreen mainScreen].bounds.size.height > [UIScreen mainScreen].bounds.size.width) {
+        // Landscape video, portrait screen. Our OpenGL surface is rotated.
+        [gestureTracker setShouldRotateTouches:YES];
+    }
+    
     [gestureTracker startRecordingGesturesWithStartUptime:startTime];
 }
 
