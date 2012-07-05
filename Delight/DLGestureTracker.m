@@ -130,9 +130,8 @@
 {
     shouldRotateTouches = aShouldRotateTouches;
     
-    if (shouldRotateTouches && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-        BOOL leftRotation = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight);
-        transform = CGAffineTransformMakeRotation(leftRotation ? -M_PI / 2 : M_PI / 2);
+    if (shouldRotateTouches) {
+        transform = CGAffineTransformMakeRotation(-M_PI / 2);
     } else {
         transform = CGAffineTransformIdentity;
     }

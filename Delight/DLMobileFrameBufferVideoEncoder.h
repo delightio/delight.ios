@@ -9,19 +9,9 @@
 #import "DLVideoEncoder.h"
 #include "IOSurface/IOSurface.h"
 
-int calculateHash(IOSurfaceID surfaceID);
-
 @interface DLMobileFrameBufferVideoEncoder : DLVideoEncoder {
-    BOOL surfaceFound;
-    NSInteger searchIterations;
-    
-    IOSurfaceID foundSurfaceID;
-    IOSurfaceAcceleratorRef accelerator;
     IOSurfaceRef bgraSurface;
 }
-
-@property (nonatomic, retain) NSMutableSet *potentialSurfaces;
-@property (nonatomic, assign) BOOL usesLayerDefaultSurface;
 
 - (void)encode;
 

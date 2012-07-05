@@ -23,7 +23,6 @@
 #import "UITextField+DLPrivateView.h"
 #import "DLCamCaptureManager.h"
 #import </usr/include/objc/objc-class.h>
-#import "IOKitLib.h"
 
 #define kDLDefaultScaleFactor 0.5f
 #define kDLDefaultMaximumFrameRate 15.0f
@@ -670,7 +669,7 @@ typedef enum {
 
 - (void)videoEncoder:(DLVideoEncoder *)aVideoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
 {
-    if (openGL && aVideoEncoder.videoSize.width > aVideoEncoder.videoSize.height && [UIScreen mainScreen].bounds.size.height > [UIScreen mainScreen].bounds.size.width) {
+    if (openGL && aVideoEncoder.videoSize.width > aVideoEncoder.videoSize.height && gestureTracker.touchView.bounds.size.height > gestureTracker.touchView.bounds.size.width) {
         // Landscape video, portrait screen. Our OpenGL surface is rotated.
         [gestureTracker setShouldRotateTouches:YES];
     }

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		83186269159BAC7200CFB45D /* IOMobileFramebuffer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83186268159BAC7200CFB45D /* IOMobileFramebuffer.framework */; };
 		837C3A3A153F870600463CB3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A39153F870600463CB3 /* UIKit.framework */; };
 		837C3A3C153F870600463CB3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A3B153F870600463CB3 /* Foundation.framework */; };
 		837C3A3E153F870600463CB3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A3D153F870600463CB3 /* CoreGraphics.framework */; };
@@ -30,8 +29,6 @@
 		838694E8156EC84400EBDB14 /* icon@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 838694E4156EC84400EBDB14 /* icon@2x~ipad.png */; };
 		838694E9156EC84400EBDB14 /* icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 838694E5156EC84400EBDB14 /* icon~ipad.png */; };
 		838897091545FABE00FCE2D5 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 838897081545FABE00FCE2D5 /* SystemConfiguration.framework */; };
-		83E58A5215926DA400B01636 /* IOSurface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83E58A4F15926DA400B01636 /* IOSurface.framework */; };
-		A951E3EC15994194003C6038 /* libIOKit.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A951E3EB15994194003C6038 /* libIOKit.dylib */; };
 		A9C4D2ED15781D2D008297A9 /* PrivateRegionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9C4D2EB15781D2D008297A9 /* PrivateRegionsViewController.m */; };
 		A9C4D2EE15781D2D008297A9 /* PrivateRegionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A9C4D2EC15781D2D008297A9 /* PrivateRegionsViewController.xib */; };
 /* End PBXBuildFile section */
@@ -47,7 +44,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		83186268159BAC7200CFB45D /* IOMobileFramebuffer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOMobileFramebuffer.framework; path = System/Library/PrivateFrameworks/IOMobileFramebuffer.framework; sourceTree = SDKROOT; };
 		837C3A35153F870600463CB3 /* UIKitSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIKitSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		837C3A39153F870600463CB3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		837C3A3B153F870600463CB3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -78,8 +74,6 @@
 		838694E4156EC84400EBDB14 /* icon@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x~ipad.png"; sourceTree = "<group>"; };
 		838694E5156EC84400EBDB14 /* icon~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon~ipad.png"; sourceTree = "<group>"; };
 		838897081545FABE00FCE2D5 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		83E58A4F15926DA400B01636 /* IOSurface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOSurface.framework; path = System/Library/PrivateFrameworks/IOSurface.framework; sourceTree = SDKROOT; };
-		A951E3EB15994194003C6038 /* libIOKit.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libIOKit.dylib; path = usr/lib/libIOKit.dylib; sourceTree = SDKROOT; };
 		A9C4D2EA15781D2D008297A9 /* PrivateRegionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrivateRegionsViewController.h; sourceTree = "<group>"; };
 		A9C4D2EB15781D2D008297A9 /* PrivateRegionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrivateRegionsViewController.m; sourceTree = "<group>"; };
 		A9C4D2EC15781D2D008297A9 /* PrivateRegionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PrivateRegionsViewController.xib; sourceTree = "<group>"; };
@@ -90,7 +84,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A951E3EC15994194003C6038 /* libIOKit.dylib in Frameworks */,
 				8382932A155863A5007C6CDA /* Delight.framework in Frameworks */,
 				838292A415584DF1007C6CDA /* AssetsLibrary.framework in Frameworks */,
 				838897091545FABE00FCE2D5 /* SystemConfiguration.framework in Frameworks */,
@@ -102,8 +95,6 @@
 				837C3A3E153F870600463CB3 /* CoreGraphics.framework in Frameworks */,
 				837C3A3A153F870600463CB3 /* UIKit.framework in Frameworks */,
 				837C3A3C153F870600463CB3 /* Foundation.framework in Frameworks */,
-				83E58A5215926DA400B01636 /* IOSurface.framework in Frameworks */,
-				83186269159BAC7200CFB45D /* IOMobileFramebuffer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,9 +122,6 @@
 			isa = PBXGroup;
 			children = (
 				838292FB15586257007C6CDA /* Delight.xcodeproj */,
-				A951E3EB15994194003C6038 /* libIOKit.dylib */,
-				83186268159BAC7200CFB45D /* IOMobileFramebuffer.framework */,
-				83E58A4F15926DA400B01636 /* IOSurface.framework */,
 				838292A315584DF1007C6CDA /* AssetsLibrary.framework */,
 				838897081545FABE00FCE2D5 /* SystemConfiguration.framework */,
 				8381FFF41540972A0051F33A /* CoreMedia.framework */,
