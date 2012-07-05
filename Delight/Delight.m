@@ -9,9 +9,6 @@
 #import "Delight.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
 #import "DLTaskController.h"
 #import "DLScreenshotController.h"
 #import "DLUIKitVideoEncoder.h"
@@ -54,12 +51,10 @@ typedef enum {
 @interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 // Methods not yet ready for the public
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-+ (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
 
 + (Delight *)sharedInstance;
 - (void)setAppToken:(NSString *)anAppToken;
 - (void)setAnnotation:(DLAnnotation)annotation;
-- (void)setOpenGL:(BOOL)openGL;
 - (void)startRecording;
 - (void)stopRecording;
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
@@ -87,7 +82,6 @@ typedef enum {
     // Configuration
     NSString *appToken;
     DLAnnotation annotation;
-    BOOL openGL;
     BOOL autoCaptureEnabled;
 	BOOL delaySessionUploadForCamera;
 	BOOL cameraDidStop;
@@ -114,6 +108,9 @@ typedef enum {
 
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
+#if TARGET_IPHONE_SIMULATOR
+    DLLog(@"[Delight] Recording not supported in simulator");
+#else
     Delight *delight = [self sharedInstance];
 	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
 		delight->taskController.sessionObjectName = @"usability_app_session";
@@ -123,30 +120,6 @@ typedef enum {
 	
     [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
-    [delight setOpenGL:NO];
-	[delight tryCreateNewSession];   
-}
-
-+ (void)startOpenGLWithAppToken:(NSString *)appToken
-{
-    [self startOpenGLWithAppToken:appToken annotation:DLAnnotationNone];
-}
-
-+ (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
-{
-#if TARGET_IPHONE_SIMULATOR
-    DLLog(@"[Delight] OpenGL recording not supported in simulator");
-#else
-    Delight *delight = [self sharedInstance];
-    [delight setAutoCaptureEnabled:YES];
-	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
-		delight->taskController.sessionObjectName = @"opengl_usability_app_session";
-	} else {
-		delight->taskController.sessionObjectName = @"opengl_app_session";
-	}
-    [delight setAnnotation:annotation];
-    [delight setAppToken:appToken];
-    [delight setOpenGL:YES];
 	[delight tryCreateNewSession];
 #endif
 }
@@ -155,21 +128,6 @@ typedef enum {
 {
     [[self sharedInstance] stopRecording];
     [self sharedInstance]->metrics.stopReason = DLMetricsStopReasonManual;
-}
-
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer
-{
-    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderbuffer);
-    [self takeOpenGLScreenshot:glView];
-}
-
-+ (void)takeOpenGLScreenshot:(UIView *)glView
-{
-    GLint backingWidth, backingHeight;
-    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
-    glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
-    
-    [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
 }
 
 + (BOOL)savesToPhotoAlbum
@@ -238,7 +196,10 @@ typedef enum {
     self = [super init];
     if (self) {
         screenshotController = [[DLScreenshotController alloc] init];        
-                
+        
+        videoEncoder = [[DLMobileFrameBufferVideoEncoder alloc] init];
+        videoEncoder.delegate = self;
+
         gestureTracker = [[DLGestureTracker alloc] init];
         gestureTracker.drawsGestures = NO;
         gestureTracker.delegate = self;
@@ -420,19 +381,6 @@ typedef enum {
     annotation = anAnnotation;
 }
 
-- (void)setOpenGL:(BOOL)anOpenGL
-{
-    openGL = anOpenGL;
-
-    [videoEncoder release];
-    if (openGL) {
-        videoEncoder = [[DLMobileFrameBufferVideoEncoder alloc] init];
-    } else {
-        videoEncoder = [[DLUIKitVideoEncoder alloc] init];
-    }
-    videoEncoder.delegate = self;
-}
-
 - (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
 {    
     if (!videoEncoder.recording) return;
@@ -456,8 +404,7 @@ typedef enum {
     NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
     lastScreenshotTime = start;
         
-    if (openGL) {
-//        gestureTracker.touchView = glView;
+    if ([videoEncoder isKindOfClass:[DLMobileFrameBufferVideoEncoder class]]) {
         DLMobileFrameBufferVideoEncoder *openGLEncoder = (DLMobileFrameBufferVideoEncoder *)videoEncoder;
         [openGLEncoder encode];
     } else {
@@ -669,7 +616,7 @@ typedef enum {
 
 - (void)videoEncoder:(DLVideoEncoder *)aVideoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
 {
-    if (openGL && aVideoEncoder.videoSize.width > aVideoEncoder.videoSize.height && gestureTracker.touchView.bounds.size.height > gestureTracker.touchView.bounds.size.width) {
+    if (aVideoEncoder.videoSize.width > aVideoEncoder.videoSize.height && gestureTracker.touchView.bounds.size.height > gestureTracker.touchView.bounds.size.width) {
         // Landscape video, portrait screen. Our OpenGL surface is rotated.
         [gestureTracker setShouldRotateTouches:YES];
     }
