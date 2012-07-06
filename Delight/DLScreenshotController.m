@@ -19,6 +19,7 @@
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
 - (void)hidePrivateFrames:(NSSet *)privateViews forWindow:(UIWindow *)window inContext:(CGContextRef)context;
+- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
 @end
@@ -162,6 +163,49 @@
     }
 }
 
+- (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)locationView privateViewFrame:(CGRect *)frame
+{    
+    for (UIView *view in privateViews) {
+        CGRect frameInWindow = [view convertRect:view.bounds toView:locationView];
+        
+        if (CGRectContainsPoint(frameInWindow, location) && view.window && !view.hidden) {
+            if (frame) {
+                *frame = frameInWindow;
+            }
+            return YES;
+        }
+    }
+    
+    if (keyboardWindow && hidesKeyboard) {
+        if (CGRectContainsPoint(keyboardFrame, location)) {
+            if (frame) {
+                *frame = keyboardFrame;
+            }
+            return YES;
+        }
+    }
+    
+    if (frame) {
+        *frame = CGRectZero;
+    }
+    return NO;
+}
+
+- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+{
+    // Black out private views directly in the pixel buffer
+    for (UIView *privateView in privateViews) {
+        if (privateView.window && !privateView.hidden) {
+            CGRect frameInWindow = [privateView convertRect:privateView.bounds toView:privateView.window];
+            [self blackOutPrivateFrame:frameInWindow inPixelBuffer:pixelBuffer transform:transform transformOffset:transformOffset];
+        }
+    }
+    
+    if (keyboardWindow && hidesKeyboard) {
+        [self blackOutPrivateFrame:keyboardFrame inPixelBuffer:pixelBuffer transform:transform transformOffset:transformOffset];
+    }
+}
+
 #pragma mark - Private methods
 
 - (UIWindow *)keyboardWindow
@@ -270,32 +314,28 @@
     }
 }
 
-- (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)locationView privateViewFrame:(CGRect *)frame
-{    
-    for (UIView *view in privateViews) {
-        CGRect frameInWindow = [view convertRect:view.bounds toView:locationView];
+- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+{
+    CGFloat scale = [[UIScreen mainScreen] scale];
+    CGRect frameInBuffer = CGRectApplyAffineTransform(frame, transform);
+    frameInBuffer.origin.x += transformOffset.x;
+    frameInBuffer.origin.y += transformOffset.y;
+    frameInBuffer.origin.x *= scale;
+    frameInBuffer.origin.y *= scale;
+    frameInBuffer.size.width *= scale;
+    frameInBuffer.size.height *= scale;
             
-        if (CGRectContainsPoint(frameInWindow, location) && view.window && !view.hidden) {
-            if (frame) {
-                *frame = frameInWindow;
-            }
-            return YES;
-        }
+    void *buffer = CVPixelBufferGetBaseAddress(pixelBuffer);
+    size_t width = CVPixelBufferGetWidth(pixelBuffer);
+    size_t height = CVPixelBufferGetHeight(pixelBuffer);
+    size_t bytesPerPixel = CVPixelBufferGetBytesPerRow(pixelBuffer) / width;
+    
+    for (int row = MAX(0, CGRectGetMinY(frameInBuffer)); row < CGRectGetMaxY(frameInBuffer) && row < height; row++) {
+        unsigned long startColumn = CGRectGetMinX(frameInBuffer);
+        unsigned long length = CGRectGetWidth(frameInBuffer) * bytesPerPixel;
+        
+        memset(buffer + ((row * width + startColumn) * bytesPerPixel), 0, length);
     }
-
-    if (keyboardWindow && hidesKeyboard) {
-        if (CGRectContainsPoint(keyboardFrame, location)) {
-            if (frame) {
-                *frame = keyboardFrame;
-            }
-            return YES;
-        }
-    }
-
-    if (frame) {
-        *frame = CGRectZero;
-    }
-    return NO;
 }
 
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context

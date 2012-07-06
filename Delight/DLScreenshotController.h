@@ -32,5 +32,6 @@
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 - (void)unregisterPrivateView:(UIView *)view;
 - (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)view privateViewFrame:(CGRect *)frame;
+- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset;
 
 @end

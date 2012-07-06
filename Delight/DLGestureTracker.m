@@ -23,6 +23,7 @@
 @synthesize scaleFactor;
 @synthesize touchView;
 @synthesize shouldRotateTouches;
+@synthesize transform;
 @synthesize drawsGestures;
 @synthesize touches;
 @synthesize orientationChanges;
@@ -135,6 +136,13 @@
     } else {
         transform = CGAffineTransformIdentity;
     }
+}
+
+- (CGPoint)transformOffset
+{
+    CGRect transformedBounds = CGRectApplyAffineTransform(self.touchView.bounds, transform);
+    CGPoint transformOffset = CGPointMake(-transformedBounds.origin.x, -transformedBounds.origin.y);
+    return transformOffset;
 }
 
 #pragma mark - Private methods
@@ -374,14 +382,14 @@
 
             // If there's a transform property set, apply it. Add an offset to keep the origin at (0, 0).
             if (!CGAffineTransformEqualToTransform(transform, CGAffineTransformIdentity)) {
-                CGRect transformedBounds = CGRectApplyAffineTransform(self.touchView.bounds, transform);
+                CGPoint transformOffset = [self transformOffset];
                 location = CGPointApplyAffineTransform(location, transform);
-                location.x -= transformedBounds.origin.x;
-                location.y -= transformedBounds.origin.y;
+                location.x += transformOffset.x;
+                location.y += transformOffset.y;
                 if (touchIsInPrivateView) {
                     privateViewFrame = CGRectApplyAffineTransform(privateViewFrame, transform);
-                    privateViewFrame.origin.x -= transformedBounds.origin.x;
-                    privateViewFrame.origin.y -= transformedBounds.origin.y;
+                    privateViewFrame.origin.x += transformOffset.x;
+                    privateViewFrame.origin.y += transformOffset.y;
                 }
             }
             

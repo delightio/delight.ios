@@ -110,6 +110,10 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     void *pixelBufferData = (void *) CVPixelBufferGetBaseAddress(pixelBuffer);
     memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
 
+    if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:)]) {
+        [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer];
+    }
+    
     if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
         DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
     }
