@@ -49,6 +49,7 @@
 @protocol DLVideoEncoderDelegate <NSObject>
 @optional
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime;
+- (void)videoEncoderWillRender:(DLVideoEncoder *)videoEncoder;
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder willEncodePixelBuffer:(CVPixelBufferRef)pixelBuffer;
 - (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder;
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didFailRecordingWithError:(NSError *)error;

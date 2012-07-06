@@ -100,8 +100,11 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
         return;
     }
     
+    if ([self.delegate respondsToSelector:@selector(videoEncoderWillRender:)]) {
+        [self.delegate videoEncoderWillRender:self];
+    }
+    
     CMTime time = [self currentFrameTime];
-
     CARenderServerRenderDisplay(0, @"LCD", bgraSurface, 0, 0);
     
     CVPixelBufferLockBaseAddress(pixelBuffer, 0);

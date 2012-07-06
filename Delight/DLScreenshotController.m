@@ -31,6 +31,7 @@
 @synthesize writesToPNG;
 @synthesize imageSize;
 @synthesize privateViews;
+@synthesize lockedPrivateViewFrames;
 
 - (id)init
 {
@@ -38,6 +39,7 @@
     if (self) {
         bitmapData = NULL;
         privateViews = [[NSMutableSet alloc] init];
+        lockedPrivateViewFrames = [[NSMutableSet alloc] init];
         self.scaleFactor = 1.0f;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardDidShowNotification:) name:UIKeyboardDidShowNotification object:nil];    
@@ -57,6 +59,7 @@
     
     [privateViews release];
     [keyboardWindow release];
+    [lockedPrivateViewFrames release];
     
     [super dealloc];
 }
@@ -86,7 +89,7 @@
     // Store the private view frames at the time that rendering begins.
     // We don't use the views directly because the frames may have changed after rendering finishes.
     // We want to black out their original positions.
-    NSMutableSet *privateFramesAtRenderTime = [[NSMutableSet alloc] initWithCapacity:[privateViews count]];
+    [lockedPrivateViewFrames removeAllObjects];
     for (UIView *view in privateViews) {
         NSString *description = objc_getAssociatedObject(view, kDLDescriptionKey);
         CGRect frameInWindow = [view convertRect:view.bounds toView:view.window];
@@ -94,7 +97,7 @@
         NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:frameInWindow], @"frame",
                                   view.window, @"window",
                                   description, @"description", nil];
-        [privateFramesAtRenderTime addObject:viewDict];
+        [lockedPrivateViewFrames addObject:viewDict];
     }
     
     // Iterate over every window from back to front
@@ -120,7 +123,7 @@
                 [[window layer] renderInContext:context];
             }
             
-            [self hidePrivateFrames:privateFramesAtRenderTime forWindow:window inContext:context];
+            [self hidePrivateFrames:lockedPrivateViewFrames forWindow:window inContext:context];
             
             CGContextRestoreGState(context);
             
@@ -129,9 +132,7 @@
             }
         }
     }
-    
-    [privateFramesAtRenderTime release];
-    
+        
     // Retrieve the screenshot image
     CGImageRef cgImage = CGBitmapContextCreateImage(context);
     UIImage *image = [UIImage imageWithCGImage:cgImage];
@@ -191,18 +192,31 @@
     return NO;
 }
 
-- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+- (void)lockPrivateViewFrames
 {
-    // Black out private views directly in the pixel buffer
+    // Keep track of the positions of the private views at the current time
+    [lockedPrivateViewFrames removeAllObjects];
+    
     for (UIView *privateView in privateViews) {
         if (privateView.window && !privateView.hidden) {
             CGRect frameInWindow = [privateView convertRect:privateView.bounds toView:privateView.window];
-            [self blackOutPrivateFrame:frameInWindow inPixelBuffer:pixelBuffer transform:transform transformOffset:transformOffset];
+            NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:frameInWindow], @"frame", nil];
+            [lockedPrivateViewFrames addObject:viewDict];
         }
     }
     
     if (keyboardWindow && hidesKeyboard) {
-        [self blackOutPrivateFrame:keyboardFrame inPixelBuffer:pixelBuffer transform:transform transformOffset:transformOffset];
+        NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:keyboardFrame], @"frame", nil];
+        [lockedPrivateViewFrames addObject:viewDict];
+    }
+}
+
+- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+{
+    // Black out private views directly in the pixel buffer
+    for (NSDictionary *frameDict in lockedPrivateViewFrames) {
+        CGRect frame = [[frameDict objectForKey:@"frame"] CGRectValue];
+        [self blackOutPrivateFrame:frame inPixelBuffer:pixelBuffer transform:transform transformOffset:transformOffset];
     }
 }
 

@@ -624,6 +624,11 @@ typedef enum {
     [gestureTracker startRecordingGesturesWithStartUptime:startTime];
 }
 
+- (void)videoEncoderWillRender:(DLVideoEncoder *)videoEncoder
+{
+    [screenshotController lockPrivateViewFrames];
+}
+
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder willEncodePixelBuffer:(CVPixelBufferRef)pixelBuffer
 {
     // Black out private views before encoding
