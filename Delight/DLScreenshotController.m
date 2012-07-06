@@ -206,7 +206,14 @@
     }
     
     if (keyboardWindow && hidesKeyboard) {
-        NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:keyboardFrame], @"frame", nil];
+        // Hide the keyboard, but also include the area just above the keyboard where the scaled keys show up on iPhone
+        CGRect extendedKeyboardFrame;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            extendedKeyboardFrame = CGRectMake(keyboardFrame.origin.x - 65, keyboardFrame.origin.y - 55, keyboardFrame.size.width + 65, keyboardFrame.size.height + 110);
+        } else {
+            extendedKeyboardFrame = keyboardFrame;
+        }
+        NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:extendedKeyboardFrame], @"frame", nil];
         [lockedPrivateViewFrames addObject:viewDict];
     }
 }
