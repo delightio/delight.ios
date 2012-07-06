@@ -11,7 +11,6 @@
 
 @interface DLOpenGLVideoEncoder ()
 - (UIImage *)resizedImageForPixelData:(GLubyte *)pixelData backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-- (void)convertPixelsTo32ARGB:(GLubyte *)pixels width:(GLint)width height:(GLint)height;
 @end
 
 @implementation DLOpenGLVideoEncoder
@@ -22,7 +21,7 @@
 {
     self = [super init];
     if (self) {
-        self.usesImplementationPixelFormat = YES;
+        self.usesImplementationPixelFormat = NO;
     }
     return self;
 }
@@ -111,10 +110,6 @@
         glReadPixels(0, 0, backingWidth, backingHeight, pixelFormat, pixelType, pixelBufferData);
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            if (usesImplementationPixelFormat) {
-                [self convertPixelsTo32ARGB:pixelBufferData width:backingWidth height:backingHeight];
-            }
-            
             UIImage *image = [self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight];
             [self encodeImage:image atPresentationTime:time byteShift:(usesImplementationPixelFormat ? 0 : 1)];
             
@@ -128,10 +123,6 @@
         glReadPixels(0, 0, backingWidth, backingHeight, pixelFormat, pixelType, pixelBufferData + (usesImplementationPixelFormat ? 0 : 1));
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{  
-            if (usesImplementationPixelFormat) {
-                [self convertPixelsTo32ARGB:pixelBufferData width:backingWidth height:backingHeight];
-            }
-            
             if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
                 DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
             }
@@ -176,17 +167,6 @@
     CGImageRelease(iref);    
     
     return image;
-}
-
-- (void)convertPixelsTo32ARGB:(GLubyte *)pixels width:(GLint)width height:(GLint)height
-{
-    if (pixelFormat == GL_RGB && pixelType == GL_UNSIGNED_SHORT_5_6_5) {
-/*        for (int i = width*height - 1; i >= 0; i--) {
-            GLbyte red = pixels[i*2] >> 3 * ((2^8 - 1) / (2^5 - 1));
-            GLbyte green = ((pixels[i*2] & 7) << 3 | pixels[i*2 + 1] >> 3) * 
-            pixels[i*4 + 1] = 0;
-        }*/
-    }
 }
 
 @end

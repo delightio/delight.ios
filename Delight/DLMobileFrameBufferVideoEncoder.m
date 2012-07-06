@@ -51,11 +51,22 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     return self;
 }
 
-- (void)dealloc
+- (void)startNewRecording
 {
-    CFRelease(bgraSurface);
+    [super startNewRecording];
     
-    [super dealloc];
+    // We can set up our asset writer already, since we know the video size (from the surface size)
+    [self setup];
+}
+
+- (void)cleanup
+{
+    [super cleanup];
+    
+    if (bgraSurface) {
+        CFRelease(bgraSurface);
+        bgraSurface = NULL;
+    }
 }
 
 - (void)setup
@@ -85,10 +96,6 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
 
 - (void)encode
 {
-    if (!bgraSurface) {
-        [self setup];
-    }
-        
     if (![videoWriterInput isReadyForMoreMediaData] || !self.recording) {
         return;
     }
