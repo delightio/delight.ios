@@ -123,7 +123,7 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
 - (CGSize)defaultSurfaceSize
 {
     IOMobileFramebufferConnection connect;
-    IOSurfaceRef defaultSurface;
+    IOSurfaceRef defaultSurface = NULL;
     
     io_service_t framebufferService = DLIOServiceGetMatchingService(0, DLIOServiceMatching("AppleCLCD"));
     if (framebufferService) {
@@ -140,21 +140,24 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
                 framebufferService = DLIOServiceGetMatchingService(0, DLIOServiceMatching("IOMobileFramebuffer"));
                 if (framebufferService) {
                     DLDebugLog(@"Using IOMobileFramebuffer");
-                } else {
-                    DLLog(@"[Delight] Couldn't find a matching IOService");
-                    CGFloat scale = [[UIScreen mainScreen] scale];
-                    return CGSizeMake([UIScreen mainScreen].bounds.size.width * scale, [UIScreen mainScreen].bounds.size.height * scale);
-                }
+                } 
             }
         }
     }
     
-    DLIOMobileFramebufferOpen(framebufferService, mach_task_self(), 0, &connect);
-    DLIOMobileFramebufferGetLayerDefaultSurface(connect, 0, &defaultSurface);
+    if (framebufferService) {
+        DLIOMobileFramebufferOpen(framebufferService, mach_task_self(), 0, &connect);
+        DLIOMobileFramebufferGetLayerDefaultSurface(connect, 0, &defaultSurface);
+    }
+    
+    if (!defaultSurface) {
+        DLLog(@"[Delight] Couldn't detect surface size, defaulting to screen size");
+        CGFloat scale = [[UIScreen mainScreen] scale];
+        return CGSizeMake([UIScreen mainScreen].bounds.size.width * scale, [UIScreen mainScreen].bounds.size.height * scale);
+    }
     
     size_t width = DLIOSurfaceGetWidth(defaultSurface);
     size_t height = DLIOSurfaceGetHeight(defaultSurface);
-    
     return CGSizeMake(width, height);
 }
 
