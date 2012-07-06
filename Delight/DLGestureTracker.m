@@ -378,6 +378,11 @@
                 location = CGPointApplyAffineTransform(location, transform);
                 location.x -= transformedBounds.origin.x;
                 location.y -= transformedBounds.origin.y;
+                if (touchIsInPrivateView) {
+                    privateViewFrame = CGRectApplyAffineTransform(privateViewFrame, transform);
+                    privateViewFrame.origin.x -= transformedBounds.origin.x;
+                    privateViewFrame.origin.y -= transformedBounds.origin.y;
+                }
             }
             
             DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView privateViewFrame:privateViewFrame];
