@@ -357,12 +357,7 @@
                                                                                interfaceOrientation:interfaceOrientation
                                                                                       timeInSession:timeInSession];
     [orientationChanges addObject:orientationChange];
-    [orientationChange release];    
-    
-    if (shouldRotateTouches) {
-        // Force update the transform property
-        [self setShouldRotateTouches:YES];
-    }
+    [orientationChange release];
 }
 
 #pragma mark - DLWindowDelegate
