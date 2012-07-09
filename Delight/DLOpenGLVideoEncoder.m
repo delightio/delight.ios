@@ -107,7 +107,7 @@
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             UIImage *image = [self resizedImageForPixelData:pixelBufferData width:backingWidth height:backingHeight];
-            [self encodeImage:image atPresentationTime:time byteShift:(usesImplementationPixelFormat ? 0 : 1)];
+            [self encodeImage:image atPresentationTime:time byteShift:(usesImplementationPixelFormat ? 0 : 1) scale:(self.videoSize.width / backingWidth)];
             
             CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
             CVPixelBufferRelease(pixelBuffer);

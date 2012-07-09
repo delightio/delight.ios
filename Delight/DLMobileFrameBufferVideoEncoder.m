@@ -131,8 +131,8 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
         void *pixelBufferData = (void *) CVPixelBufferGetBaseAddress(pixelBuffer);
         memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
         
-        if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:)]) {
-            [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer];
+        if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
+            [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:videoScale];
         }
         
         if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
@@ -144,7 +144,7 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     } else {
         // Need to scale down before encoding
         UIImage *image = [self resizedImageForPixelData:frameBuffer width:DLIOSurfaceGetWidth(bgraSurface) height:DLIOSurfaceGetHeight(bgraSurface)];
-        [self encodeImage:image atPresentationTime:time byteShift:0];
+        [self encodeImage:image atPresentationTime:time byteShift:0 scale:videoScale];
     }
 }
 

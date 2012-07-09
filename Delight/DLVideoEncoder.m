@@ -113,7 +113,7 @@
     [videoWriter release]; videoWriter = nil;
 }
 
-- (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift
+- (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift scale:(CGFloat)scale
 {
     if ([videoWriterInput isReadyForMoreMediaData] && self.recording) {        
         [lock lock];
@@ -132,8 +132,8 @@
             uint8_t *destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
             CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image) - byteShift), destPixels + byteShift);
             
-            if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:)]) {
-                [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer];
+            if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
+                [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:scale];
             }
             
             if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]){

@@ -629,12 +629,12 @@ typedef enum {
     [screenshotController lockPrivateViewFrames];
 }
 
-- (void)videoEncoder:(DLVideoEncoder *)videoEncoder willEncodePixelBuffer:(CVPixelBufferRef)pixelBuffer
+- (void)videoEncoder:(DLVideoEncoder *)aVideoEncoder willEncodePixelBuffer:(CVPixelBufferRef)pixelBuffer scale:(CGFloat)scale
 {
     // Black out private views before encoding
-    [screenshotController blackOutPrivateViewsInPixelBuffer:pixelBuffer 
-                                                  transform:gestureTracker.transform 
-                                            transformOffset:[gestureTracker transformOffset]];
+    CGAffineTransform transform = CGAffineTransformScale(gestureTracker.transform, scale, scale);
+    CGPoint offset = CGPointApplyAffineTransform([gestureTracker transformOffset], CGAffineTransformMakeScale(scale, scale));
+    [screenshotController blackOutPrivateViewsInPixelBuffer:pixelBuffer transform:transform transformOffset:offset];
 }
 
 - (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder
