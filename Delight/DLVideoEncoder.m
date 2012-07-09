@@ -195,6 +195,8 @@
 
 - (UIImage *)resizedImageForPixelData:(void *)pixelData width:(int)backingWidth height:(int)backingHeight
 {
+    CGSize imageSize = self.videoSize;
+    
     // Create a CGImage with the original pixel data
     CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, pixelData, backingWidth * backingHeight * 4, NULL);
     CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
@@ -202,16 +204,20 @@
                                     ref, NULL, true, kCGRenderingIntentDefault);
     
     // Create a graphics context with the target size
-    UIGraphicsBeginImageContextWithOptions(self.videoSize, NO, 1.0);
+    UIGraphicsBeginImageContextWithOptions(imageSize, NO, 1.0);
     
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextScaleCTM(context, 1.0, -1.0);
-    CGContextTranslateCTM(context, 0, -self.videoSize.height);
+    CGContextTranslateCTM(context, 0, -imageSize.height);
     CGContextSetBlendMode(context, kCGBlendModeCopy);
     CGContextSetAllowsAntialiasing(context, NO);
 	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
     
-    CGContextDrawImage(context, CGRectMake(0.0, 0.0, self.videoSize.width, self.videoSize.height), iref);
+    [lock lock];
+    if (self.recording) {
+        CGContextDrawImage(context, CGRectMake(0.0, 0.0, imageSize.width, imageSize.height), iref);
+    }
+    [lock unlock];
     
     // Retrieve the UIImage from the current context
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
