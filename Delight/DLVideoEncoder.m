@@ -132,6 +132,10 @@
             uint8_t *destPixels = CVPixelBufferGetBaseAddress(pixelBuffer);
             CFDataGetBytes(image, CFRangeMake(0, CFDataGetLength(image) - byteShift), destPixels + byteShift);
             
+            if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:)]) {
+                [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer];
+            }
+            
             if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]){
                 DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
             }
@@ -187,6 +191,39 @@
     CMTime time = CMTimeMake((int)millisElapsed, 1000);
     
     return time;
+}
+
+- (UIImage *)resizedImageForPixelData:(void *)pixelData width:(int)backingWidth height:(int)backingHeight
+{
+    // Create a CGImage with the original pixel data
+    CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, pixelData, backingWidth * backingHeight * 4, NULL);
+    CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
+    CGImageRef iref = CGImageCreate(backingWidth, backingHeight, 8, 32, backingWidth * 4, colorspace, kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst,
+                                    ref, NULL, true, kCGRenderingIntentDefault);
+    
+    // Create a graphics context with the target size
+    UIGraphicsBeginImageContextWithOptions(self.videoSize, NO, 1.0);
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextTranslateCTM(context, 0, -self.videoSize.height);
+    CGContextSetBlendMode(context, kCGBlendModeCopy);
+    CGContextSetAllowsAntialiasing(context, NO);
+	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
+    
+    CGContextDrawImage(context, CGRectMake(0.0, 0.0, self.videoSize.width, self.videoSize.height), iref);
+    
+    // Retrieve the UIImage from the current context
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    // Clean up
+    CFRelease(ref);
+    CFRelease(colorspace);
+    CGImageRelease(iref);
+    
+    return image;
 }
 
 #pragma mark - Private methods

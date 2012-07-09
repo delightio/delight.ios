@@ -43,6 +43,7 @@
 - (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift;
 - (NSURL *)tempFileURL;
 - (CMTime)currentFrameTime;
+- (UIImage *)resizedImageForPixelData:(void *)pixelData width:(int)backingWidth height:(int)backingHeight;
 
 @end
 

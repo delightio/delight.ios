@@ -11,6 +11,7 @@
 
 @interface DLMobileFrameBufferVideoEncoder : DLVideoEncoder {
     IOSurfaceRef bgraSurface;
+    CGFloat videoScale;
 }
 
 - (void)encode;
