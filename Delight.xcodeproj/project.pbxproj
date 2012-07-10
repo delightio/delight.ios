@@ -565,7 +565,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "DELIGHT_VERSION_PUBLIC=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/Delight-Info.plist\")\nDELIGHT_VERSION_PRIVATE=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/DelightPrivate-Info.plist\")\n\nsed -i \"\" \"s/#define DELIGHT_VERSION.*/#define DELIGHT_VERSION (PRIVATE_FRAMEWORK ? @\\\"$DELIGHT_VERSION_PRIVATE\\\" : @\\\"$DELIGHT_VERSION_PUBLIC\\\")/\" \"$SRCROOT/Delight/DLConstants.h\"";
+			shellScript = "DELIGHT_VERSION_PUBLIC=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/Delight-Info.plist\")\nDELIGHT_VERSION_PRIVATE=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/DelightPrivate-Info.plist\")\n\nsed -i \"\" \"s/#define DELIGHT_VERSION_PRIVATE.*/#define DELIGHT_VERSION_PRIVATE @\\\"$DELIGHT_VERSION_PRIVATE\\\"/\" \"$SRCROOT/Delight/DLConstants.h\"\nsed -i \"\" \"s/#define DELIGHT_VERSION_PUBLIC.*/#define DELIGHT_VERSION_PUBLIC @\\\"$DELIGHT_VERSION_PUBLIC\\\"/\" \"$SRCROOT/Delight/DLConstants.h\"";
 		};
 		83559D3E15ABB60B0062E66A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
