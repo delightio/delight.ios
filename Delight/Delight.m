@@ -92,9 +92,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
-#if TARGET_IPHONE_SIMULATOR && PRIVATE_FRAMEWORK
-    DLLog(@"[Delight] Recording not supported in simulator");
-#else
 	Delight *delight = [self sharedInstance];
 	if (annotation == DLAnnotationFrontVideoAndAudio) {
 		delight.taskController.sessionObjectName = @"usability_app_session";
@@ -106,7 +103,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [delight setAppToken:appToken];
     [delight setOpenGL:NO];
 	[delight tryCreateNewSession];
-#endif
 }
 
 + (void)startOpenGLWithAppToken:(NSString *)appToken

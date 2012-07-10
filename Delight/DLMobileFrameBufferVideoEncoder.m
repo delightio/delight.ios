@@ -10,6 +10,10 @@
 #import "IOMobileFramebuffer/IOMobileFramebuffer.h"
 #include <dlfcn.h>
 
+#if TARGET_IPHONE_SIMULATOR
+CGImageRef UIGetScreenImage(void);
+#endif
+
 void CARenderServerRenderDisplay(int, NSString *, IOSurfaceRef, int, int);
 
 // Dynamically-loaded functions
@@ -72,12 +76,14 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
 - (void)setup
 {
     CGSize defaultSurfaceSize = [self defaultSurfaceSize];
+    
+    videoScale = 1.0;
+#if !TARGET_IPHONE_SIMULATOR
     if (defaultSurfaceSize.height > 1024.0) {
         // Encoder has a dimension limit, need to scale down our video
         videoScale = 0.5;
-    } else {
-        videoScale = 1.0;
     }
+#endif
     self.videoSize = CGSizeMake(defaultSurfaceSize.width * videoScale, defaultSurfaceSize.height * videoScale);
     
     uint32_t width = (uint32_t) defaultSurfaceSize.width;
@@ -114,8 +120,16 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     
     CMTime time = [self currentFrameTime];
     
+#if TARGET_IPHONE_SIMULATOR
+    // CARenderServerRenderDisplay doesn't work in simulator, but we can fall back to UIGetScreenImage since speed isn't a big concern
+    CGImageRef screenImage = UIGetScreenImage();
+    UIImage *image = [[UIImage alloc] initWithCGImage:screenImage];
+    [self encodeImage:image atPresentationTime:time byteShift:0 scale:videoScale];
+    [image release];
+    CGImageRelease(screenImage);
+#else    
     // Render the display to our BGRA surface
-    CARenderServerRenderDisplay(0, @"LCD", bgraSurface, 0, 2);
+    CARenderServerRenderDisplay(0, @"LCD", bgraSurface, 0, 0);
     void *frameBuffer = DLIOSurfaceGetBaseAddress(bgraSurface);
     
     if (videoScale == 1.0) {
@@ -146,6 +160,7 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
         UIImage *image = [self resizedImageForPixelData:frameBuffer width:DLIOSurfaceGetWidth(bgraSurface) height:DLIOSurfaceGetHeight(bgraSurface)];
         [self encodeImage:image atPresentationTime:time byteShift:0 scale:videoScale];
     }
+#endif
 }
 
 - (int)pixelFormatType
@@ -186,7 +201,7 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     }
     
     if (!defaultSurface) {
-        DLLog(@"[Delight] Couldn't detect surface size, defaulting to screen size");
+        DLDebugLog(@"Couldn't detect surface size, defaulting to screen size");
         CGFloat scale = [[UIScreen mainScreen] scale];
         return CGSizeMake([UIScreen mainScreen].bounds.size.width * scale, [UIScreen mainScreen].bounds.size.height * scale);
     }
