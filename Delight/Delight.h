@@ -31,35 +31,6 @@
 + (void)stop;
 
 /**---------------------------------------------------------------------------------------
- * @name OpenGL ES Recording
- * ---------------------------------------------------------------------------------------
- */
-
-/** Starts capturing the screen and recording gestures for OpenGL ES-based apps. You must also call either `takeOpenGLScreenshot:` or `takeOpenGLScreenshot:colorRenderbuffer:` inside your render loop, just before calling `-[EAGLContext presentRenderbuffer:]`.
-
- @see startWithAppToken:
- @param appToken The application token from your [control panel](http://delight.io/apps).
- */
-+ (void)startOpenGLWithAppToken:(NSString *)appToken;
-
-/** Writes the framebuffer pixel data to the recording. Call this method after drawing and before `-[EAGLContext presentRenderbuffer:]`. If you have multiple renderbuffers, use `takeOpenGLScreenshot:colorRenderbuffer:` instead.
- 
- @see startOpenGLWithAppToken:
- @see takeOpenGLScreenshot:colorRenderbuffer:
- @param glView The OpenGL ES view.
- */
-+ (void)takeOpenGLScreenshot:(UIView *)glView;
-
-/** Writes the framebuffer pixel data to the recording. Call this method after drawing and before `-[EAGLContext presentRenderbuffer:]`. If your application creates only a single color renderbuffer which is already bound, you may use `takeOpenGLScreenshot:` instead.
- 
- @see startOpenGLWithAppToken:
- @see takeOpenGLScreenshot:
- @param glView The OpenGL ES view.
- @param colorRenderbuffer The color renderbuffer object used to render the OpenGL ES view.
- */
-+ (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer;
-
-/**---------------------------------------------------------------------------------------
  * @name Adding Metadata
  * ---------------------------------------------------------------------------------------
  */
