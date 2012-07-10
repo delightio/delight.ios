@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		83559D4A15ABBDD40062E66A /* Delight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8382931B1558634E007C6CDA /* Delight.framework */; };
 		837C3A24153F7DEB00463CB3 /* TeapotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 837C3A23153F7DEB00463CB3 /* TeapotViewController.m */; };
 		837C3A29153F804900463CB3 /* TeapotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 837C3A28153F7EC100463CB3 /* TeapotView.m */; };
+		837D9D0315ACDEE400704989 /* DelightPrivate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83559D4815ABBB840062E66A /* DelightPrivate.framework */; };
 		8383861615549A6000A83AE9 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8383861415549A6000A83AE9 /* AssetsLibrary.framework */; };
 		8383861715549A6000A83AE9 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8383861515549A6000A83AE9 /* SystemConfiguration.framework */; };
 		838694F8156ECA1700EBDB14 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 838694F4156ECA1700EBDB14 /* icon.png */; };
@@ -81,7 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83559D4A15ABBDD40062E66A /* Delight.framework in Frameworks */,
+				837D9D0315ACDEE400704989 /* DelightPrivate.framework in Frameworks */,
 				8383861615549A6000A83AE9 /* AssetsLibrary.framework in Frameworks */,
 				8383861715549A6000A83AE9 /* SystemConfiguration.framework in Frameworks */,
 				83F73F21153E32BF0094BD16 /* AVFoundation.framework in Frameworks */,
