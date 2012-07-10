@@ -55,6 +55,10 @@
         NSArray *windows = [[UIApplication sharedApplication] windows];
         if ([windows count]) {
             for (UIWindow *window in windows) {
+                if (![window respondsToSelector:@selector(DLsetDelegate:)]) {
+                    NSLog(@"[Delight] Error: categories not loaded. Have you included -ObjC in the 'Other Linker Flags' setting of your target?");
+                    [NSException raise:@"Categories not loaded" format:@"UIWindow additions missing"];
+                }
                 [window DLsetDelegate:self];
             }
             
@@ -343,6 +347,10 @@
 - (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
 {
     UIWindow *window = [notification object];
+    if (![window respondsToSelector:@selector(DLsetDelegate:)]) {
+        NSLog(@"[Delight] Error: categories not loaded. Have you included -ObjC in the 'Other Linker Flags' setting of your target?");
+        [NSException raise:@"Categories not loaded" format:@"UIWindow additions missing"];
+    }
     [window DLsetDelegate:self];
     
     if (!touchView) {
