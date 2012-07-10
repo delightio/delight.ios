@@ -60,6 +60,21 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSTimeInterval maximumRecordingDuration;
 }
 
+@synthesize taskController = _taskController;
+@synthesize recordingContext = _recordingContext;
+@synthesize screenshotController = _screenshotController;
+@synthesize videoEncoder = _videoEncoder;
+@synthesize gestureTracker = _gestureTracker;
+@synthesize cameraManager = _cameraManager;
+@synthesize metrics = _metrics;
+@synthesize appToken = _appToken;
+@synthesize annotation = _annotation;
+@synthesize scaleFactor = _scaleFactor;
+@synthesize autoCaptureEnabled = _autoCaptureEnabled;
+@synthesize userStopped = _userStopped;
+@synthesize openGL = _openGL;
+@synthesize userProperties = _userProperties;
+
 #pragma mark - Class methods
 
 + (Delight *)sharedInstance
