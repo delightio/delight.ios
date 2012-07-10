@@ -34,6 +34,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		83559D5515ABBEE40062E66A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 838292FB15586257007C6CDA /* Delight.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 83559D4315ABB60B0062E66A;
+			remoteInfo = "Delight Private";
+		};
 		838293271558639A007C6CDA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 838292FB15586257007C6CDA /* Delight.xcodeproj */;
@@ -176,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				838293281558639A007C6CDA /* Delight.framework */,
+				83559D5615ABBEE40062E66A /* DelightPrivate.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -233,6 +241,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		83559D5615ABBEE40062E66A /* DelightPrivate.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework.static;
+			path = DelightPrivate.framework;
+			remoteRef = 83559D5515ABBEE40062E66A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		838293281558639A007C6CDA /* Delight.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework.static;
@@ -342,7 +357,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "UIKitSample/UIKitSample-Prefix.pch";
 				INFOPLIST_FILE = "UIKitSample/UIKitSample-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -359,7 +374,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "UIKitSample/UIKitSample-Prefix.pch";
 				INFOPLIST_FILE = "UIKitSample/UIKitSample-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;

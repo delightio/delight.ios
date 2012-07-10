@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		83559D4A15ABBDD40062E66A /* Delight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8382931B1558634E007C6CDA /* Delight.framework */; };
 		837C3A24153F7DEB00463CB3 /* TeapotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 837C3A23153F7DEB00463CB3 /* TeapotViewController.m */; };
 		837C3A29153F804900463CB3 /* TeapotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 837C3A28153F7EC100463CB3 /* TeapotView.m */; };
-		8382931C15586358007C6CDA /* Delight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8382931B1558634E007C6CDA /* Delight.framework */; };
 		8383861615549A6000A83AE9 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8383861415549A6000A83AE9 /* AssetsLibrary.framework */; };
 		8383861715549A6000A83AE9 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8383861515549A6000A83AE9 /* SystemConfiguration.framework */; };
 		838694F8156ECA1700EBDB14 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 838694F4156ECA1700EBDB14 /* icon.png */; };
@@ -19,7 +19,6 @@
 		83F73EEF153E31B40094BD16 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EEE153E31B40094BD16 /* UIKit.framework */; };
 		83F73EF1153E31B40094BD16 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF0153E31B40094BD16 /* Foundation.framework */; };
 		83F73EF3153E31B40094BD16 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF2153E31B40094BD16 /* CoreGraphics.framework */; };
-		83F73EF5153E31B40094BD16 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF4153E31B40094BD16 /* GLKit.framework */; };
 		83F73EF7153E31B40094BD16 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F73EF6153E31B40094BD16 /* OpenGLES.framework */; };
 		83F73EFD153E31B40094BD16 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83F73EFB153E31B40094BD16 /* InfoPlist.strings */; };
 		83F73EFF153E31B40094BD16 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 83F73EFE153E31B40094BD16 /* main.m */; };
@@ -31,6 +30,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		83559D4715ABBB840062E66A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 838293131558634E007C6CDA /* Delight.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 83559D4315ABB60B0062E66A;
+			remoteInfo = "Delight Private";
+		};
 		8382931A1558634E007C6CDA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 838293131558634E007C6CDA /* Delight.xcodeproj */;
@@ -57,7 +63,6 @@
 		83F73EEE153E31B40094BD16 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		83F73EF0153E31B40094BD16 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		83F73EF2153E31B40094BD16 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		83F73EF4153E31B40094BD16 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		83F73EF6153E31B40094BD16 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		83F73EFA153E31B40094BD16 /* OpenGLSample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "OpenGLSample-Info.plist"; sourceTree = "<group>"; };
 		83F73EFC153E31B40094BD16 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -76,7 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8382931C15586358007C6CDA /* Delight.framework in Frameworks */,
+				83559D4A15ABBDD40062E66A /* Delight.framework in Frameworks */,
 				8383861615549A6000A83AE9 /* AssetsLibrary.framework in Frameworks */,
 				8383861715549A6000A83AE9 /* SystemConfiguration.framework in Frameworks */,
 				83F73F21153E32BF0094BD16 /* AVFoundation.framework in Frameworks */,
@@ -86,7 +91,6 @@
 				83F73EEF153E31B40094BD16 /* UIKit.framework in Frameworks */,
 				83F73EF1153E31B40094BD16 /* Foundation.framework in Frameworks */,
 				83F73EF3153E31B40094BD16 /* CoreGraphics.framework in Frameworks */,
-				83F73EF5153E31B40094BD16 /* GLKit.framework in Frameworks */,
 				83F73EF7153E31B40094BD16 /* OpenGLES.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -106,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				8382931B1558634E007C6CDA /* Delight.framework */,
+				83559D4815ABBB840062E66A /* DelightPrivate.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,7 +145,6 @@
 				83F73EEE153E31B40094BD16 /* UIKit.framework */,
 				83F73EF0153E31B40094BD16 /* Foundation.framework */,
 				83F73EF2153E31B40094BD16 /* CoreGraphics.framework */,
-				83F73EF4153E31B40094BD16 /* GLKit.framework */,
 				83F73EF6153E31B40094BD16 /* OpenGLES.framework */,
 			);
 			name = Frameworks;
@@ -229,6 +233,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		83559D4815ABBB840062E66A /* DelightPrivate.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework.static;
+			path = DelightPrivate.framework;
+			remoteRef = 83559D4715ABBB840062E66A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8382931B1558634E007C6CDA /* Delight.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework.static;
@@ -330,12 +341,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../..\"",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OpenGLSample/OpenGLSample-Prefix.pch";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "OpenGLSample/OpenGLSample-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -348,12 +360,13 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../..\"",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OpenGLSample/OpenGLSample-Prefix.pch";
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				INFOPLIST_FILE = "OpenGLSample/OpenGLSample-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;

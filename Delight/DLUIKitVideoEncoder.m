@@ -20,7 +20,7 @@
 
 - (void)encodeImage:(UIImage *)frameImage
 {
-    [self encodeImage:frameImage atPresentationTime:[self currentFrameTime] byteShift:0];
+    [self encodeImage:frameImage atPresentationTime:[self currentFrameTime] byteShift:0 scale:1.0f];
 }
 
 @end

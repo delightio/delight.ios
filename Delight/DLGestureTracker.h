@@ -26,6 +26,8 @@
 // The view that touch locations will be relative to. By default, main application window will be used.
 @property (nonatomic, retain) UIView *touchView;
 
+@property (nonatomic, assign) BOOL shouldRotateTouches;
+@property (nonatomic, readonly) CGAffineTransform transform;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL drawsGestures;
 @property (nonatomic, retain) NSMutableArray *touches;
@@ -34,6 +36,8 @@
 
 - (void)startRecordingGesturesWithStartUptime:(NSTimeInterval)aStartTime;
 - (void)stopRecordingGestures;
+- (CGRect)touchBounds;
+- (CGPoint)transformOffset;
 - (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image;
 
 @end

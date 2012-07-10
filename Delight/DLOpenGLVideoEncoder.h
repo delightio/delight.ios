@@ -11,7 +11,11 @@
 @interface DLOpenGLVideoEncoder : DLVideoEncoder {
     CVPixelBufferPoolRef pixelBufferPool;
     BOOL encoding;
+    GLint pixelFormat;
+    GLint pixelType;
 }
+
+@property (nonatomic, assign) BOOL usesImplementationPixelFormat;
 
 - (void)encodeGLPixelsWithBackingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
 

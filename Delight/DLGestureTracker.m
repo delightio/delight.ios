@@ -18,10 +18,18 @@
 - (void)handleDeviceOrientationDidChangeNotification:(NSNotification *)notification;
 @end
 
+#if PRIVATE_FRAMEWORK
+@interface UIScreen (Private)
+- (float)_rotation;
+@end
+#endif
+
 @implementation DLGestureTracker
 
 @synthesize scaleFactor;
 @synthesize touchView;
+@synthesize shouldRotateTouches;
+@synthesize transform;
 @synthesize drawsGestures;
 @synthesize touches;
 @synthesize orientationChanges;
@@ -38,6 +46,7 @@
         lock = [[NSLock alloc] init];
 
         scaleFactor = 1.0f;
+        transform = CGAffineTransformIdentity;
         bitmapData = NULL;
         startTime = -1;
         drawsGestures = YES;
@@ -122,6 +131,29 @@
 - (void)stopRecordingGestures
 {
     startTime = -1;
+}
+
+- (void)setShouldRotateTouches:(BOOL)aShouldRotateTouches
+{
+    shouldRotateTouches = aShouldRotateTouches;
+    
+    if (shouldRotateTouches) {
+#if PRIVATE_FRAMEWORK
+        CGFloat rotation = ([[UIScreen mainScreen] respondsToSelector:@selector(_rotation)] ? -[[UIScreen mainScreen] _rotation] : M_PI_2);
+#else
+        CGFloat rotation = M_PI_2;
+#endif
+        transform = CGAffineTransformMakeRotation(rotation);
+    } else {
+        transform = CGAffineTransformIdentity;
+    }
+}
+
+- (CGPoint)transformOffset
+{
+    CGRect transformedBounds = CGRectApplyAffineTransform(self.touchView.bounds, transform);
+    CGPoint transformOffset = CGPointMake(-transformedBounds.origin.x, -transformedBounds.origin.y);
+    return transformOffset;
 }
 
 #pragma mark - Private methods
@@ -299,6 +331,13 @@
     [gesturesJustCompleted release];
 }
 
+- (CGRect)touchBounds
+{
+    CGRect touchBounds = CGRectApplyAffineTransform(self.touchView.bounds, transform);
+    touchBounds.origin = CGPointMake(0, 0);
+    return touchBounds;
+}
+
 #pragma mark - Notifications
 
 - (void)handleWindowDidBecomeVisibleNotification:(NSNotification *)notification
@@ -329,7 +368,7 @@
                                                                                interfaceOrientation:interfaceOrientation
                                                                                       timeInSession:timeInSession];
     [orientationChanges addObject:orientationChange];
-    [orientationChange release];    
+    [orientationChange release];
 }
 
 #pragma mark - DLWindowDelegate
@@ -346,6 +385,19 @@
 			CGRect privateViewFrame;
 			CGPoint location = [touch locationInView:touchView];
             BOOL touchIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location inView:touchView privateViewFrame:&privateViewFrame];
+
+            // If there's a transform property set, apply it. Add an offset to keep the origin at (0, 0).
+            if (!CGAffineTransformEqualToTransform(transform, CGAffineTransformIdentity)) {
+                CGPoint transformOffset = [self transformOffset];
+                location = CGPointApplyAffineTransform(location, transform);
+                location.x += transformOffset.x;
+                location.y += transformOffset.y;
+                if (touchIsInPrivateView) {
+                    privateViewFrame = CGRectApplyAffineTransform(privateViewFrame, transform);
+                    privateViewFrame.origin.x += transformOffset.x;
+                    privateViewFrame.origin.y += transformOffset.y;
+                }
+            }
             
             DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView privateViewFrame:privateViewFrame];
             [touches addObject:ourTouch];

@@ -12,6 +12,64 @@
 		832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 832D1DAC1589626D004F2BD6 /* DLConstants.h */; };
 		833B500D15670E690085552F /* DLMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 833B500B15670E690085552F /* DLMetrics.h */; };
 		833B500E15670E690085552F /* DLMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 833B500C15670E690085552F /* DLMetrics.m */; };
+		83559CBA15ABB60B0062E66A /* Delight.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969414EAECD6006D93C2 /* Delight.m */; };
+		83559CBB15ABB60B0062E66A /* UIWindow+DLInterceptEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */; };
+		83559CBC15ABB60B0062E66A /* DLScreenshotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2715337E5C00003862 /* DLScreenshotController.m */; };
+		83559CBD15ABB60B0062E66A /* DLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2C15338CC500003862 /* DLVideoEncoder.m */; };
+		83559CBE15ABB60B0062E66A /* DLTaskController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3CF1536EBBA00B6E4AB /* DLTaskController.m */; };
+		83559CBF15ABB60B0062E66A /* DLRecordingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DA15371AE500B6E4AB /* DLRecordingContext.m */; };
+		83559CC015ABB60B0062E66A /* DLTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3DF15371E7E00B6E4AB /* DLTask.m */; };
+		83559CC115ABB60B0062E66A /* DLGetNewSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E31537225F00B6E4AB /* DLGetNewSessionTask.m */; };
+		83559CC215ABB60B0062E66A /* DLUpdateSessionTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3E71537BE2F00B6E4AB /* DLUpdateSessionTask.m */; };
+		83559CC315ABB60B0062E66A /* DLUploadVideoFileTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A9A9A3EB1537BEB400B6E4AB /* DLUploadVideoFileTask.m */; };
+		83559CC415ABB60B0062E66A /* DLPostVideoTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */; };
+		83559CC515ABB60B0062E66A /* DLReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = A98094561542A732002B2BCE /* DLReachability.m */; };
+		83559CC615ABB60B0062E66A /* DLCamCaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF261548D47400926A71 /* DLCamCaptureManager.m */; };
+		83559CC715ABB60B0062E66A /* DLCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* DLCamRecorder.m */; };
+		83559CC815ABB60B0062E66A /* CALayer+DLThreadSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */; };
+		83559CC915ABB60B0062E66A /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
+		83559CCA15ABB60B0062E66A /* DLOrientationChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA821547688E0057FC37 /* DLOrientationChange.m */; };
+		83559CCB15ABB60B0062E66A /* UITextField+DLPrivateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 838186FF1563156400608514 /* UITextField+DLPrivateView.m */; };
+		83559CCC15ABB60B0062E66A /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
+		83559CCD15ABB60B0062E66A /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
+		83559CCE15ABB60B0062E66A /* DLMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 833B500C15670E690085552F /* DLMetrics.m */; };
+		83559CCF15ABB60B0062E66A /* DLOpenGLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */; };
+		83559CD015ABB60B0062E66A /* DLUIKitVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A8D158AC08200A41326 /* DLUIKitVideoEncoder.m */; };
+		83559CD115ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83E58A3315926AF200B01636 /* DLMobileFrameBufferVideoEncoder.m */; };
+		83559CD315ABB60B0062E66A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A980945E1542B221002B2BCE /* SystemConfiguration.framework */; };
+		83559CD415ABB60B0062E66A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A9A3D715371A3E00B6E4AB /* UIKit.framework */; };
+		83559CD515ABB60B0062E66A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896B614EAF090006D93C2 /* OpenGLES.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		83559CD615ABB60B0062E66A /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */; };
+		83559CD715ABB60B0062E66A /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */; };
+		83559CD815ABB60B0062E66A /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AC14EAEFBF006D93C2 /* CoreMedia.framework */; };
+		83559CD915ABB60B0062E66A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AB14EAEFBF006D93C2 /* CoreGraphics.framework */; };
+		83559CDA15ABB60B0062E66A /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AD14EAEFBF006D93C2 /* CoreVideo.framework */; };
+		83559CDB15ABB60B0062E66A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AE14EAEFBF006D93C2 /* QuartzCore.framework */; };
+		83559CDC15ABB60B0062E66A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
+		83559CDE15ABB60B0062E66A /* Delight.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969314EAECD6006D93C2 /* Delight.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		83559CDF15ABB60B0062E66A /* UIWindow+DLInterceptEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */; settings = {ATTRIBUTES = (); }; };
+		83559CE015ABB60B0062E66A /* DLTaskController.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3CE1536EBBA00B6E4AB /* DLTaskController.h */; };
+		83559CE115ABB60B0062E66A /* DLScreenshotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2615337E5C00003862 /* DLScreenshotController.h */; settings = {ATTRIBUTES = (); }; };
+		83559CE215ABB60B0062E66A /* DLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2B15338CC500003862 /* DLVideoEncoder.h */; settings = {ATTRIBUTES = (); }; };
+		83559CE315ABB60B0062E66A /* DLRecordingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3D915371AE500B6E4AB /* DLRecordingContext.h */; };
+		83559CE415ABB60B0062E66A /* DLTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3DE15371E7E00B6E4AB /* DLTask.h */; };
+		83559CE515ABB60B0062E66A /* DLGetNewSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E21537225F00B6E4AB /* DLGetNewSessionTask.h */; };
+		83559CE615ABB60B0062E66A /* DLUpdateSessionTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3E61537BE2F00B6E4AB /* DLUpdateSessionTask.h */; };
+		83559CE715ABB60B0062E66A /* DLCamCaptureManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF251548D47400926A71 /* DLCamCaptureManager.h */; settings = {ATTRIBUTES = (); }; };
+		83559CE815ABB60B0062E66A /* DLUploadVideoFileTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A9A9A3EA1537BEB400B6E4AB /* DLUploadVideoFileTask.h */; };
+		83559CE915ABB60B0062E66A /* DLPostVideoTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */; };
+		83559CEA15ABB60B0062E66A /* DLReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = A98094551542A732002B2BCE /* DLReachability.h */; };
+		83559CEB15ABB60B0062E66A /* DLTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA7D154768530057FC37 /* DLTouch.h */; };
+		83559CEC15ABB60B0062E66A /* DLOrientationChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA811547688D0057FC37 /* DLOrientationChange.h */; };
+		83559CED15ABB60B0062E66A /* DLCamRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF271548D47400926A71 /* DLCamRecorder.h */; };
+		83559CEE15ABB60B0062E66A /* CALayer+DLThreadSafe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */; };
+		83559CEF15ABB60B0062E66A /* UITextField+DLPrivateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 838186FE1563156400608514 /* UITextField+DLPrivateView.h */; };
+		83559CF015ABB60B0062E66A /* DLMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 833B500B15670E690085552F /* DLMetrics.h */; };
+		83559CF115ABB60B0062E66A /* DLConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 832D1DAC1589626D004F2BD6 /* DLConstants.h */; };
+		83559CF215ABB60B0062E66A /* DLOpenGLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */; };
+		83559CF315ABB60B0062E66A /* DLUIKitVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A8C158AC08200A41326 /* DLUIKitVideoEncoder.h */; };
+		83559CF715ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83E58A3215926AF200B01636 /* DLMobileFrameBufferVideoEncoder.h */; };
+		83559D3D15ABB60B0062E66A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
 		836ABF2B1548D47400926A71 /* DLCamCaptureManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF251548D47400926A71 /* DLCamCaptureManager.h */; settings = {ATTRIBUTES = (); }; };
 		836ABF2C1548D47400926A71 /* DLCamCaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF261548D47400926A71 /* DLCamCaptureManager.m */; };
 		836ABF2D1548D47400926A71 /* DLCamRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF271548D47400926A71 /* DLCamRecorder.h */; };
@@ -73,6 +131,8 @@
 		832D1DAC1589626D004F2BD6 /* DLConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLConstants.h; sourceTree = "<group>"; };
 		833B500B15670E690085552F /* DLMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLMetrics.h; sourceTree = "<group>"; };
 		833B500C15670E690085552F /* DLMetrics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLMetrics.m; sourceTree = "<group>"; };
+		83559D4315ABB60B0062E66A /* DelightPrivate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = DelightPrivate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		83559D4415ABB60B0062E66A /* DelightPrivate-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DelightPrivate-Info.plist"; sourceTree = "<group>"; };
 		836ABF251548D47400926A71 /* DLCamCaptureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamCaptureManager.h; sourceTree = "<group>"; };
 		836ABF261548D47400926A71 /* DLCamCaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamCaptureManager.m; sourceTree = "<group>"; };
 		836ABF271548D47400926A71 /* DLCamRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamRecorder.h; sourceTree = "<group>"; };
@@ -110,6 +170,8 @@
 		83B896AD14EAEFBF006D93C2 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		83B896AE14EAEFBF006D93C2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		83B896B614EAF090006D93C2 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		83E58A3215926AF200B01636 /* DLMobileFrameBufferVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLMobileFrameBufferVideoEncoder.h; sourceTree = "<group>"; };
+		83E58A3315926AF200B01636 /* DLMobileFrameBufferVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLMobileFrameBufferVideoEncoder.m; sourceTree = "<group>"; };
 		A9508D311537E99B001853A0 /* DLTaskHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DLTaskHeader.h; sourceTree = "<group>"; };
 		A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLPostVideoTask.h; sourceTree = "<group>"; };
 		A96BE1E5153E156800D8BA2D /* DLPostVideoTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLPostVideoTask.m; sourceTree = "<group>"; };
@@ -132,6 +194,23 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		83559CD215ABB60B0062E66A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83559CD315ABB60B0062E66A /* SystemConfiguration.framework in Frameworks */,
+				83559CD415ABB60B0062E66A /* UIKit.framework in Frameworks */,
+				83559CD515ABB60B0062E66A /* OpenGLES.framework in Frameworks */,
+				83559CD615ABB60B0062E66A /* AssetsLibrary.framework in Frameworks */,
+				83559CD715ABB60B0062E66A /* AVFoundation.framework in Frameworks */,
+				83559CD815ABB60B0062E66A /* CoreMedia.framework in Frameworks */,
+				83559CD915ABB60B0062E66A /* CoreGraphics.framework in Frameworks */,
+				83559CDA15ABB60B0062E66A /* CoreVideo.framework in Frameworks */,
+				83559CDB15ABB60B0062E66A /* QuartzCore.framework in Frameworks */,
+				83559CDC15ABB60B0062E66A /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83B8967C14EAEC68006D93C2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -200,6 +279,8 @@
 				83995A8D158AC08200A41326 /* DLUIKitVideoEncoder.m */,
 				83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */,
 				83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */,
+				83E58A3215926AF200B01636 /* DLMobileFrameBufferVideoEncoder.h */,
+				83E58A3315926AF200B01636 /* DLMobileFrameBufferVideoEncoder.m */,
 			);
 			name = Encoder;
 			sourceTree = "<group>";
@@ -217,6 +298,7 @@
 			isa = PBXGroup;
 			children = (
 				83B8968214EAEC68006D93C2 /* Delight.framework */,
+				83559D4315ABB60B0062E66A /* DelightPrivate.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -261,6 +343,7 @@
 			isa = PBXGroup;
 			children = (
 				83B8968914EAEC68006D93C2 /* Delight-Info.plist */,
+				83559D4415ABB60B0062E66A /* DelightPrivate-Info.plist */,
 				83B8968A14EAEC68006D93C2 /* InfoPlist.strings */,
 				83B8968D14EAEC68006D93C2 /* Delight-Prefix.pch */,
 			);
@@ -304,6 +387,36 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		83559CDD15ABB60B0062E66A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83559CDE15ABB60B0062E66A /* Delight.h in Headers */,
+				83559CDF15ABB60B0062E66A /* UIWindow+DLInterceptEvents.h in Headers */,
+				83559CE015ABB60B0062E66A /* DLTaskController.h in Headers */,
+				83559CE115ABB60B0062E66A /* DLScreenshotController.h in Headers */,
+				83559CE215ABB60B0062E66A /* DLVideoEncoder.h in Headers */,
+				83559CE315ABB60B0062E66A /* DLRecordingContext.h in Headers */,
+				83559CE415ABB60B0062E66A /* DLTask.h in Headers */,
+				83559CE515ABB60B0062E66A /* DLGetNewSessionTask.h in Headers */,
+				83559CE615ABB60B0062E66A /* DLUpdateSessionTask.h in Headers */,
+				83559CE715ABB60B0062E66A /* DLCamCaptureManager.h in Headers */,
+				83559CE815ABB60B0062E66A /* DLUploadVideoFileTask.h in Headers */,
+				83559CE915ABB60B0062E66A /* DLPostVideoTask.h in Headers */,
+				83559CEA15ABB60B0062E66A /* DLReachability.h in Headers */,
+				83559CEB15ABB60B0062E66A /* DLTouch.h in Headers */,
+				83559CEC15ABB60B0062E66A /* DLOrientationChange.h in Headers */,
+				83559CED15ABB60B0062E66A /* DLCamRecorder.h in Headers */,
+				83559CEE15ABB60B0062E66A /* CALayer+DLThreadSafe.h in Headers */,
+				83559CEF15ABB60B0062E66A /* UITextField+DLPrivateView.h in Headers */,
+				83559CF015ABB60B0062E66A /* DLMetrics.h in Headers */,
+				83559CF115ABB60B0062E66A /* DLConstants.h in Headers */,
+				83559CF215ABB60B0062E66A /* DLOpenGLVideoEncoder.h in Headers */,
+				83559CF315ABB60B0062E66A /* DLUIKitVideoEncoder.h in Headers */,
+				83559CF715ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83B8967D14EAEC68006D93C2 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -336,9 +449,31 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		83B8968114EAEC68006D93C2 /* Delight */ = {
+		83559CB615ABB60B0062E66A /* Delight Private */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "Delight" */;
+			buildConfigurationList = 83559D4015ABB60B0062E66A /* Build configuration list for PBXNativeTarget "Delight Private" */;
+			buildPhases = (
+				83559CB715ABB60B0062E66A /* ShellScript */,
+				83559CB815ABB60B0062E66A /* ShellScript */,
+				83559CB915ABB60B0062E66A /* Sources */,
+				83559CD215ABB60B0062E66A /* Frameworks */,
+				83559CDD15ABB60B0062E66A /* Headers */,
+				83559D3C15ABB60B0062E66A /* Resources */,
+				83559D3E15ABB60B0062E66A /* ShellScript */,
+				83559D3F15ABB60B0062E66A /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Delight Private";
+			productName = ScreenCapture;
+			productReference = 83559D4315ABB60B0062E66A /* DelightPrivate.framework */;
+			productType = "com.apple.product-type.framework.static";
+		};
+		83B8968114EAEC68006D93C2 /* Delight Public */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "Delight Public" */;
 			buildPhases = (
 				83B8967A14EAEC68006D93C2 /* ShellScript */,
 				83CCB3CF1582967F0018EAD2 /* ShellScript */,
@@ -353,7 +488,7 @@
 			);
 			dependencies = (
 			);
-			name = Delight;
+			name = "Delight Public";
 			productName = ScreenCapture;
 			productReference = 83B8968214EAEC68006D93C2 /* Delight.framework */;
 			productType = "com.apple.product-type.framework.static";
@@ -380,12 +515,21 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				83B8968114EAEC68006D93C2 /* Delight */,
+				83B8968114EAEC68006D93C2 /* Delight Public */,
+				83559CB615ABB60B0062E66A /* Delight Private */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		83559D3C15ABB60B0062E66A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83559D3D15ABB60B0062E66A /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83B8967E14EAEC68006D93C2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -397,6 +541,58 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		83559CB715ABB60B0062E66A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nset +u\nif [[ $UFW_MASTER_SCRIPT_RUNNING ]]\nthen\n    # Nothing for the slave script to do\n    exit 0\nfi\nset -u\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\n    UFW_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\n    echo \"Could not find platform name from SDK_NAME: $SDK_NAME\"\n    exit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\n\tUFW_SDK_VERSION=${BASH_REMATCH[1]}\nelse\n    echo \"Could not find sdk version  from SDK_NAME: $SDK_NAME\"\n    exit 1\nfi\n\nif [[ \"$UFW_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\n    UFW_OTHER_PLATFORM=iphonesimulator\nelse\n    UFW_OTHER_PLATFORM=iphoneos\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$UFW_SDK_PLATFORM$ ]]\nthen\n    UFW_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${UFW_OTHER_PLATFORM}\"\nelse\n    echo \"Could not find $UFW_SDK_PLATFORM in $BUILT_PRODUCTS_DIR\"\n    exit 1\nfi\n\nONLY_ACTIVE_PLATFORM=${ONLY_ACTIVE_PLATFORM:-$ONLY_ACTIVE_ARCH}\n\n# Short-circuit if all binaries are up to date\n\nif [[ -f \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" ]] && \\\n   [[ -f \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/${EXECUTABLE_PATH}\" ]] && \\\n   [[ ! \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" -nt \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/${EXECUTABLE_PATH}\" ]] && \\\n  ([[ \"${ONLY_ACTIVE_PLATFORM}\" == \"YES\" ]] || \\\n    ([[ -f \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" ]] && \\\n     [[ -f \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/${EXECUTABLE_PATH}\" ]] && \\\n     [[ ! \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" -nt \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/${EXECUTABLE_PATH}\" ]]\n    )\n  )\nthen\n    exit 0\nfi\n\n\n# Clean other platform if needed\n\nif [[ ! -f \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" ]] && [[ \"${ONLY_ACTIVE_PLATFORM}\" != \"YES\" ]]\nthen\n\techo \"Platform \\\"$UFW_SDK_PLATFORM\\\" was cleaned recently. Cleaning \\\"$UFW_OTHER_PLATFORM\\\" as well\"\n\techo xcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${UFW_OTHER_PLATFORM}${UFW_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\" clean\n\txcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${UFW_OTHER_PLATFORM}${UFW_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\" clean\nfi\n\n\n# Make sure we are building from fresh binaries\n\nrm -rf \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nrm -rf \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework\"\n\nif [[ \"${ONLY_ACTIVE_PLATFORM}\" != \"YES\" ]]\nthen\n    rm -rf \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\n    rm -rf \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework\"\nfi\n";
+		};
+		83559CB815ABB60B0062E66A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "DELIGHT_VERSION_PUBLIC=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/Delight-Info.plist\")\nDELIGHT_VERSION_PRIVATE=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"$SRCROOT/Delight/DelightPrivate-Info.plist\")\n\nsed -i \"\" \"s/#define DELIGHT_VERSION.*/#define DELIGHT_VERSION (PRIVATE_FRAMEWORK ? @\\\"$DELIGHT_VERSION_PRIVATE\\\" : @\\\"$DELIGHT_VERSION_PUBLIC\\\")/\" \"$SRCROOT/Delight/DLConstants.h\"";
+		};
+		83559D3E15ABB60B0062E66A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "INLINED_PYHON_SCRIPT=\"import sys; import os.path; headerPathFromFind = sys.argv[2]; srcRoot = sys.argv[1]; headerPathFromFindWithoutFilename = os.path.dirname( headerPathFromFind ); relatedPathForDirectory = os.path.relpath( headerPathFromFindWithoutFilename, srcRoot ); print( relatedPathForDirectory );\"\n\nHEADERS_ROOT=$SRCROOT/Delight\nFRAMEWORK_HEADERS_DIR=\"$BUILT_PRODUCTS_DIR/$WRAPPER_NAME/Headers\"\n\n## only header files expected at this point\nPUBLIC_HEADERS=$( ls -1 \"$FRAMEWORK_HEADERS_DIR\" )\n\n\nfor PUBLIC_HEADER in $PUBLIC_HEADERS; do\n\n   FIND_RESULT=$( find \"$HEADERS_ROOT\" -name \"$PUBLIC_HEADER\" )\n   RELATIVE_PATH=$( python -c \"$INLINED_PYHON_SCRIPT\" \"$HEADERS_ROOT\" \"$FIND_RESULT\" )\n\n   mkdir -p \"$FRAMEWORK_HEADERS_DIR/$RELATIVE_PATH\"\n   mv \"$FRAMEWORK_HEADERS_DIR/$PUBLIC_HEADER\" \"$FRAMEWORK_HEADERS_DIR/$RELATIVE_PATH/$PUBLIC_HEADER\"\ndone\n";
+		};
+		83559D3F15ABB60B0062E66A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nset +u\nif [[ $UFW_MASTER_SCRIPT_RUNNING ]]\nthen\n    # Nothing for the slave script to do\n    exit 0\nfi\nset -u\nexport UFW_MASTER_SCRIPT_RUNNING=1\n\n\n# Functions\n\n## List files in the specified directory, storing to the specified array.\n#\n# @param $1 The path to list\n# @param $2 The name of the array to fill\n#\n##\nlist_files ()\n{\n    filelist=$(ls \"$1\")\n    while read line\n    do\n        eval \"$2[\\${#$2[*]}]=\\\"\\$line\\\"\"\n    done <<< \"$filelist\"\n}\n\n\n# Sanity check\n\nif [[ ! -f \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" ]]\nthen\n    echo \"Framework target \\\"${TARGET_NAME}\\\" had no source files to build from. Make sure your source files have the correct target membership\"\n    exit 1\nfi\n\n\n# Gather information\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\n    UFW_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\n    echo \"Could not find platform name from SDK_NAME: $SDK_NAME\"\n    exit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\n    UFW_SDK_VERSION=${BASH_REMATCH[1]}\nelse\n    echo \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\n    exit 1\nfi\n\nif [[ \"$UFW_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\n    UFW_OTHER_PLATFORM=iphonesimulator\nelse\n    UFW_OTHER_PLATFORM=iphoneos\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$UFW_SDK_PLATFORM$ ]]\nthen\n    UFW_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${UFW_OTHER_PLATFORM}\"\nelse\n    echo \"Could not find $UFW_SDK_PLATFORM in $BUILT_PRODUCTS_DIR\"\n    exit 1\nfi\n\nONLY_ACTIVE_PLATFORM=${ONLY_ACTIVE_PLATFORM:-$ONLY_ACTIVE_ARCH}\n\n# Short-circuit if all binaries are up to date.\n# We already checked the other platform in the prerun script.\n\nif [[ -f \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" ]] && [[ -f \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/${EXECUTABLE_PATH}\" ]] && [[ ! \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" -nt \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/${EXECUTABLE_PATH}\" ]]\nthen\n    exit 0\nfi\n\nif [ \"${ONLY_ACTIVE_PLATFORM}\" == \"YES\" ]\nthen\n    echo \"ONLY_ACTIVE_PLATFORM=${ONLY_ACTIVE_PLATFORM}: Skipping other platform build\"\nelse\n    # Make sure the other platform gets built\n    \n    echo \"Build other platform\"\n    \n    echo xcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${UFW_OTHER_PLATFORM}${UFW_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\" $ACTION\n    xcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${UFW_OTHER_PLATFORM}${UFW_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" CONFIGURATION_TEMP_DIR=\"${PROJECT_TEMP_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\" $ACTION\n    \n    \n    # Build the fat static library binary\n    \n    echo \"Create universal static library\"\n    \n    echo \"$PLATFORM_DEVELOPER_BIN_DIR/libtool\" -static \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" -o \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}.temp\"\n    \"$PLATFORM_DEVELOPER_BIN_DIR/libtool\" -static \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" \"${UFW_OTHER_BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" -o \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}.temp\"\n    \n    echo mv \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}.temp\" \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\n    mv \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}.temp\" \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\nfi\n\n# Build embedded framework structure\n\necho \"Build Embedded Framework\"\n\necho rm -rf \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework\"\nrm -rf \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework\"\necho mkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/Resources\"\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/Resources\"\necho cp -a \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/\"\ncp -a \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/\"\n\ndeclare -a UFW_FILE_LIST\nlist_files \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\" UFW_FILE_LIST\nfor filename in \"${UFW_FILE_LIST[@]}\"\ndo\n    if [[ \"${filename}\" != \"Info.plist\" ]] && [[ ! \"${filename}\" =~ .*\\.lproj$ ]]\n    then\n        echo ln -sf \"../${WRAPPER_NAME}/Resources/${filename}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/Resources/${filename}\"\n        ln -sf \"../${WRAPPER_NAME}/Resources/${filename}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.embeddedframework/Resources/${filename}\"\n    fi\ndone\n\n\nif [ \"${ONLY_ACTIVE_PLATFORM}\" != \"YES\" ]\nthen\n    # Replace other platform's framework with a copy of this one (so that both have the same universal binary)\n    \n    echo \"Copy from $UFW_SDK_PLATFORM to $UFW_OTHER_PLATFORM\"\n    \n    echo rm -rf \"${BUILD_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\"\n    rm -rf \"${BUILD_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\"\n    echo cp -a \"${BUILD_DIR}/${CONFIGURATION}-${UFW_SDK_PLATFORM}\" \"${BUILD_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\"\n    cp -a \"${BUILD_DIR}/${CONFIGURATION}-${UFW_SDK_PLATFORM}\" \"${BUILD_DIR}/${CONFIGURATION}-${UFW_OTHER_PLATFORM}\"\nfi\n";
+		};
 		83B8967A14EAEC68006D93C2 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,6 +648,37 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		83559CB915ABB60B0062E66A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83559CBA15ABB60B0062E66A /* Delight.m in Sources */,
+				83559CBB15ABB60B0062E66A /* UIWindow+DLInterceptEvents.m in Sources */,
+				83559CBC15ABB60B0062E66A /* DLScreenshotController.m in Sources */,
+				83559CBD15ABB60B0062E66A /* DLVideoEncoder.m in Sources */,
+				83559CBE15ABB60B0062E66A /* DLTaskController.m in Sources */,
+				83559CBF15ABB60B0062E66A /* DLRecordingContext.m in Sources */,
+				83559CC015ABB60B0062E66A /* DLTask.m in Sources */,
+				83559CC115ABB60B0062E66A /* DLGetNewSessionTask.m in Sources */,
+				83559CC215ABB60B0062E66A /* DLUpdateSessionTask.m in Sources */,
+				83559CC315ABB60B0062E66A /* DLUploadVideoFileTask.m in Sources */,
+				83559CC415ABB60B0062E66A /* DLPostVideoTask.m in Sources */,
+				83559CC515ABB60B0062E66A /* DLReachability.m in Sources */,
+				83559CC615ABB60B0062E66A /* DLCamCaptureManager.m in Sources */,
+				83559CC715ABB60B0062E66A /* DLCamRecorder.m in Sources */,
+				83559CC815ABB60B0062E66A /* CALayer+DLThreadSafe.m in Sources */,
+				83559CC915ABB60B0062E66A /* DLTouch.m in Sources */,
+				83559CCA15ABB60B0062E66A /* DLOrientationChange.m in Sources */,
+				83559CCB15ABB60B0062E66A /* UITextField+DLPrivateView.m in Sources */,
+				83559CCC15ABB60B0062E66A /* DLGesture.m in Sources */,
+				83559CCD15ABB60B0062E66A /* DLGestureTracker.m in Sources */,
+				83559CCE15ABB60B0062E66A /* DLMetrics.m in Sources */,
+				83559CCF15ABB60B0062E66A /* DLOpenGLVideoEncoder.m in Sources */,
+				83559CD015ABB60B0062E66A /* DLUIKitVideoEncoder.m in Sources */,
+				83559CD115ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83B8967B14EAEC68006D93C2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -496,6 +723,67 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		83559D4115ABB60B0062E66A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					armv6,
+					"$(ARCHS_STANDARD_32_BIT)",
+				);
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Delight/Delight-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"PRIVATE_FRAMEWORK=1",
+				);
+				GCC_THUMB_SUPPORT = NO;
+				INFOPLIST_FILE = "Delight/DelightPrivate-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)/usr/lib/system\"",
+				);
+				PRODUCT_NAME = DelightPrivate;
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		83559D4215ABB60B0062E66A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					armv6,
+					"$(ARCHS_STANDARD_32_BIT)",
+				);
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Delight/Delight-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "PRIVATE_FRAMEWORK=1";
+				GCC_THUMB_SUPPORT = NO;
+				INFOPLIST_FILE = "Delight/DelightPrivate-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)/usr/lib/system\"",
+				);
+				PRODUCT_NAME = DelightPrivate;
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
 		83B8968E14EAEC68006D93C2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -546,12 +834,20 @@
 				);
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Delight/Delight-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "Delight/Delight-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)/usr/lib/system\"",
+				);
 				PRODUCT_NAME = Delight;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
@@ -567,11 +863,19 @@
 				);
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Delight/Delight-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "Delight/Delight-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)/usr/lib/system\"",
+				);
 				PRODUCT_NAME = Delight;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
@@ -581,6 +885,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		83559D4015ABB60B0062E66A /* Build configuration list for PBXNativeTarget "Delight Private" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83559D4115ABB60B0062E66A /* Debug */,
+				83559D4215ABB60B0062E66A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		83B8967814EAEC68006D93C2 /* Build configuration list for PBXProject "Delight" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -590,7 +903,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "Delight" */ = {
+		83B8969014EAEC68006D93C2 /* Build configuration list for PBXNativeTarget "Delight Public" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83B8969114EAEC68006D93C2 /* Debug */,

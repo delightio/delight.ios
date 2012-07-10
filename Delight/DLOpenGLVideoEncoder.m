@@ -9,11 +9,18 @@
 #import "DLOpenGLVideoEncoder.h"
 #import "DLConstants.h"
 
-@interface DLOpenGLVideoEncoder ()
-- (UIImage *)resizedImageForPixelData:(GLubyte *)pixelData backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
-@end
-
 @implementation DLOpenGLVideoEncoder
+
+@synthesize usesImplementationPixelFormat;
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        self.usesImplementationPixelFormat = NO;
+    }
+    return self;
+}
 
 - (void)setupWriter
 {
@@ -36,6 +43,15 @@
         // Backing size not too big, we can encode the GL bytes directly
         self.videoSize = CGSizeMake(backingWidth, backingHeight);
         rgbaShift = YES;
+    }
+    
+    if (usesImplementationPixelFormat) {
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &pixelFormat);
+        glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &pixelType);
+        rgbaShift = NO;
+    } else {
+        pixelFormat = GL_RGBA;
+        pixelType = GL_UNSIGNED_BYTE;
     }
     
     [self setup];
@@ -87,11 +103,11 @@
 
     if (backingHeight != self.videoSize.height) {
         // Encode a scaled image
-        glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData);
-                            
+        glReadPixels(0, 0, backingWidth, backingHeight, pixelFormat, pixelType, pixelBufferData);
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            UIImage *image = [self resizedImageForPixelData:pixelBufferData backingWidth:backingWidth backingHeight:backingHeight];
-            [self encodeImage:image atPresentationTime:time byteShift:1];
+            UIImage *image = [self resizedImageForPixelData:pixelBufferData width:backingWidth height:backingHeight];
+            [self encodeImage:image atPresentationTime:time byteShift:(usesImplementationPixelFormat ? 0 : 1) scale:(self.videoSize.width / backingWidth)];
             
             CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
             CVPixelBufferRelease(pixelBuffer);
@@ -100,8 +116,8 @@
         
     } else {
         // Encode the raw GL bytes directly
-        glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixelBufferData + 1);    // + 1 to convert RGBA->ARGB
-            
+        glReadPixels(0, 0, backingWidth, backingHeight, pixelFormat, pixelType, pixelBufferData + (usesImplementationPixelFormat ? 0 : 1));
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{  
             if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
                 DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
@@ -112,41 +128,6 @@
             encoding = NO;
         });
     }
-}
-
-#pragma mark - Private methods
-
-- (UIImage *)resizedImageForPixelData:(GLubyte *)pixelData backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight
-{
-    // Create a CGImage with the original pixel data
-    CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, pixelData, backingWidth * backingHeight * 4, NULL);
-    CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
-    CGImageRef iref = CGImageCreate(backingWidth, backingHeight, 8, 32, backingWidth * 4, colorspace, kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst,
-                                    ref, NULL, true, kCGRenderingIntentDefault);
-    
-    // Create a graphics context with the target size
-    UIGraphicsBeginImageContextWithOptions(self.videoSize, NO, 1.0);
-
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextScaleCTM(context, 1.0, -1.0);
-    CGContextTranslateCTM(context, 0, -self.videoSize.height);
-    CGContextSetBlendMode(context, kCGBlendModeCopy);
-    CGContextSetAllowsAntialiasing(context, NO);
-	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
-
-    CGContextDrawImage(context, CGRectMake(0.0, 0.0, self.videoSize.width, self.videoSize.height), iref);
-    
-    // Retrieve the UIImage from the current context
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    
-    UIGraphicsEndImageContext();
-    
-    // Clean up
-    CFRelease(ref);
-    CFRelease(colorspace);
-    CGImageRelease(iref);    
-    
-    return image;
 }
 
 @end

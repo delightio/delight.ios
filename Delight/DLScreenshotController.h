@@ -27,10 +27,13 @@
 @property (nonatomic, assign) BOOL writesToPNG;
 @property (nonatomic, readonly) CGSize imageSize;
 @property (nonatomic, readonly) NSMutableSet *privateViews;
+@property (nonatomic, retain) NSMutableSet *lockedPrivateViewFrames;
 
 - (UIImage *)screenshot;
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description;
 - (void)unregisterPrivateView:(UIView *)view;
 - (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)view privateViewFrame:(CGRect *)frame;
+- (void)lockPrivateViewFrames;
+- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset;
 
 @end

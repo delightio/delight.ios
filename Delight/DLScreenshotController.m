@@ -19,6 +19,7 @@
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
 - (void)hidePrivateFrames:(NSSet *)privateViews forWindow:(UIWindow *)window inContext:(CGContextRef)context;
+- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
 @end
@@ -30,6 +31,7 @@
 @synthesize writesToPNG;
 @synthesize imageSize;
 @synthesize privateViews;
+@synthesize lockedPrivateViewFrames;
 
 - (id)init
 {
@@ -37,6 +39,7 @@
     if (self) {
         bitmapData = NULL;
         privateViews = [[NSMutableSet alloc] init];
+        lockedPrivateViewFrames = [[NSMutableSet alloc] init];
         self.scaleFactor = 1.0f;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardDidShowNotification:) name:UIKeyboardDidShowNotification object:nil];    
@@ -56,6 +59,7 @@
     
     [privateViews release];
     [keyboardWindow release];
+    [lockedPrivateViewFrames release];
     
     [super dealloc];
 }
@@ -85,7 +89,7 @@
     // Store the private view frames at the time that rendering begins.
     // We don't use the views directly because the frames may have changed after rendering finishes.
     // We want to black out their original positions.
-    NSMutableSet *privateFramesAtRenderTime = [[NSMutableSet alloc] initWithCapacity:[privateViews count]];
+    [lockedPrivateViewFrames removeAllObjects];
     for (UIView *view in privateViews) {
         NSString *description = objc_getAssociatedObject(view, kDLDescriptionKey);
         CGRect frameInWindow = [view convertRect:view.bounds toView:view.window];
@@ -93,7 +97,7 @@
         NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:frameInWindow], @"frame",
                                   view.window, @"window",
                                   description, @"description", nil];
-        [privateFramesAtRenderTime addObject:viewDict];
+        [lockedPrivateViewFrames addObject:viewDict];
     }
     
     // Iterate over every window from back to front
@@ -119,7 +123,7 @@
                 [[window layer] renderInContext:context];
             }
             
-            [self hidePrivateFrames:privateFramesAtRenderTime forWindow:window inContext:context];
+            [self hidePrivateFrames:lockedPrivateViewFrames forWindow:window inContext:context];
             
             CGContextRestoreGState(context);
             
@@ -128,9 +132,7 @@
             }
         }
     }
-    
-    [privateFramesAtRenderTime release];
-    
+        
     // Retrieve the screenshot image
     CGImageRef cgImage = CGBitmapContextCreateImage(context);
     UIImage *image = [UIImage imageWithCGImage:cgImage];
@@ -159,6 +161,69 @@
         objc_setAssociatedObject(view, kDLDescriptionKey, nil, OBJC_ASSOCIATION_RETAIN);
         [privateViews removeObject:view];
         DLLog(@"[Delight] Unregistered private view: %@", [view class]);
+    }
+}
+
+- (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)locationView privateViewFrame:(CGRect *)frame
+{    
+    for (UIView *view in privateViews) {
+        CGRect frameInWindow = [view convertRect:view.bounds toView:locationView];
+        
+        if (CGRectContainsPoint(frameInWindow, location) && view.window && !view.hidden) {
+            if (frame) {
+                *frame = frameInWindow;
+            }
+            return YES;
+        }
+    }
+    
+    if (keyboardWindow && hidesKeyboard) {
+        if (CGRectContainsPoint(keyboardFrame, location)) {
+            if (frame) {
+                *frame = keyboardFrame;
+            }
+            return YES;
+        }
+    }
+    
+    if (frame) {
+        *frame = CGRectZero;
+    }
+    return NO;
+}
+
+- (void)lockPrivateViewFrames
+{
+    // Keep track of the positions of the private views at the current time
+    [lockedPrivateViewFrames removeAllObjects];
+    
+    for (UIView *privateView in privateViews) {
+        if (privateView.window && !privateView.hidden) {
+            CGRect frameInWindow = [privateView convertRect:privateView.bounds toView:privateView.window];
+            NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:frameInWindow], @"frame", nil];
+            [lockedPrivateViewFrames addObject:viewDict];
+        }
+    }
+    
+    if (keyboardWindow && hidesKeyboard) {
+        // Hide the keyboard, but also include the area just above the keyboard where the scaled keys show up on iPhone
+        CGRect extendedKeyboardFrame;
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            extendedKeyboardFrame = CGRectMake(keyboardFrame.origin.x - 65, keyboardFrame.origin.y - 55, keyboardFrame.size.width + 65, keyboardFrame.size.height + 110);
+        } else {
+            extendedKeyboardFrame = keyboardFrame;
+        }
+        NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:extendedKeyboardFrame], @"frame", nil];
+        [lockedPrivateViewFrames addObject:viewDict];
+    }
+}
+
+- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+{
+    // Black out private views directly in the pixel buffer
+    for (NSDictionary *frameDict in lockedPrivateViewFrames) {
+        CGRect frame = [[frameDict objectForKey:@"frame"] CGRectValue];
+        [self blackOutPrivateFrame:frame inPixelBuffer:pixelBuffer transform:transform transformOffset:transformOffset];
     }
 }
 
@@ -270,32 +335,28 @@
     }
 }
 
-- (BOOL)locationIsInPrivateView:(CGPoint)location inView:(UIView *)locationView privateViewFrame:(CGRect *)frame
-{    
-    for (UIView *view in privateViews) {
-        CGRect frameInWindow = [view convertRect:view.bounds toView:locationView];
+- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+{
+    CGFloat scale = [[UIScreen mainScreen] scale];
+    CGRect frameInBuffer = CGRectApplyAffineTransform(frame, transform);
+    frameInBuffer.origin.x += transformOffset.x;
+    frameInBuffer.origin.y += transformOffset.y;
+    frameInBuffer.origin.x *= scale;
+    frameInBuffer.origin.y *= scale;
+    frameInBuffer.size.width *= scale;
+    frameInBuffer.size.height *= scale;
             
-        if (CGRectContainsPoint(frameInWindow, location) && view.window && !view.hidden) {
-            if (frame) {
-                *frame = frameInWindow;
-            }
-            return YES;
-        }
+    void *buffer = CVPixelBufferGetBaseAddress(pixelBuffer);
+    size_t width = CVPixelBufferGetWidth(pixelBuffer);
+    size_t height = CVPixelBufferGetHeight(pixelBuffer);
+    size_t bytesPerPixel = CVPixelBufferGetBytesPerRow(pixelBuffer) / width;
+    
+    for (int row = MAX(0, CGRectGetMinY(frameInBuffer)); row < CGRectGetMaxY(frameInBuffer) && row < height; row++) {
+        unsigned long startColumn = CGRectGetMinX(frameInBuffer);
+        unsigned long length = CGRectGetWidth(frameInBuffer) * bytesPerPixel;
+        
+        memset(buffer + ((row * width + startColumn) * bytesPerPixel), 0, length);
     }
-
-    if (keyboardWindow && hidesKeyboard) {
-        if (CGRectContainsPoint(keyboardFrame, location)) {
-            if (frame) {
-                *frame = keyboardFrame;
-            }
-            return YES;
-        }
-    }
-
-    if (frame) {
-        *frame = CGRectZero;
-    }
-    return NO;
 }
 
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context

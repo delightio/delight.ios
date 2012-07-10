@@ -21,7 +21,6 @@
 /** Starts capturing the screen and recording gestures. The recording will automatically end after 10 minutes, or if the app is sent to the background. A new recording will be started whenever the app is brought to the foreground. Recordings only take place if you have scheduled recordings in your [control panel](http://delight.io/apps), and recordings are not paused.
  
  @warning This method should only be called once, typically in your application delegate's `applicationDidFinishLaunching:withOptions:` method.
- @warning If your app uses OpenGL ES, do not use this method. Use `startOpenGLWithAppToken:` instead.
  @see stop
  @param appToken The application token from your [control panel](http://delight.io/apps).
  */

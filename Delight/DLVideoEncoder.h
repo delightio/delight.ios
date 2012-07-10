@@ -33,6 +33,7 @@
 @property (nonatomic, assign) double averageBitRate;
 @property (nonatomic, assign) NSUInteger maximumKeyFrameInterval;
 @property (nonatomic, readonly) long outputFileSize;
+@property (nonatomic, readonly) int pixelFormatType;
 @property (nonatomic, assign) id<DLVideoEncoderDelegate> delegate;
 
 - (void)startNewRecording;
@@ -40,15 +41,18 @@
 - (void)setup;
 - (void)setupWriter;
 - (void)cleanup;
-- (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift;
+- (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift scale:(CGFloat)scale;
 - (NSURL *)tempFileURL;
 - (CMTime)currentFrameTime;
+- (UIImage *)resizedImageForPixelData:(void *)pixelData width:(int)backingWidth height:(int)backingHeight;
 
 @end
 
 @protocol DLVideoEncoderDelegate <NSObject>
 @optional
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime;
+- (void)videoEncoderWillRender:(DLVideoEncoder *)videoEncoder;
+- (void)videoEncoder:(DLVideoEncoder *)videoEncoder willEncodePixelBuffer:(CVPixelBufferRef)pixelBuffer scale:(CGFloat)scale;
 - (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder;
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didFailRecordingWithError:(NSError *)error;
 @end

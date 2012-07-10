@@ -20,6 +20,10 @@
 #import "UITextField+DLPrivateView.h"
 #import </usr/include/objc/objc-class.h>
 
+#if PRIVATE_FRAMEWORK
+#import "DLMobileFrameBufferVideoEncoder.h"
+#endif
+
 #define kDLDefaultScaleFactor 0.5f
 #define kDLDefaultMaximumFrameRate 15.0f
 #define kDLDefaultMaximumRecordingDuration 60.0f*10
@@ -56,21 +60,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSTimeInterval maximumRecordingDuration;
 }
 
-@synthesize taskController = _taskController;
-@synthesize recordingContext = _recordingContext;
-@synthesize screenshotController = _screenshotController;
-@synthesize videoEncoder = _videoEncoder;
-@synthesize gestureTracker = _gestureTracker;
-@synthesize cameraManager = _cameraManager;
-@synthesize metrics = _metrics;
-@synthesize appToken = _appToken;
-@synthesize annotation = _annotation;
-@synthesize userStopped = _userStopped;
-@synthesize scaleFactor = _scaleFactor;
-@synthesize autoCaptureEnabled = _autoCaptureEnabled;
-@synthesize openGL = _openGL;
-@synthesize userProperties = _userProperties;
-
 #pragma mark - Class methods
 
 + (Delight *)sharedInstance
@@ -88,7 +77,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
-    Delight *delight = [self sharedInstance];
+#if TARGET_IPHONE_SIMULATOR && PRIVATE_FRAMEWORK
+    DLLog(@"[Delight] Recording not supported in simulator");
+#else
+	Delight *delight = [self sharedInstance];
 	if (annotation == DLAnnotationFrontVideoAndAudio) {
 		delight.taskController.sessionObjectName = @"usability_app_session";
 	} else {
@@ -99,6 +91,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [delight setAppToken:appToken];
     [delight setOpenGL:NO];
 	[delight tryCreateNewSession];
+#endif
 }
 
 + (void)startOpenGLWithAppToken:(NSString *)appToken
@@ -108,9 +101,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
+#if PRIVATE_FRAMEWORK
+    // Private framework - no distinction between UIKit and OpenGL apps
+    [self startWithAppToken:appToken annotation:annotation];
+#else
     Delight *delight = [self sharedInstance];
     [delight setAutoCaptureEnabled:NO];
-	if (annotation == DLAnnotationFrontVideoAndAudio) {
+	if ( annotation == DLAnnotationFrontVideoAndAudio ) {
 		delight.taskController.sessionObjectName = @"opengl_usability_app_session";
 	} else {
 		delight.taskController.sessionObjectName = @"opengl_app_session";
@@ -119,6 +116,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [delight setAppToken:appToken];
     [delight setOpenGL:YES];
 	[delight tryCreateNewSession];
+#endif
 }
 
 + (void)stop
@@ -130,17 +128,21 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)takeOpenGLScreenshot:(UIView *)glView colorRenderbuffer:(GLuint)colorRenderbuffer
 {
+#if !PRIVATE_FRAMEWORK
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderbuffer);
     [self takeOpenGLScreenshot:glView];
+#endif
 }
 
 + (void)takeOpenGLScreenshot:(UIView *)glView
 {
+#if !PRIVATE_FRAMEWORK
     GLint backingWidth, backingHeight;
     glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &backingWidth);
     glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &backingHeight);
     
     [[self sharedInstance] takeScreenshot:glView backingWidth:backingWidth backingHeight:backingHeight];
+#endif
 }
 
 + (BOOL)savesToPhotoAlbum
@@ -265,7 +267,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[_taskController release];
     [_metrics release];
     [_userProperties release];
-	[screenshotQueue release];	
+	[screenshotQueue release];
     
     [super dealloc];
 }
@@ -382,11 +384,15 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     _openGL = anOpenGL;
     
+#if PRIVATE_FRAMEWORK
+	self.videoEncoder = [[[DLMobileFrameBufferVideoEncoder alloc] init] autorelease];
+#else
     if (_openGL) {
         self.videoEncoder = [[[DLOpenGLVideoEncoder alloc] init] autorelease];
     } else {
         self.videoEncoder = [[[DLUIKitVideoEncoder alloc] init] autorelease];
     }
+#endif
     self.videoEncoder.delegate = self;
 }
 
@@ -413,7 +419,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
     lastScreenshotTime = start;
         
-    if (self.openGL) {
+#if PRIVATE_FRAMEWORK
+    DLMobileFrameBufferVideoEncoder *surfaceEncoder = (DLMobileFrameBufferVideoEncoder *)self.videoEncoder;
+    [surfaceEncoder encode];
+#else
+    if ([self.videoEncoder isKindOfClass:[DLOpenGLVideoEncoder class]]) {
         self.gestureTracker.touchView = glView;
         DLOpenGLVideoEncoder *openGLEncoder = (DLOpenGLVideoEncoder *)self.videoEncoder;
         [openGLEncoder encodeGLPixelsWithBackingWidth:backingWidth backingHeight:backingHeight];
@@ -422,6 +432,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         DLUIKitVideoEncoder *imageEncoder = (DLUIKitVideoEncoder *)self.videoEncoder;
         [imageEncoder encodeImage:screenshot];
     }
+#endif
         
     if (self.recordingContext.startTime && [[NSDate date] timeIntervalSinceDate:self.recordingContext.startTime] >= maximumRecordingDuration) {
         // We've exceeded the maximum recording duration
@@ -629,7 +640,27 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
 {
+    if (videoEncoder.videoSize.width > videoEncoder.videoSize.height && self.gestureTracker.touchView.bounds.size.height > self.gestureTracker.touchView.bounds.size.width) {
+        // Landscape video, portrait screen. Our OpenGL surface is rotated.
+        [self.gestureTracker setShouldRotateTouches:YES];
+    }
+    
     [self.gestureTracker startRecordingGesturesWithStartUptime:startTime];
+}
+
+- (void)videoEncoderWillRender:(DLVideoEncoder *)videoEncoder
+{
+    [self.screenshotController lockPrivateViewFrames];
+}
+
+- (void)videoEncoder:(DLVideoEncoder *)videoEncoder willEncodePixelBuffer:(CVPixelBufferRef)pixelBuffer scale:(CGFloat)scale
+{
+    if (![videoEncoder isKindOfClass:[DLUIKitVideoEncoder class]]) {
+        // Black out private views before encoding
+        CGAffineTransform transform = CGAffineTransformScale(self.gestureTracker.transform, scale, scale);
+        CGPoint offset = CGPointApplyAffineTransform([self.gestureTracker transformOffset], CGAffineTransformMakeScale(scale, scale));
+        [self.screenshotController blackOutPrivateViewsInPixelBuffer:pixelBuffer transform:transform transformOffset:offset];
+    }
 }
 
 - (void)videoEncoderDidFinishRecording:(DLVideoEncoder *)videoEncoder
