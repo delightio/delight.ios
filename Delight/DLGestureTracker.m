@@ -18,6 +18,11 @@
 - (void)handleDeviceOrientationDidChangeNotification:(NSNotification *)notification;
 @end
 
+// TODO: Only include for private framework
+@interface UIScreen (Private)
+- (float)_rotation;
+@end
+
 @implementation DLGestureTracker
 
 @synthesize scaleFactor;
@@ -132,7 +137,8 @@
     shouldRotateTouches = aShouldRotateTouches;
     
     if (shouldRotateTouches) {
-        transform = CGAffineTransformMakeRotation(-M_PI / 2);
+        CGFloat rotation = ([[UIScreen mainScreen] respondsToSelector:@selector(_rotation)] ? -[[UIScreen mainScreen] _rotation] : M_PI_2);
+        transform = CGAffineTransformMakeRotation(rotation);
     } else {
         transform = CGAffineTransformIdentity;
     }
