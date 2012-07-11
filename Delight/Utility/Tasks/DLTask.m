@@ -21,6 +21,7 @@ NSString * const DLScreenTrackKey = @"screen_track";
 NSString * const DLTouchTrackKey = @"touch_track";
 NSString * const DLFrontTrackKey = @"front_track";
 NSString * const DLOrientationTrackKey = @"orientation_track";
+NSString * const DLViewTrackKey = @"view_track";
 
 @implementation DLTask
 @synthesize recordingContext = _recordingContext;

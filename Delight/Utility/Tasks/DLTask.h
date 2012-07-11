@@ -18,6 +18,7 @@ extern NSString * const DLScreenTrackKey;
 extern NSString * const DLTouchTrackKey;
 extern NSString * const DLFrontTrackKey;
 extern NSString * const DLOrientationTrackKey;
+extern NSString * const DLViewTrackKey;
 
 @class DLTaskController;
 

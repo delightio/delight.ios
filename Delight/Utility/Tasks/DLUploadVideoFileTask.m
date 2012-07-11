@@ -70,7 +70,10 @@
 		[self.recordingContext setTaskFinished:DLFinishedUploadOrientationFile];
 	} else if ( [_trackName isEqualToString:@"front_track"] ) {
 		[self.recordingContext setTaskFinished:DLFinishedUploadFrontCameraFile];
-	}
+	} else if ( [_trackName isEqualToString:@"view_track"] ) {
+    	[self.recordingContext setTaskFinished:DLFinishedUploadViewFile];    
+    }
+    
 	DLDebugLog(@"uploaded %@ to server", _trackName);
 	// delete video file
 	NSError * err = nil;

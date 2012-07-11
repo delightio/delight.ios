@@ -70,7 +70,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
 @synthesize userStopped = _userStopped;
 @synthesize userProperties = _userProperties;
-@synthesize sectionChanges = _sectionChanges;
+@synthesize viewChanges = _viewChanges;
 
 #pragma mark - Class methods
 
@@ -168,7 +168,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     Delight *delight = [Delight sharedInstance];
     NSTimeInterval timeInSession = (delight.videoEncoder.recording ? [[NSProcessInfo processInfo] systemUptime] - delight.videoEncoder.recordingStartTime : 0.0f);
     DLViewChange *sectionChange = [DLViewChange viewChangeWithName:viewName type:type timeInSession:timeInSession];
-    [delight.sectionChanges addObject:sectionChange];    
+    [delight.viewChanges addObject:sectionChange];    
 }
 
 #pragma mark -
@@ -244,7 +244,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[_taskController release];
     [_metrics release];
     [_userProperties release];
-    [_sectionChanges release];
+    [_viewChanges release];
 	[screenshotQueue release];
     
     [super dealloc];
@@ -312,7 +312,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         self.recordingContext.startTime = [NSDate date];
         self.recordingContext.screenFilePath = self.videoEncoder.outputPath;
-        self.sectionChanges = [NSMutableArray array];
+        self.viewChanges = [NSMutableArray array];
 
         if (self.autoCaptureEnabled) {
             [self scheduleScreenshot];
@@ -332,6 +332,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		self.recordingContext.touches = self.gestureTracker.touches;
         self.recordingContext.touchBounds = self.gestureTracker.touchView.bounds;
         self.recordingContext.orientationChanges = self.gestureTracker.orientationChanges;
+        self.recordingContext.viewChanges = self.viewChanges;
     }
 }
 
