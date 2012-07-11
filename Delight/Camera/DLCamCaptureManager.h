@@ -23,7 +23,6 @@
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundRecordingID;
 @property (nonatomic, assign, getter=isRecording) BOOL recording;
 @property (nonatomic, assign, getter=isAudioOnly) BOOL audioOnly;
-@property (nonatomic, assign) BOOL savesToPhotoAlbum;
 @property (nonatomic, retain) NSString *outputPath;
 @property (nonatomic, assign) id <DLCamCaptureManagerDelegate> delegate;
 

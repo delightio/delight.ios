@@ -33,13 +33,10 @@
 		83559CCC15ABB60B0062E66A /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
 		83559CCD15ABB60B0062E66A /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
 		83559CCE15ABB60B0062E66A /* DLMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = 833B500C15670E690085552F /* DLMetrics.m */; };
-		83559CCF15ABB60B0062E66A /* DLOpenGLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */; };
 		83559CD015ABB60B0062E66A /* DLUIKitVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A8D158AC08200A41326 /* DLUIKitVideoEncoder.m */; };
 		83559CD115ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83E58A3315926AF200B01636 /* DLMobileFrameBufferVideoEncoder.m */; };
 		83559CD315ABB60B0062E66A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A980945E1542B221002B2BCE /* SystemConfiguration.framework */; };
 		83559CD415ABB60B0062E66A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9A9A3D715371A3E00B6E4AB /* UIKit.framework */; };
-		83559CD515ABB60B0062E66A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896B614EAF090006D93C2 /* OpenGLES.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		83559CD615ABB60B0062E66A /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */; };
 		83559CD715ABB60B0062E66A /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */; };
 		83559CD815ABB60B0062E66A /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AC14EAEFBF006D93C2 /* CoreMedia.framework */; };
 		83559CD915ABB60B0062E66A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AB14EAEFBF006D93C2 /* CoreGraphics.framework */; };
@@ -66,7 +63,6 @@
 		83559CEF15ABB60B0062E66A /* UITextField+DLPrivateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 838186FE1563156400608514 /* UITextField+DLPrivateView.h */; };
 		83559CF015ABB60B0062E66A /* DLMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 833B500B15670E690085552F /* DLMetrics.h */; };
 		83559CF115ABB60B0062E66A /* DLConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 832D1DAC1589626D004F2BD6 /* DLConstants.h */; };
-		83559CF215ABB60B0062E66A /* DLOpenGLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */; };
 		83559CF315ABB60B0062E66A /* DLUIKitVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A8C158AC08200A41326 /* DLUIKitVideoEncoder.h */; };
 		83559CF715ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83E58A3215926AF200B01636 /* DLMobileFrameBufferVideoEncoder.h */; };
 		83559D3D15ABB60B0062E66A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B8968A14EAEC68006D93C2 /* InfoPlist.strings */; };
@@ -84,8 +80,6 @@
 		8385CA80154768530057FC37 /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
 		8385CA831547688E0057FC37 /* DLOrientationChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA811547688D0057FC37 /* DLOrientationChange.h */; };
 		8385CA841547688E0057FC37 /* DLOrientationChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA821547688E0057FC37 /* DLOrientationChange.m */; };
-		83995A8A158ABEA600A41326 /* DLOpenGLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A88158ABEA600A41326 /* DLOpenGLVideoEncoder.h */; };
-		83995A8B158ABEA600A41326 /* DLOpenGLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A89158ABEA600A41326 /* DLOpenGLVideoEncoder.m */; };
 		83995A8E158AC08200A41326 /* DLUIKitVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83995A8C158AC08200A41326 /* DLUIKitVideoEncoder.h */; };
 		83995A8F158AC08200A41326 /* DLUIKitVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83995A8D158AC08200A41326 /* DLUIKitVideoEncoder.m */; };
 		83B8968614EAEC68006D93C2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B8968514EAEC68006D93C2 /* Foundation.framework */; };
@@ -94,13 +88,11 @@
 		83B8969A14EAECD6006D93C2 /* Delight.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969414EAECD6006D93C2 /* Delight.m */; };
 		83B8969B14EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = 83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */; settings = {ATTRIBUTES = (); }; };
 		83B8969C14EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */; };
-		83B896AF14EAEFBF006D93C2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */; };
 		83B896B014EAEFBF006D93C2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */; };
 		83B896B114EAEFBF006D93C2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AB14EAEFBF006D93C2 /* CoreGraphics.framework */; };
 		83B896B214EAEFBF006D93C2 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AC14EAEFBF006D93C2 /* CoreMedia.framework */; };
 		83B896B314EAEFBF006D93C2 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AD14EAEFBF006D93C2 /* CoreVideo.framework */; };
 		83B896B414EAEFBF006D93C2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896AE14EAEFBF006D93C2 /* QuartzCore.framework */; };
-		83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83B896B614EAF090006D93C2 /* OpenGLES.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A93411C815352A3F0044077B /* DLVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83149B2C15338CC500003862 /* DLVideoEncoder.m */; };
 		A93411C915352A3F0044077B /* DLVideoEncoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 83149B2B15338CC500003862 /* DLVideoEncoder.h */; settings = {ATTRIBUTES = (); }; };
 		A96BE1E6153E156800D8BA2D /* DLPostVideoTask.h in Headers */ = {isa = PBXBuildFile; fileRef = A96BE1E4153E156800D8BA2D /* DLPostVideoTask.h */; };
@@ -163,13 +155,11 @@
 		83B8969414EAECD6006D93C2 /* Delight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Delight.m; sourceTree = "<group>"; };
 		83B8969514EAECD6006D93C2 /* UIWindow+DLInterceptEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+DLInterceptEvents.h"; sourceTree = "<group>"; };
 		83B8969614EAECD6006D93C2 /* UIWindow+DLInterceptEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+DLInterceptEvents.m"; sourceTree = "<group>"; };
-		83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		83B896AB14EAEFBF006D93C2 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		83B896AC14EAEFBF006D93C2 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		83B896AD14EAEFBF006D93C2 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		83B896AE14EAEFBF006D93C2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		83B896B614EAF090006D93C2 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		83E58A3215926AF200B01636 /* DLMobileFrameBufferVideoEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLMobileFrameBufferVideoEncoder.h; sourceTree = "<group>"; };
 		83E58A3315926AF200B01636 /* DLMobileFrameBufferVideoEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLMobileFrameBufferVideoEncoder.m; sourceTree = "<group>"; };
 		A9508D311537E99B001853A0 /* DLTaskHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DLTaskHeader.h; sourceTree = "<group>"; };
@@ -200,8 +190,6 @@
 			files = (
 				83559CD315ABB60B0062E66A /* SystemConfiguration.framework in Frameworks */,
 				83559CD415ABB60B0062E66A /* UIKit.framework in Frameworks */,
-				83559CD515ABB60B0062E66A /* OpenGLES.framework in Frameworks */,
-				83559CD615ABB60B0062E66A /* AssetsLibrary.framework in Frameworks */,
 				83559CD715ABB60B0062E66A /* AVFoundation.framework in Frameworks */,
 				83559CD815ABB60B0062E66A /* CoreMedia.framework in Frameworks */,
 				83559CD915ABB60B0062E66A /* CoreGraphics.framework in Frameworks */,
@@ -217,8 +205,6 @@
 			files = (
 				A980945F1542B221002B2BCE /* SystemConfiguration.framework in Frameworks */,
 				A9A9A3D815371A3E00B6E4AB /* UIKit.framework in Frameworks */,
-				83B896B714EAF090006D93C2 /* OpenGLES.framework in Frameworks */,
-				83B896AF14EAEFBF006D93C2 /* AssetsLibrary.framework in Frameworks */,
 				83B896B014EAEFBF006D93C2 /* AVFoundation.framework in Frameworks */,
 				83B896B214EAEFBF006D93C2 /* CoreMedia.framework in Frameworks */,
 				83B896B114EAEFBF006D93C2 /* CoreGraphics.framework in Frameworks */,
@@ -308,8 +294,6 @@
 			children = (
 				A980945E1542B221002B2BCE /* SystemConfiguration.framework */,
 				A9A9A3D715371A3E00B6E4AB /* UIKit.framework */,
-				83B896B614EAF090006D93C2 /* OpenGLES.framework */,
-				83B896A914EAEFBF006D93C2 /* AssetsLibrary.framework */,
 				83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */,
 				83B896AB14EAEFBF006D93C2 /* CoreGraphics.framework */,
 				83B896AC14EAEFBF006D93C2 /* CoreMedia.framework */,
@@ -411,7 +395,6 @@
 				83559CEF15ABB60B0062E66A /* UITextField+DLPrivateView.h in Headers */,
 				83559CF015ABB60B0062E66A /* DLMetrics.h in Headers */,
 				83559CF115ABB60B0062E66A /* DLConstants.h in Headers */,
-				83559CF215ABB60B0062E66A /* DLOpenGLVideoEncoder.h in Headers */,
 				83559CF315ABB60B0062E66A /* DLUIKitVideoEncoder.h in Headers */,
 				83559CF715ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.h in Headers */,
 			);
@@ -441,7 +424,6 @@
 				838187001563156400608514 /* UITextField+DLPrivateView.h in Headers */,
 				833B500D15670E690085552F /* DLMetrics.h in Headers */,
 				832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */,
-				83995A8A158ABEA600A41326 /* DLOpenGLVideoEncoder.h in Headers */,
 				83995A8E158AC08200A41326 /* DLUIKitVideoEncoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -673,7 +655,6 @@
 				83559CCC15ABB60B0062E66A /* DLGesture.m in Sources */,
 				83559CCD15ABB60B0062E66A /* DLGestureTracker.m in Sources */,
 				83559CCE15ABB60B0062E66A /* DLMetrics.m in Sources */,
-				83559CCF15ABB60B0062E66A /* DLOpenGLVideoEncoder.m in Sources */,
 				83559CD015ABB60B0062E66A /* DLUIKitVideoEncoder.m in Sources */,
 				83559CD115ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.m in Sources */,
 			);
@@ -704,7 +685,6 @@
 				837E8A4D15658ACE00FB16E9 /* DLGesture.m in Sources */,
 				837E8A4F15658AD100FB16E9 /* DLGestureTracker.m in Sources */,
 				833B500E15670E690085552F /* DLMetrics.m in Sources */,
-				83995A8B158ABEA600A41326 /* DLOpenGLVideoEncoder.m in Sources */,
 				83995A8F158AC08200A41326 /* DLUIKitVideoEncoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
