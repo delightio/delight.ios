@@ -14,6 +14,7 @@
 #import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
+#import "UIViewController+DLViewChange.h"
 #import </usr/include/objc/objc-class.h>
 
 #if PRIVATE_FRAMEWORK
@@ -69,6 +70,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
 @synthesize userStopped = _userStopped;
 @synthesize userProperties = _userProperties;
+@synthesize sectionChanges = _sectionChanges;
 
 #pragma mark - Class methods
 
@@ -155,6 +157,20 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
++ (void)markViewChange:(NSString *)viewName
+{
+    [self markViewChange:viewName type:DLViewChangeTypeUser];
+    DLLog(@"[Delight] View changed to: %@", viewName);
+}
+
++ (void)markViewChange:(NSString *)viewName type:(DLViewChangeType)type
+{
+    Delight *delight = [Delight sharedInstance];
+    NSTimeInterval timeInSession = (delight.videoEncoder.recording ? [[NSProcessInfo processInfo] systemUptime] - delight.videoEncoder.recordingStartTime : 0.0f);
+    DLViewChange *sectionChange = [DLViewChange viewChangeWithName:viewName type:type timeInSession:timeInSession];
+    [delight.sectionChanges addObject:sectionChange];    
+}
+
 #pragma mark -
 
 - (id)init
@@ -209,6 +225,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         Swizzle([UITextField class], @selector(setSecureTextEntry:), @selector(DLsetSecureTextEntry:));
         Swizzle([UITextField class], @selector(becomeFirstResponder), @selector(DLbecomeFirstResponder));
         Swizzle([UITextField class], @selector(resignFirstResponder), @selector(DLresignFirstResponder));
+        
+        // Method swizzling to automatically mark UIViewController changes as new sections
+        Swizzle([UIViewController class], @selector(viewDidAppear:), @selector(DLviewDidAppear:));
     }
     return self;
 }
@@ -225,6 +244,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[_taskController release];
     [_metrics release];
     [_userProperties release];
+    [_sectionChanges release];
 	[screenshotQueue release];
     
     [super dealloc];
@@ -292,7 +312,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         self.recordingContext.startTime = [NSDate date];
         self.recordingContext.screenFilePath = self.videoEncoder.outputPath;
-        
+        self.sectionChanges = [NSMutableArray array];
+
         if (self.autoCaptureEnabled) {
             [self scheduleScreenshot];
         }
@@ -568,7 +589,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 #pragma mark - DLVideoEncoderDelegate
 
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
-{
+{    
     if (videoEncoder.videoSize.width > videoEncoder.videoSize.height && self.gestureTracker.touchView.bounds.size.height > self.gestureTracker.touchView.bounds.size.width) {
         // Landscape video, portrait screen. Our surface is rotated.
         [self.gestureTracker setShouldRotateTouches:YES];

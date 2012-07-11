@@ -25,6 +25,7 @@
 @synthesize maximumKeyFrameInterval;
 @synthesize outputFileSize;
 @synthesize pixelFormatType;
+@synthesize recordingStartTime;
 @synthesize delegate;
 
 - (id)init
