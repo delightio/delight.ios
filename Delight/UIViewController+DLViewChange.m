@@ -9,6 +9,8 @@
 #import "UIViewController+DLViewChange.h"
 #import "Delight_Private.h"
 
+DL_MAKE_CATEGORIES_LOADABLE(UIViewController_DLViewChange);
+
 @implementation UIViewController (DLViewChange)
 
 - (void)DLviewDidAppear:(BOOL)animated
