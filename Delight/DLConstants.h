@@ -8,8 +8,11 @@
 
 // Don't change the version here, it is auto-generated via a build script.
 // Change it in Delight-Info.plist instead.
-#define DELIGHT_VERSION (PRIVATE_FRAMEWORK ? @"2.2.Private" : @"2.2")
+#define DELIGHT_VERSION_PRIVATE @"2.2.1.Private"
+#define DELIGHT_VERSION_PUBLIC @"2.2.1"
 
-// The maximum height that OpenGL recordings should have.
-// If a OpenGL backing height is beyond this value, each frame will be scaled down (slow).
-#define DL_OPENGL_MAX_VIDEO_HEIGHT 1080
+#ifdef PRIVATE_FRAMEWORK
+    #define DELIGHT_VERSION DELIGHT_VERSION_PRIVATE
+#else
+    #define DELIGHT_VERSION DELIGHT_VERSION_PUBLIC
+#endif

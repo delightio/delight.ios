@@ -7,12 +7,10 @@ Basic Setup
 1. Sign up on [http://delight.io](http://delight.io) to receive your app token.
 
 2. Add Delight.framework to your target. Also make sure the following frameworks are linked:
-    * AssetsLibrary
     * AVFoundation
     * CoreGraphics
     * CoreMedia
     * CoreVideo
-    * OpenGLES
     * QuartzCore
     * SystemConfiguration
 
@@ -29,22 +27,20 @@ By default, recording will stop when the user presses the device's home button o
 
 After a recording has been stopped, it is not possible to restart it again in that session.
 
-### Saving to Photo Album ###
-
-If you would like the video to be copied to the user's Photo Album after each recording, call `[Delight setSavesToPhotoAlbum:YES]`. By default the video is not copied.
-
 ### Properties ###
 
 You can attach arbitrary metadata to recordings by calling `[Delight setPropertyValue:forKey:]`. The value must be either an NSString or NSNumber. In the control panel, it is possible to filter recordings by property.
 
 ### Debug Log ###
 
-By default, debug log statements from the delight.io framework are suppressed. To turn them on, call `[Delight setDebugLogEnabled:YES]`.
+By default, debug log statements from Delight are suppressed. To turn them on, call `[Delight setDebugLogEnabled:YES]`.
 
 OpenGL ES
 ---------
 
-To record applications that use OpenGL ES, call `[Delight startOpenGLWithAppToken:]` instead of `[Delight startWithAppToken:]`. You must also call either `[Delight takeOpenGLScreenshot:]` or `[Delight takeOpenGLScreenshot:colorRenderbuffer:]` inside your render loop (after drawing but before `-[EAGLContext presentRenderbuffer:]`).
+To record applications that use OpenGL ES, you must link DelightPrivate.framework instead of Delight.framework. This is a special version of Delight that uses private APIs, and is able to record OpenGL layers at high frame rates. Follow the same steps as in the Basic Setup, but change the import statement to `#import <DelightPrivate/Delight.h>`.
+
+**Note:** Since DelightPrivate.framework uses private APIs, it should not be used in App Store builds.
 
 Private Views
 -------------
@@ -59,20 +55,10 @@ Note that UITextFields with the secureTextEntry property set to true are automat
 
 To allow/prevent the keyboard from being recorded, call `[Delight setHidesKeyboardInRecording:]`. When set to YES, the keyboard area will be covered up by a grey box in the recording and keystroke gestures will not be drawn. By default, the keyboard is shown in the recording, except for when the user is entering text into a secure UITextField.
 
-OpenGL ES Support
------------------
-
-Currently delight.io only supports UIKit apps. OpenGL ES support is in the works, however, and interested parties should email us at [opengl@delight.io](mailto:opengl@delight.io) to sign up for the beta.
-
 Viewing Recordings
 ------------------
 
-Log in to your control panel at [delight.io](http://delight.io) to view your recordings. You can filter your recordings by version and build, as defined in your application's Info.plist file. If you have turned on [saving to Photo Album](#saving-to-photo-album) you may also view recordings by launching the Photos app on the device.
-
-App Development Frameworks
---------------------------
-
-It is possible to integrate Delight with certain app development frameworks such as PhoneGap and Clutch.io. Please refer to the [developer documentation](http://delight.io/docs) for more information.
+Log in to your control panel at [delight.io](http://delight.io) to view your recordings. You can filter your recordings by version and build, as defined in your application's Info.plist file.
 
 Troubleshooting
 ---------------

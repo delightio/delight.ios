@@ -7,9 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <OpenGLES/EAGL.h>
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
 
 /*
    DLScreenshotController takes and stores screenshots of a UIView.

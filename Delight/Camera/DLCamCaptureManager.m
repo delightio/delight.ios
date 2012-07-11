@@ -39,7 +39,6 @@
 @synthesize backgroundRecordingID;
 @synthesize recording;
 @synthesize audioOnly;
-@synthesize savesToPhotoAlbum;
 @synthesize outputPath;
 @synthesize delegate;
 
@@ -311,33 +310,12 @@
         }
     }
     
-    if (videoInput && savesToPhotoAlbum) {
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeVideoAtPathToSavedPhotosAlbum:outputFileURL
-                                    completionBlock:^(NSURL *assetURL, NSError *error) {
-                                        if (error) {
-                                            if ([[self delegate] respondsToSelector:@selector(captureManager:didFailWithError:)]) {
-                                                [[self delegate] captureManager:self didFailWithError:error];
-                                            }											
-                                        }
-                                        
-                                        if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
-                                            [[self delegate] captureManagerRecordingFinished:self];
-                                        }
-                                        
-                                        if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-                                            [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
-                                        }
-                                    }];
-        [library release];
-    } else {
-        if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
-            [[self delegate] captureManagerRecordingFinished:self];
-        }
-        
-        if ([[UIDevice currentDevice] isMultitaskingSupported]) {
-            [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
-        }
+    if ([[self delegate] respondsToSelector:@selector(captureManagerRecordingFinished:)]) {
+        [[self delegate] captureManagerRecordingFinished:self];
+    }
+    
+    if ([[UIDevice currentDevice] isMultitaskingSupported]) {
+        [[UIApplication sharedApplication] endBackgroundTask:[self backgroundRecordingID]];
     }
 }
 

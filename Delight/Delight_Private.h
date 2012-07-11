@@ -33,16 +33,14 @@ typedef enum {
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL autoCaptureEnabled;
 @property (nonatomic, assign) BOOL userStopped;
-@property (nonatomic, assign) BOOL openGL;
 @property (nonatomic, retain) NSMutableDictionary *userProperties;
 
 + (Delight *)sharedInstance;
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-+ (void)startOpenGLWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
 
 - (void)startRecording;
 - (void)stopRecording;
-- (void)takeScreenshot:(UIView *)glView backingWidth:(GLint)backingWidth backingHeight:(GLint)backingHeight;
+- (void)takeScreenshot;
 - (void)scheduleScreenshot;
 - (void)tryCreateNewSession; // check with Delight server to see if we need to start a new recording session
 
