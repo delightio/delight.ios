@@ -136,7 +136,7 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
         // We can encode the surface data directly
         CVPixelBufferRef pixelBuffer = NULL;
         CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, avAdaptor.pixelBufferPool, &pixelBuffer);
-        if (self.recording && (pixelBuffer == NULL) || (status != kCVReturnSuccess)) {
+        if (self.recording && ((pixelBuffer == NULL) || (status != kCVReturnSuccess))) {
             DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
             return;
         }
