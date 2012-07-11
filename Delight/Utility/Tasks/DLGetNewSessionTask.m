@@ -10,6 +10,7 @@
 #import "DLTaskController.h"
 #import <sys/utsname.h>
 #import "Delight.h"
+#import "Delight_Private.h"
 #import "DLConstants.h"
 
 NSString * const DLUploadURIElementName = @"upload_uris";
@@ -50,15 +51,27 @@ NSString * const DLMaximumRecordingDurationElementName = @"maximum_duration";
 	uname(&systemInfo);
 	
 	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
-	NSString * paramStr = [self parameterStringForProperties:[NSDictionary dictionaryWithObjectsAndKeys:dotVer, @"app_version", 
-                                                              buildVer, @"app_build",
-                                                              [[NSLocale currentLocale] localeIdentifier], @"app_locale",
-                                                              self.taskController.networkStatusString, @"app_connectivity",
-                                                              DELIGHT_VERSION, @"delight_version",
-                                                              machineName, @"device_hw_version", 
-                                                              theDevice.systemVersion, @"device_os_version",
-                                                              nil]];
+	NSString * systemPropertyParamStr = [self parameterStringForProperties:[NSDictionary dictionaryWithObjectsAndKeys:dotVer, @"app_version", 
+                                                                            buildVer, @"app_build",
+                                                                            [[NSLocale currentLocale] localeIdentifier], @"app_locale",
+                                                                            self.taskController.networkStatusString, @"app_connectivity",
+                                                                            DELIGHT_VERSION, @"delight_version",
+                                                                            machineName, @"device_hw_version", 
+                                                                            theDevice.systemVersion, @"device_os_version",
+                                                                            nil]];
 
+    NSMutableString *userPropertyParamStr = [NSMutableString string];
+    NSDictionary *userProperties = [Delight sharedInstance].userProperties;
+    for (NSString * key in [userProperties allKeys]) {
+        id value = [userProperties objectForKey:key];
+        if ([value isKindOfClass:[NSString class]]) {
+            value = [self stringByAddingPercentEscapes:value];
+        }
+        [userPropertyParamStr appendFormat:@"&%@[properties][%@]=%@", self.taskController.sessionObjectName, [self stringByAddingPercentEscapes:key], value];
+    }
+    
+    NSString *paramStr = [NSString stringWithFormat:@"%@%@", systemPropertyParamStr, userPropertyParamStr];
+    
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
