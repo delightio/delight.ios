@@ -158,13 +158,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
-+ (void)markViewChange:(NSString *)viewName
++ (void)markCurrentViewName:(NSString *)viewName
 {
-    [self markViewChange:viewName type:DLViewChangeTypeUser];
-    DLLog(@"[Delight] View changed to: %@", viewName);
+    [self markCurrentViewName:viewName type:DLViewChangeTypeUser];
+    DLLog(@"[Delight] Marked view: %@", viewName);
 }
 
-+ (void)markViewChange:(NSString *)viewName type:(DLViewChangeType)type
++ (void)markCurrentViewName:(NSString *)viewName type:(DLViewChangeType)type
 {
     Delight *delight = [Delight sharedInstance];
     NSTimeInterval timeInSession = (delight.videoEncoder.recording ? [[NSProcessInfo processInfo] systemUptime] - delight.videoEncoder.recordingStartTime : 0.0f);

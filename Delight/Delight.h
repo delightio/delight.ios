@@ -94,11 +94,11 @@
  * ---------------------------------------------------------------------------------------
  */
 
-/** Marks the current point in time as a change in view.
+/** Gives the specified name to the current view on screen.
   
- @param viewName The name of the new view.
+ @param viewName The name of the current view.
  */
-+ (void)markViewChange:(NSString *)viewName;
++ (void)markCurrentViewName:(NSString *)viewName;
 
 /**---------------------------------------------------------------------------------------
  * @name Debugging

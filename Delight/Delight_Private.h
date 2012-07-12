@@ -40,7 +40,7 @@ typedef enum {
 
 + (Delight *)sharedInstance;
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-+ (void)markViewChange:(NSString *)viewName type:(DLViewChangeType)type;
++ (void)markCurrentViewName:(NSString *)viewName type:(DLViewChangeType)type;
 
 - (void)startRecording;
 - (void)stopRecording;

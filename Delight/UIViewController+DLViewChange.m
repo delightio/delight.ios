@@ -16,7 +16,7 @@ DL_MAKE_CATEGORIES_LOADABLE(UIViewController_DLViewChange);
 - (void)DLviewDidAppear:(BOOL)animated
 {
     [self DLviewDidAppear:animated];    
-    [Delight markViewChange:NSStringFromClass([self class]) type:DLViewChangeTypeViewController];
+    [Delight markCurrentViewName:NSStringFromClass([self class]) type:DLViewChangeTypeViewController];
 }
 
 @end
