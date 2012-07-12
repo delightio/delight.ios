@@ -10,15 +10,12 @@
 #import <QuartzCore/QuartzCore.h>
 #import </usr/include/objc/objc-runtime.h>
 
-#define kDLDescriptionKey "DLDescription"
-
 @interface DLScreenshotController ()
 - (UIWindow *)keyboardWindow;
 - (CGContextRef)newBitmapContextOfSize:(CGSize)size;
 - (void)drawLabelCenteredAt:(CGPoint)point inWindow:(UIWindow *)window inContext:(CGContextRef)context 
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
-- (void)hidePrivateFrames:(NSSet *)privateViews forWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
@@ -86,20 +83,6 @@
     // Clear the status bar since we don't draw over it
     CGContextClearRect(context, [[UIApplication sharedApplication] statusBarFrame]);
     
-    // Store the private view frames at the time that rendering begins.
-    // We don't use the views directly because the frames may have changed after rendering finishes.
-    // We want to black out their original positions.
-    [lockedPrivateViewFrames removeAllObjects];
-    for (UIView *view in privateViews) {
-        NSString *description = objc_getAssociatedObject(view, kDLDescriptionKey);
-        CGRect frameInWindow = [view convertRect:view.bounds toView:view.window];
-
-        NSDictionary *viewDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithCGRect:frameInWindow], @"frame",
-                                  view.window, @"window",
-                                  description, @"description", nil];
-        [lockedPrivateViewFrames addObject:viewDict];
-    }
-    
     // Iterate over every window from back to front
     for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
         if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen]) {
@@ -122,9 +105,7 @@
                 // Draw the view hierarchy onto our context
                 [[window layer] renderInContext:context];
             }
-            
-            [self hidePrivateFrames:lockedPrivateViewFrames forWindow:window inContext:context];
-            
+                        
             CGContextRestoreGState(context);
             
             if (hidesKeyboard && window == keyboardWindow) {
@@ -149,7 +130,7 @@
 - (void)registerPrivateView:(UIView *)view description:(NSString *)description
 {
     if (![privateViews containsObject:view]) {
-        objc_setAssociatedObject(view, kDLDescriptionKey, description, OBJC_ASSOCIATION_RETAIN);
+        objc_setAssociatedObject(view, "DLDescription", description, OBJC_ASSOCIATION_RETAIN);
         [privateViews addObject:view];
         DLLog(@"[Delight] Registered private view: %@", [view class]);
     }
@@ -158,7 +139,7 @@
 - (void)unregisterPrivateView:(UIView *)view
 {
     if ([privateViews containsObject:view]) {
-        objc_setAssociatedObject(view, kDLDescriptionKey, nil, OBJC_ASSOCIATION_RETAIN);
+        objc_setAssociatedObject(view, "DLDescription", nil, OBJC_ASSOCIATION_RETAIN);
         [privateViews removeObject:view];
         DLLog(@"[Delight] Unregistered private view: %@", [view class]);
     }
@@ -306,33 +287,6 @@
     [label removeFromSuperview];
     [label release];
     [labelSuperview release];    
-}
-
-- (void)hidePrivateFrames:(NSSet *)frames forWindow:(UIWindow *)window inContext:(CGContextRef)context
-{
-    // Black out private views
-    for (NSDictionary *frameDict in frames) {
-        CGRect frame = [[frameDict objectForKey:@"frame"] CGRectValue];
-        UIWindow *viewWindow = [frameDict objectForKey:@"window"];
-        NSString *description = [frameDict objectForKey:@"description"];
-        
-        if (viewWindow == window) {
-            CGContextSetGrayFillColor(context, 0.1, 1.0);
-            CGContextFillRect(context, frame);
-            UIView *windowRootView = ([window.subviews count] > 0 ? [window.subviews objectAtIndex:0] : nil);
-            
-            if ((NSNull *)description != [NSNull null]) {
-                [self drawLabelCenteredAt:CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame))
-                                 inWindow:window
-                                inContext:context 
-                                     text:description 
-                                textColor:[UIColor whiteColor] 
-                          backgroundColor:[UIColor colorWithWhite:0.1 alpha:1.0]
-                                 fontSize:18.0
-                                transform:(windowRootView ? windowRootView.transform : CGAffineTransformIdentity)];
-            }
-        }
-    }
 }
 
 - (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset

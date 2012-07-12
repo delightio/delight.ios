@@ -9,7 +9,9 @@
 #import <QuartzCore/QuartzCore.h>
 
 @interface CALayer (DLThreadSafe)
+- (void)DLthreadSafeRenderInContext:(CGContextRef)context;
+- (void)DLthreadSafeDrawInContext:(CGContextRef)context;
+- (void)DLthreadSafeDrawInContext2:(CGContextRef)context;
 - (void)DLrenderInContext:(CGContextRef)context;
-- (void)DLdrawInContext:(CGContextRef)context;
 - (CALayer *)copyWithPlainLayer;
 @end

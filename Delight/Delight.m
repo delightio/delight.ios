@@ -69,6 +69,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
 @synthesize userStopped = _userStopped;
 @synthesize userProperties = _userProperties;
+@synthesize screenshotThread = _screenshotThread;
 
 #pragma mark - Class methods
 
@@ -176,7 +177,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         screenshotQueue = [[NSOperationQueue alloc] init];
         screenshotQueue.maxConcurrentOperationCount = 1;
-
+        
         self.userProperties = [NSMutableDictionary dictionary];
         self.metrics = [[[DLMetrics alloc] init] autorelease];
         
@@ -200,9 +201,14 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         Swizzle([UIWindow class], @selector(sendEvent:), @selector(DLsendEvent:));
         
         // Method swizzling to rewrite UIWebView layer rendering code to avoid crash
-        Swizzle(NSClassFromString(@"TileHostLayer"), @selector(renderInContext:), @selector(DLrenderInContext:));
-        Swizzle(NSClassFromString(@"WebLayer"), @selector(drawInContext:), @selector(DLdrawInContext:));
-        Swizzle(NSClassFromString(@"WebTiledLayer"), @selector(drawInContext:), @selector(DLdrawInContext:));
+        Swizzle(NSClassFromString(@"TileHostLayer"), @selector(renderInContext:), @selector(DLthreadSafeRenderInContext:));
+        Swizzle(NSClassFromString(@"WebLayer"), @selector(drawInContext:), @selector(DLthreadSafeDrawInContext:));
+        //        Swizzle(NSClassFromString(@"WebTiledLayer"), @selector(drawInContext:), @selector(DLthreadSafeDrawInContext2:));
+        
+#ifndef PRIVATE_FRAMEWORK
+        // Method swizzling to hide private views
+        Swizzle([CALayer class], @selector(renderInContext:), @selector(DLrenderInContext:));
+#endif
         
         // Method swizzling to automatically make secure UITextFields private views
         Swizzle([UITextField class], @selector(didMoveToSuperview), @selector(DLdidMoveToSuperview));
@@ -353,7 +359,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
     NSTimeInterval start = [[NSProcessInfo processInfo] systemUptime];
     lastScreenshotTime = start;
-        
+    self.screenshotThread = [NSThread currentThread];
+    
 #if PRIVATE_FRAMEWORK
     DLMobileFrameBufferVideoEncoder *surfaceEncoder = (DLMobileFrameBufferVideoEncoder *)self.videoEncoder;
     [surfaceEncoder encode];
