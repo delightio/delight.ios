@@ -90,20 +90,28 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     uint32_t height = (uint32_t) defaultSurfaceSize.height;
 
     // Create a BGRA surface that we will render the display to
-    int pitch = width * 4, allocSize = 4 * width * height;
+    int pitch = width * 4;
+    int allocSize = width * height * 4;
     int bPE = 4;
     char pixelFormat[4] = {'A', 'R', 'G', 'B'};
-    CFMutableDictionaryRef dict;
-    dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-                                     &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    CFNumberRef pitchRef, bPERef, widthRef, heightRef, pixelFormatRef, allocSizeRef;
+    CFMutableDictionaryRef dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+                                                            &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     CFDictionarySetValue(dict, @"IOSurfaceIsGlobal", kCFBooleanTrue);
-    CFDictionarySetValue(dict, @"IOSurfaceBytesPerRow", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &pitch));
-    CFDictionarySetValue(dict, @"IOSurfaceBytesPerElement", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &bPE));
-    CFDictionarySetValue(dict, @"IOSurfaceWidth", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &width));
-    CFDictionarySetValue(dict, @"IOSurfaceHeight", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &height));
-    CFDictionarySetValue(dict, @"IOSurfacePixelFormat", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, pixelFormat));
-    CFDictionarySetValue(dict, @"IOSurfaceAllocSize", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &allocSize));
+    CFDictionarySetValue(dict, @"IOSurfaceBytesPerRow", (pitchRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &pitch)));
+    CFDictionarySetValue(dict, @"IOSurfaceBytesPerElement", (bPERef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &bPE)));
+    CFDictionarySetValue(dict, @"IOSurfaceWidth", (widthRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &width)));
+    CFDictionarySetValue(dict, @"IOSurfaceHeight", (heightRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &height)));
+    CFDictionarySetValue(dict, @"IOSurfacePixelFormat", (pixelFormatRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, pixelFormat)));
+    CFDictionarySetValue(dict, @"IOSurfaceAllocSize", (allocSizeRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &allocSize)));
     bgraSurface = DLIOSurfaceCreate(dict);
+    
+    CFRelease(pitchRef);
+    CFRelease(bPERef);
+    CFRelease(widthRef);
+    CFRelease(heightRef);
+    CFRelease(pixelFormatRef);
+    CFRelease(allocSizeRef);
     
     [super setup];
 }
@@ -136,22 +144,30 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
         // We can encode the surface data directly
         CVPixelBufferRef pixelBuffer = NULL;
         CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, avAdaptor.pixelBufferPool, &pixelBuffer);
-        if (self.recording && ((pixelBuffer == NULL) || (status != kCVReturnSuccess))) {
+        
+        if (!self.recording) {
+            return;
+        } else if ((pixelBuffer == NULL) || (status != kCVReturnSuccess)) {
             DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
             return;
         }
         
         CVPixelBufferLockBaseAddress(pixelBuffer, 0);
         void *pixelBufferData = (void *) CVPixelBufferGetBaseAddress(pixelBuffer);
-        memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
         
-        if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
-            [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:videoScale];
+        [lock lock];
+        if (self.recording) {
+            memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
+            
+            if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
+                [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:videoScale];
+            }
+            
+            if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
+                DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
+            }
         }
-        
-        if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
-            DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
-        }
+        [lock unlock];
         
         CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
         CVPixelBufferRelease(pixelBuffer);

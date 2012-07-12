@@ -37,7 +37,8 @@ static CGFloat DistanceBetweenTwoPoints(CGPoint point1, CGPoint point2)
 
 - (id)initWithLocation:(CGPoint)location
 {
-    if ([self init]) {
+    self = [self init];
+    if (self) {
         [self addLocation:location];
     }
     return self;

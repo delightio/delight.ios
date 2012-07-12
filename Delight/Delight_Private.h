@@ -36,6 +36,7 @@ typedef enum {
 @property (nonatomic, assign) BOOL userStopped;
 @property (nonatomic, retain) NSMutableDictionary *userProperties;
 @property (nonatomic, retain) NSMutableArray *viewChanges;
+@property (nonatomic, assign) NSThread *screenshotThread;
 
 + (Delight *)sharedInstance;
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
