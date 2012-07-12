@@ -146,15 +146,20 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
         
         CVPixelBufferLockBaseAddress(pixelBuffer, 0);
         void *pixelBufferData = (void *) CVPixelBufferGetBaseAddress(pixelBuffer);
-        memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
         
-        if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
-            [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:videoScale];
+        [lock lock];
+        if (self.recording) {
+            memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
+            
+            if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
+                [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:videoScale];
+            }
+            
+            if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
+                DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
+            }
         }
-        
-        if (self.recording && ![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
-            DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
-        }
+        [lock unlock];
         
         CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
         CVPixelBufferRelease(pixelBuffer);
