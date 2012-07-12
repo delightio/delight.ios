@@ -90,20 +90,28 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     uint32_t height = (uint32_t) defaultSurfaceSize.height;
 
     // Create a BGRA surface that we will render the display to
-    int pitch = width * 4, allocSize = 4 * width * height;
+    int pitch = width * 4;
+    int allocSize = width * height * 4;
     int bPE = 4;
     char pixelFormat[4] = {'A', 'R', 'G', 'B'};
-    CFMutableDictionaryRef dict;
-    dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-                                     &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    CFNumberRef pitchRef, bPERef, widthRef, heightRef, pixelFormatRef, allocSizeRef;
+    CFMutableDictionaryRef dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+                                                            &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     CFDictionarySetValue(dict, @"IOSurfaceIsGlobal", kCFBooleanTrue);
-    CFDictionarySetValue(dict, @"IOSurfaceBytesPerRow", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &pitch));
-    CFDictionarySetValue(dict, @"IOSurfaceBytesPerElement", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &bPE));
-    CFDictionarySetValue(dict, @"IOSurfaceWidth", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &width));
-    CFDictionarySetValue(dict, @"IOSurfaceHeight", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &height));
-    CFDictionarySetValue(dict, @"IOSurfacePixelFormat", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, pixelFormat));
-    CFDictionarySetValue(dict, @"IOSurfaceAllocSize", CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &allocSize));
+    CFDictionarySetValue(dict, @"IOSurfaceBytesPerRow", (pitchRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &pitch)));
+    CFDictionarySetValue(dict, @"IOSurfaceBytesPerElement", (bPERef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &bPE)));
+    CFDictionarySetValue(dict, @"IOSurfaceWidth", (widthRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &width)));
+    CFDictionarySetValue(dict, @"IOSurfaceHeight", (heightRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &height)));
+    CFDictionarySetValue(dict, @"IOSurfacePixelFormat", (pixelFormatRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, pixelFormat)));
+    CFDictionarySetValue(dict, @"IOSurfaceAllocSize", (allocSizeRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &allocSize)));
     bgraSurface = DLIOSurfaceCreate(dict);
+    
+    CFRelease(pitchRef);
+    CFRelease(bPERef);
+    CFRelease(widthRef);
+    CFRelease(heightRef);
+    CFRelease(pixelFormatRef);
+    CFRelease(allocSizeRef);
     
     [super setup];
 }
