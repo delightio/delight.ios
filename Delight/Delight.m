@@ -315,7 +315,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         [self.videoEncoder stopRecording];
 
 		self.recordingContext.touches = self.gestureTracker.touches;
-        self.recordingContext.touchBounds = self.gestureTracker.touchView.bounds;
+        self.recordingContext.touchBounds = [self.gestureTracker touchBounds];
         self.recordingContext.orientationChanges = self.gestureTracker.orientationChanges;
     }
 }
