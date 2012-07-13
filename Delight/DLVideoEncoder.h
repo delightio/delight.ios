@@ -40,6 +40,7 @@
 - (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift scale:(CGFloat)scale;
 - (NSURL *)tempFileURL;
 - (CMTime)currentFrameTime;
+- (NSTimeInterval)currentFrameTimeInterval;
 - (UIImage *)resizedImageForPixelData:(void *)pixelData width:(int)backingWidth height:(int)backingHeight;
 
 @end

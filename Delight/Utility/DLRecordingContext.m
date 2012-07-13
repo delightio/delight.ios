@@ -18,7 +18,7 @@
 @synthesize touches = _touches;
 @synthesize touchBounds = _touchBounds;
 @synthesize orientationChanges = _orientationChanges;
-@synthesize viewChanges = _viewChanges;
+@synthesize viewSections = _viewSections;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize scaleFactor = _scaleFactor;
@@ -89,7 +89,7 @@
 	[_sourceFilePaths release];
 	[_touches release];
     [_orientationChanges release];
-    [_viewChanges release];
+    [_viewSections release];
 	[_startTime release];
 	[_endTime release];
     [_usabilityTestDescription release];

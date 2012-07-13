@@ -12,7 +12,7 @@
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
 #import "DLCamCaptureManager.h"
-#import "DLViewChange.h"
+#import "DLAnalytics.h"
 
 typedef enum {
     DLAnnotationNone,
@@ -29,18 +29,17 @@ typedef enum {
 @property (nonatomic, retain) DLGestureTracker *gestureTracker;
 @property (nonatomic, retain) DLCamCaptureManager *cameraManager;
 @property (nonatomic, retain) DLMetrics *metrics;
+@property (nonatomic, retain) DLAnalytics *analytics;
 @property (nonatomic, retain) NSString *appToken;
 @property (nonatomic, assign) DLAnnotation annotation;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL autoCaptureEnabled;
 @property (nonatomic, assign) BOOL userStopped;
 @property (nonatomic, retain) NSMutableDictionary *userProperties;
-@property (nonatomic, retain) NSMutableArray *viewChanges;
 @property (nonatomic, assign) NSThread *screenshotThread;
 
 + (Delight *)sharedInstance;
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-+ (void)markCurrentViewName:(NSString *)viewName type:(DLViewChangeType)type;
 
 - (void)startRecording;
 - (void)stopRecording;

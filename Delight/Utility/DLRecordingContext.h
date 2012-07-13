@@ -36,7 +36,7 @@ typedef enum {
 @property (nonatomic, retain) NSArray * touches;
 @property (nonatomic, assign) CGRect touchBounds;
 @property (nonatomic, retain) NSArray * orientationChanges;
-@property (nonatomic, retain) NSArray * viewChanges;
+@property (nonatomic, retain) NSArray * viewSections;
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic) float scaleFactor;

@@ -12,7 +12,7 @@
 #import "DLReachability.h"
 #import "DLTouch.h"
 #import "DLOrientationChange.h"
-#import "DLViewChange.h"
+#import "DLViewSection.h"
 #import <UIKit/UIKit.h>
 
 @interface DLTaskController (PrivateMethods)
@@ -25,7 +25,7 @@
 - (void)uploadSession:(DLRecordingContext *)aSession;
 - (void)archiveTouchesForSession:(DLRecordingContext *)aSession;
 - (void)archiveOrientationChangesForSession:(DLRecordingContext *)aSession;
-- (void)archiveViewChangesForSession:(DLRecordingContext *)aSession;
+- (void)archiveViewSectionsForSession:(DLRecordingContext *)aSession;
 - (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx;
 - (NSString *)orientationFilePathForSession:(DLRecordingContext *)ctx;
 - (NSString *)viewFilePathForSession:(DLRecordingContext *)ctx;
@@ -115,16 +115,16 @@
 	[pool release];
 }
 
-- (void)archiveViewChangesForSession:(DLRecordingContext *)aSession {
+- (void)archiveViewSectionsForSession:(DLRecordingContext *)aSession {
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	NSString * errStr = nil;
-	NSArray * allViewChanges = aSession.viewChanges;
+	NSArray * allViewSections = aSession.viewSections;
 	NSMutableDictionary * rootDict = [NSMutableDictionary dictionaryWithCapacity:3];
-	NSMutableArray * dictViewChanges = [NSMutableArray arrayWithCapacity:[allViewChanges count]];
-	for (DLViewChange * theViewChange in allViewChanges) {
-		[dictViewChanges addObject:[theViewChange dictionaryRepresentation]];
+	NSMutableArray * dictViewSections = [NSMutableArray arrayWithCapacity:[allViewSections count]];
+	for (DLViewSection * theViewSection in allViewSections) {
+		[dictViewSections addObject:[theViewSection dictionaryRepresentation]];
 	}
-	[rootDict setObject:dictViewChanges forKey:@"viewChanges"];
+	[rootDict setObject:dictViewSections forKey:@"viewSections"];
 	
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * orientationPath = [self viewFilePathForSession:aSession];
@@ -173,7 +173,7 @@
 			[self archiveTouchesForSession:aSession];
             [self archiveOrientationChangesForSession:aSession];
             if ([aSession shouldPostTrackForName:DLViewTrackKey]) {
-                [self archiveViewChangesForSession:aSession];
+                [self archiveViewSectionsForSession:aSession];
             }
 			// create tasks to upload
 			[self uploadSession:aSession];
@@ -184,7 +184,7 @@
 		[self archiveTouchesForSession:aSession];
         [self archiveOrientationChangesForSession:aSession];
         if ([aSession shouldPostTrackForName:DLViewTrackKey]) {
-            [self archiveViewChangesForSession:aSession];
+            [self archiveViewSectionsForSession:aSession];
         }
 	}
 }

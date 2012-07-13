@@ -1,5 +1,5 @@
 //
-//  UIViewController+DLViewChange.h
+//  UIViewController+DLViewSection.h
 //  Delight
 //
 //  Created by Chris Haugli on 7/10/12.
@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIViewController (DLViewChange)
+@interface UIViewController (DLViewSection)
 
 - (void)DLviewDidAppear:(BOOL)animated;
+- (void)DLviewWillDisappear:(BOOL)animated;
 
 @end

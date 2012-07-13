@@ -14,7 +14,7 @@
 #import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
-#import "UIViewController+DLViewChange.h"
+#import "UIViewController+DLViewSection.h"
 #import </usr/include/objc/objc-class.h>
 
 #if PRIVATE_FRAMEWORK
@@ -64,13 +64,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize gestureTracker = _gestureTracker;
 @synthesize cameraManager = _cameraManager;
 @synthesize metrics = _metrics;
+@synthesize analytics = _analytics;
 @synthesize appToken = _appToken;
 @synthesize annotation = _annotation;
 @synthesize scaleFactor = _scaleFactor;
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
 @synthesize userStopped = _userStopped;
 @synthesize userProperties = _userProperties;
-@synthesize viewChanges = _viewChanges;
 @synthesize screenshotThread = _screenshotThread;
 
 #pragma mark - Class methods
@@ -160,16 +160,19 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)markCurrentViewName:(NSString *)viewName
 {
-    [self markCurrentViewName:viewName type:DLViewChangeTypeUser];
-    DLLog(@"[Delight] Marked view: %@", viewName);
-}
-
-+ (void)markCurrentViewName:(NSString *)viewName type:(DLViewChangeType)type
-{
     Delight *delight = [Delight sharedInstance];
-    NSTimeInterval timeInSession = (delight.videoEncoder.recording ? [[NSProcessInfo processInfo] systemUptime] - delight.videoEncoder.recordingStartTime : 0.0f);
-    DLViewChange *sectionChange = [DLViewChange viewChangeWithName:viewName type:type timeInSession:timeInSession];
-    [delight.viewChanges addObject:sectionChange];    
+    NSTimeInterval startTime = [delight.videoEncoder currentFrameTimeInterval];
+    DLViewSection *lastViewSection = [delight.analytics lastViewSectionForType:DLViewSectionTypeUser];
+    DLViewSection *sectionChange = [DLViewSection viewSectionWithName:viewName type:DLViewSectionTypeUser startTime:startTime];
+
+    [delight.analytics addViewSection:sectionChange];
+    
+    // Set the end time for the last user-marked view
+    if (lastViewSection) {
+        lastViewSection.endTime = startTime;
+    }
+    
+    DLLog(@"[Delight] Marked view: %@", viewName);
 }
 
 #pragma mark -
@@ -232,8 +235,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         Swizzle([UITextField class], @selector(becomeFirstResponder), @selector(DLbecomeFirstResponder));
         Swizzle([UITextField class], @selector(resignFirstResponder), @selector(DLresignFirstResponder));
         
-        // Method swizzling to automatically mark UIViewController changes as new sections
+        // Method swizzling to automatically mark UIViewController changes in the view track
         Swizzle([UIViewController class], @selector(viewDidAppear:), @selector(DLviewDidAppear:));
+        Swizzle([UIViewController class], @selector(viewWillDisappear:), @selector(DLviewWillDisappear:));
     }
     return self;
 }
@@ -250,7 +254,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[_taskController release];
     [_metrics release];
     [_userProperties release];
-    [_viewChanges release];
+    [_analytics release];
 	[screenshotQueue release];
     
     [super dealloc];
@@ -318,7 +322,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         self.recordingContext.startTime = [NSDate date];
         self.recordingContext.screenFilePath = self.videoEncoder.outputPath;
-        self.viewChanges = [NSMutableArray array];
+        self.analytics = [[[DLAnalytics alloc] init] autorelease];
 
         if (self.autoCaptureEnabled) {
             [self scheduleScreenshot];
@@ -338,7 +342,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		self.recordingContext.touches = self.gestureTracker.touches;
         self.recordingContext.touchBounds = [self.gestureTracker touchBounds];
         self.recordingContext.orientationChanges = self.gestureTracker.orientationChanges;
-        self.recordingContext.viewChanges = self.viewChanges;
+        self.recordingContext.viewSections = self.analytics.viewSections;
+        self.analytics = nil;       // Stop tracking analytics data
     }
 }
 
