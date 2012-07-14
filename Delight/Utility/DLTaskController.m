@@ -12,7 +12,7 @@
 #import "DLReachability.h"
 #import "DLTouch.h"
 #import "DLOrientationChange.h"
-#import "DLViewSection.h"
+#import "DLViewInfo.h"
 #import <UIKit/UIKit.h>
 
 @interface DLTaskController (PrivateMethods)
@@ -25,10 +25,12 @@
 - (void)uploadSession:(DLRecordingContext *)aSession;
 - (void)archiveTouchesForSession:(DLRecordingContext *)aSession;
 - (void)archiveOrientationChangesForSession:(DLRecordingContext *)aSession;
-- (void)archiveViewSectionsForSession:(DLRecordingContext *)aSession;
+- (void)archiveViewInfoForSession:(DLRecordingContext *)aSession;
+- (void)archiveEventsForSession:(DLRecordingContext *)aSession;
 - (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx;
 - (NSString *)orientationFilePathForSession:(DLRecordingContext *)ctx;
 - (NSString *)viewFilePathForSession:(DLRecordingContext *)ctx;
+- (NSString *)eventFilePathForSession:(DLRecordingContext *)ctx;
 
 @end
 
@@ -115,22 +117,41 @@
 	[pool release];
 }
 
-- (void)archiveViewSectionsForSession:(DLRecordingContext *)aSession {
+- (void)archiveViewInfoForSession:(DLRecordingContext *)aSession {
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	NSString * errStr = nil;
-	NSArray * allViewSections = aSession.viewSections;
+	NSArray * allViewInfo = aSession.viewInfos;
 	NSMutableDictionary * rootDict = [NSMutableDictionary dictionaryWithCapacity:3];
-	NSMutableArray * dictViewSections = [NSMutableArray arrayWithCapacity:[allViewSections count]];
-	for (DLViewSection * theViewSection in allViewSections) {
-		[dictViewSections addObject:[theViewSection dictionaryRepresentation]];
+	NSMutableArray * dictViewInfo = [NSMutableArray arrayWithCapacity:[allViewInfo count]];
+	for (DLViewInfo * theViewInfo in allViewInfo) {
+		[dictViewInfo addObject:[theViewInfo dictionaryRepresentation]];
 	}
-	[rootDict setObject:dictViewSections forKey:@"viewSections"];
+	[rootDict setObject:dictViewInfo forKey:@"viewInfos"];
 	
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
-	NSString * orientationPath = [self viewFilePathForSession:aSession];
-	[theData writeToFile:orientationPath atomically:NO];
+	NSString * viewPath = [self viewFilePathForSession:aSession];
+	[theData writeToFile:viewPath atomically:NO];
 	// set file path
-	[aSession.sourceFilePaths setObject:orientationPath forKey:DLViewTrackKey];
+	[aSession.sourceFilePaths setObject:viewPath forKey:DLViewTrackKey];
+	[pool release];
+}
+
+- (void)archiveEventInfoForSession:(DLRecordingContext *)aSession {
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	NSString * errStr = nil;
+	NSArray * allEvents = aSession.events;
+	NSMutableDictionary * rootDict = [NSMutableDictionary dictionaryWithCapacity:3];
+	NSMutableArray * dictEvent = [NSMutableArray arrayWithCapacity:[allEvents count]];
+	for (DLViewInfo * theEvent in allEvents) {
+		[dictEvent addObject:[theEvent dictionaryRepresentation]];
+	}
+	[rootDict setObject:dictEvent forKey:@"events"];
+	
+	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
+	NSString * eventPath = [self eventFilePathForSession:aSession];
+	[theData writeToFile:eventPath atomically:NO];
+	// set file path
+	[aSession.sourceFilePaths setObject:eventPath forKey:DLEventTrackKey];
 	[pool release];
 }
 
@@ -173,7 +194,10 @@
 			[self archiveTouchesForSession:aSession];
             [self archiveOrientationChangesForSession:aSession];
             if ([aSession shouldPostTrackForName:DLViewTrackKey]) {
-                [self archiveViewSectionsForSession:aSession];
+                [self archiveViewInfoForSession:aSession];
+            }
+            if ([aSession shouldPostTrackForName:DLEventTrackKey]) {
+                [self archiveEventsForSession:aSession];
             }
 			// create tasks to upload
 			[self uploadSession:aSession];
@@ -184,7 +208,10 @@
 		[self archiveTouchesForSession:aSession];
         [self archiveOrientationChangesForSession:aSession];
         if ([aSession shouldPostTrackForName:DLViewTrackKey]) {
-            [self archiveViewSectionsForSession:aSession];
+            [self archiveViewInfoForSession:aSession];
+        }
+        if ([aSession shouldPostTrackForName:DLEventTrackKey]) {
+            [self archiveEventsForSession:aSession];
         }
 	}
 }
@@ -238,6 +265,10 @@
 
 - (NSString *)viewFilePathForSession:(DLRecordingContext *)ctx {
     return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"view-%@.plist", ctx.sessionID]];
+}
+
+- (NSString *)eventFilePathForSession:(DLRecordingContext *)ctx {
+    return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"events-%@.plist", ctx.sessionID]];
 }
 
 - (void)removeRecordingContext:(DLRecordingContext *)ctx {

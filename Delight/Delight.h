@@ -98,7 +98,14 @@
   
  @param viewName The name of the current view.
  */
-+ (void)markCurrentViewName:(NSString *)viewName;
++ (void)markCurrentView:(NSString *)viewName;
+
+/** Tracks an event.
+ 
+ @param eventName The name of the event.
+ @param eventInfo A dictionary of additional information to track with the event (optional).
+ */
++ (void)trackEvent:(NSString *)eventName info:(NSDictionary *)eventInfo;
 
 /**---------------------------------------------------------------------------------------
  * @name Debugging

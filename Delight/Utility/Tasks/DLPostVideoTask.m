@@ -47,6 +47,8 @@
 		[self.recordingContext setTaskFinished:DLFinishedPostFrontCamera];
 	} else if ( [_trackName isEqualToString:@"view_track"] ) {
         [self.recordingContext setTaskFinished:DLFinishedPostView];
+    } else if ( [_trackName isEqualToString:@"event_track"] ) {
+        [self.recordingContext setTaskFinished:DLFinishedPostEvents];
     }
 	if ( [self.recordingContext allTasksFinished] ) {
 		DLLog(@"[Delight] recording uploaded, session: %@", self.recordingContext.sessionID);

@@ -14,7 +14,7 @@
 #import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
-#import "UIViewController+DLViewSection.h"
+#import "UIViewController+DLViewInfo.h"
 #import </usr/include/objc/objc-class.h>
 
 #if PRIVATE_FRAMEWORK
@@ -158,21 +158,27 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
-+ (void)markCurrentViewName:(NSString *)viewName
++ (void)markCurrentView:(NSString *)viewName
 {
     Delight *delight = [Delight sharedInstance];
     NSTimeInterval startTime = [delight.videoEncoder currentFrameTimeInterval];
-    DLViewSection *lastViewSection = [delight.analytics lastViewSectionForType:DLViewSectionTypeUser];
-    DLViewSection *sectionChange = [DLViewSection viewSectionWithName:viewName type:DLViewSectionTypeUser startTime:startTime];
+    DLViewInfo *lastViewInfo = [delight.analytics lastViewInfoForType:DLViewInfoTypeUser];
+    DLViewInfo *sectionChange = [DLViewInfo viewInfoWithName:viewName type:DLViewInfoTypeUser startTime:startTime];
 
-    [delight.analytics addViewSection:sectionChange];
+    [delight.analytics addViewInfo:sectionChange];
     
     // Set the end time for the last user-marked view
-    if (lastViewSection) {
-        lastViewSection.endTime = startTime;
+    if (lastViewInfo) {
+        lastViewInfo.endTime = startTime;
     }
     
     DLLog(@"[Delight] Marked view: %@", viewName);
+}
+
++ (void)trackEvent:(NSString *)eventName info:(NSDictionary *)eventInfo
+{
+    DLEvent *event = [DLEvent eventWithName:eventName properties:eventInfo];
+    [[Delight sharedInstance].analytics addEvent:event];
 }
 
 #pragma mark -
@@ -342,7 +348,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		self.recordingContext.touches = self.gestureTracker.touches;
         self.recordingContext.touchBounds = [self.gestureTracker touchBounds];
         self.recordingContext.orientationChanges = self.gestureTracker.orientationChanges;
-        self.recordingContext.viewSections = self.analytics.viewSections;
+        self.recordingContext.viewInfos = self.analytics.viewInfos;
+        self.recordingContext.events = self.analytics.events;
         self.analytics = nil;       // Stop tracking analytics data
     }
 }

@@ -1,36 +1,36 @@
 //
-//  DLViewSection.m
+//  DLViewInfo.m
 //  Delight
 //
 //  Created by Chris Haugli on 7/10/12.
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "DLViewSection.h"
+#import "DLViewInfo.h"
 
-@implementation DLViewSection
+@implementation DLViewInfo
 
 @synthesize name = _name;
 @synthesize type = _type;
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 
-+ (id)viewSectionWithName:(NSString *)name type:(DLViewSectionType)type startTime:(NSTimeInterval)startTime
++ (id)viewInfoWithName:(NSString *)name type:(DLViewInfoType)type startTime:(NSTimeInterval)startTime
 {
     return [[[self alloc] initWithName:name type:type startTime:startTime] autorelease];
 }
 
-+ (NSString *)stringForType:(DLViewSectionType)type
++ (NSString *)stringForType:(DLViewInfoType)type
 {
     switch (type) {
-        case DLViewSectionTypeViewController:   return @"vc";
-        case DLViewSectionTypeUser:             return @"user";
+        case DLViewInfoTypeViewController:   return @"vc";
+        case DLViewInfoTypeUser:             return @"user";
     }
     
     return nil;
 }
 
-- (id)initWithName:(NSString *)name type:(DLViewSectionType)type startTime:(NSTimeInterval)startTime
+- (id)initWithName:(NSString *)name type:(DLViewInfoType)type startTime:(NSTimeInterval)startTime
 {
     self = [super init];
     if (self) {
@@ -52,7 +52,7 @@
 {
 	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         _name, @"name",
-                                        [DLViewSection stringForType:_type], @"type",
+                                        [DLViewInfo stringForType:_type], @"type",
                                         [NSNumber numberWithDouble:_startTime], @"startTime", nil];
     if (_endTime >= 0) {
         [dictionary setObject:[NSNumber numberWithDouble:_endTime] forKey:@"endTime"];

@@ -7,71 +7,85 @@
 //
 
 #import "DLAnalytics.h"
-#import "DLViewSection.h"
+#import "DLViewInfo.h"
 
 @interface DLAnalytics ()
-- (void)updateDictionariesForViewSection:(DLViewSection *)viewSection;
+- (void)updateDictionariesForViewInfo:(DLViewInfo *)viewInfo;
 @end
 
 @implementation DLAnalytics {
-    NSMutableArray *viewSections;
-    NSMutableDictionary *lastViewSectionForNameDict;
-    NSMutableDictionary *lastViewSectionForTypeDict;
+    NSMutableArray *viewInfos;
+    NSMutableDictionary *lastViewInfoForNameDict;
+    NSMutableDictionary *lastViewInfoForTypeDict;
+    
+    NSMutableArray *events;
 }
 
 - (id)init
 {
     self = [super init];
     if (self) {
-        viewSections = [[NSMutableArray alloc] init];
-        lastViewSectionForNameDict = [[NSMutableDictionary alloc] init];
-        lastViewSectionForTypeDict = [[NSMutableDictionary alloc] init];
+        viewInfos = [[NSMutableArray alloc] init];
+        lastViewInfoForNameDict = [[NSMutableDictionary alloc] init];
+        lastViewInfoForTypeDict = [[NSMutableDictionary alloc] init];
+        events = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    [viewSections release];
-    [lastViewSectionForNameDict release];
-    [lastViewSectionForTypeDict release];
+    [viewInfos release];
+    [lastViewInfoForNameDict release];
+    [lastViewInfoForTypeDict release];
+    [events release];
     
     [super dealloc];
 }
 
-- (NSArray *)viewSections
+- (NSArray *)viewInfos
 {
-    return viewSections;
+    return viewInfos;
 }
 
-- (void)addViewSection:(DLViewSection *)viewSection
+- (NSArray *)events
 {
-    [viewSections addObject:viewSection];
-    [self updateDictionariesForViewSection:viewSection];
+    return events;
 }
 
-- (void)insertViewSection:(DLViewSection *)viewSection atIndex:(NSUInteger)index
+- (void)addViewInfo:(DLViewInfo *)viewInfo
 {
-    [viewSections insertObject:viewSection atIndex:index];
-    [self updateDictionariesForViewSection:viewSection];
+    [viewInfos addObject:viewInfo];
+    [self updateDictionariesForViewInfo:viewInfo];
 }
 
-- (DLViewSection *)lastViewSectionForName:(NSString *)name
+- (void)insertViewInfo:(DLViewInfo *)viewInfo atIndex:(NSUInteger)index
 {
-    return [lastViewSectionForNameDict objectForKey:name];
+    [viewInfos insertObject:viewInfo atIndex:index];
+    [self updateDictionariesForViewInfo:viewInfo];
 }
 
-- (DLViewSection *)lastViewSectionForType:(DLViewSectionType)type
+- (DLViewInfo *)lastViewInfoForName:(NSString *)name
 {
-    return [lastViewSectionForTypeDict objectForKey:[NSNumber numberWithInt:type]];
+    return [lastViewInfoForNameDict objectForKey:name];
+}
+
+- (DLViewInfo *)lastViewInfoForType:(DLViewInfoType)type
+{
+    return [lastViewInfoForTypeDict objectForKey:[NSNumber numberWithInt:type]];
+}
+
+- (void)addEvent:(DLEvent *)event
+{
+    [events addObject:event];
 }
 
 #pragma mark - Private methods
 
-- (void)updateDictionariesForViewSection:(DLViewSection *)viewSection
+- (void)updateDictionariesForViewInfo:(DLViewInfo *)viewInfo
 {
-    [lastViewSectionForNameDict setObject:viewSection forKey:viewSection.name];
-    [lastViewSectionForTypeDict setObject:viewSection forKey:[NSNumber numberWithInt:viewSection.type]];
+    [lastViewInfoForNameDict setObject:viewInfo forKey:viewInfo.name];
+    [lastViewInfoForTypeDict setObject:viewInfo forKey:[NSNumber numberWithInt:viewInfo.type]];
 }
 
 @end

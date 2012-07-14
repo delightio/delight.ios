@@ -72,6 +72,8 @@
 		[self.recordingContext setTaskFinished:DLFinishedUploadFrontCameraFile];
 	} else if ( [_trackName isEqualToString:@"view_track"] ) {
     	[self.recordingContext setTaskFinished:DLFinishedUploadViewFile];    
+    } else if ( [_trackName isEqualToString:@"event_track"] ) {
+    	[self.recordingContext setTaskFinished:DLFinishedUploadEventFile];
     }
     
 	DLDebugLog(@"uploaded %@ to server", _trackName);

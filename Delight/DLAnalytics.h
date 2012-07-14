@@ -7,15 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DLViewSection.h"
+#import "DLViewInfo.h"
+#import "DLEvent.h"
 
 @interface DLAnalytics : NSObject
 
-@property (nonatomic, readonly) NSArray *viewSections;
+@property (nonatomic, readonly) NSArray *viewInfos;
+@property (nonatomic, readonly) NSArray *events;
 
-- (void)addViewSection:(DLViewSection *)viewSection;
-- (void)insertViewSection:(DLViewSection *)viewSection atIndex:(NSUInteger)index;
-- (DLViewSection *)lastViewSectionForName:(NSString *)name;
-- (DLViewSection *)lastViewSectionForType:(DLViewSectionType)type;
+- (void)addViewInfo:(DLViewInfo *)viewInfo;
+- (void)insertViewInfo:(DLViewInfo *)viewInfo atIndex:(NSUInteger)index;
+- (DLViewInfo *)lastViewInfoForName:(NSString *)name;
+- (DLViewInfo *)lastViewInfoForType:(DLViewInfoType)type;
+- (void)addEvent:(DLEvent *)event;
 
 @end

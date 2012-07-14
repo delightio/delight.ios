@@ -18,7 +18,8 @@
 @synthesize touches = _touches;
 @synthesize touchBounds = _touchBounds;
 @synthesize orientationChanges = _orientationChanges;
-@synthesize viewSections = _viewSections;
+@synthesize viewInfos = _viewInfos;
+@synthesize events = _events;
 @synthesize shouldRecordVideo = _shouldRecordVideo;
 @synthesize wifiUploadOnly = _wifiUploadOnly;
 @synthesize scaleFactor = _scaleFactor;
@@ -89,7 +90,8 @@
 	[_sourceFilePaths release];
 	[_touches release];
     [_orientationChanges release];
-    [_viewSections release];
+    [_viewInfos release];
+    [_events release];
 	[_startTime release];
 	[_endTime release];
     [_usabilityTestDescription release];
@@ -137,7 +139,8 @@
 	([trkName isEqualToString:DLTouchTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostTouches] ) ||
 	([trkName isEqualToString:DLOrientationTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostOrientation] ) ||
 	([trkName isEqualToString:DLFrontTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostFrontCamera] ) ||
-    ([trkName isEqualToString:DLViewTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostView] );
+    ([trkName isEqualToString:DLViewTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostView] ) ||
+    ([trkName isEqualToString:DLEventTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedPostEvents] );
 }
 
 - (BOOL)shouldUploadFileForTrackName:(NSString *)trkName {
@@ -145,7 +148,8 @@
 	([trkName isEqualToString:DLTouchTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadTouchesFile] ) ||
 	([trkName isEqualToString:DLOrientationTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadOrientationFile] ) ||
 	([trkName isEqualToString:DLFrontTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadFrontCameraFile] ) ||
-    ([trkName isEqualToString:DLViewTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadViewFile] );
+    ([trkName isEqualToString:DLViewTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadViewFile] ) ||
+    ([trkName isEqualToString:DLEventTrackKey] && [_finishedTaskIndex containsIndex:DLFinishedUploadEventFile] );
 }
 
 - (BOOL)allTasksFinished {
@@ -180,6 +184,10 @@
                 [_sourceFilePaths removeObjectForKey:DLViewTrackKey];
                 break;
                 
+            case DLFinishedPostEvents:
+                [_sourceFilePaths removeObjectForKey:DLEventTrackKey];
+                break;
+                
 			default:
 				break;
 		}
@@ -205,8 +213,13 @@
 			}
             if ( [_sourceFilePaths objectForKey:DLViewTrackKey] ) {
                 [_finishedTaskIndex addIndex:DLFinishedUploadViewFile];
-                [_finishedTaskIndex addIndex:DLFinishedPostView];                
+                [_finishedTaskIndex addIndex:DLFinishedPostView];
             }
+            if ( [_sourceFilePaths objectForKey:DLEventTrackKey] ) {
+                [_finishedTaskIndex addIndex:DLFinishedUploadEventFile];
+                [_finishedTaskIndex addIndex:DLFinishedPostEvents];
+            }
+
 		} else {
 			// only upload the info
 			[_finishedTaskIndex addIndex:DLFinishedUpdateSession];
@@ -222,7 +235,7 @@
 
 - (void)setScreenFilePath:(NSString *)aPath {
 	if ( _sourceFilePaths == nil ) {
-		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:5];
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:6];
 	}
 	[_sourceFilePaths setObject:aPath forKey:DLScreenTrackKey];
 }
@@ -233,7 +246,7 @@
 
 - (void)setCameraFilePath:(NSString *)aPath {
 	if ( _sourceFilePaths == nil ) {
-		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:5];
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:6];
 	}
 	[_finishedTaskIndex addIndex:DLFinishedUploadFrontCameraFile];
 	[_sourceFilePaths setObject:aPath forKey:DLFrontTrackKey];
@@ -245,7 +258,7 @@
 
 - (void)setTouchFilePath:(NSString *)aPath {
 	if ( _sourceFilePaths == nil ) {
-		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:5];
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:6];
 	}
 	[_sourceFilePaths setObject:aPath forKey:DLTouchTrackKey];
 }
@@ -256,7 +269,7 @@
 
 - (void)setOrientationFilePath:(NSString *)aPath {
 	if ( _sourceFilePaths == nil ) {
-		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:5];
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:6];
 	}
 	[_finishedTaskIndex addIndex:DLFinishedUploadOrientationFile];
 	[_sourceFilePaths setObject:aPath forKey:DLOrientationTrackKey];
@@ -268,11 +281,22 @@
 
 - (void)setViewFilePath:(NSString *)aPath {
 	if ( _sourceFilePaths == nil ) {
-		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:5];
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:6];
 	}
 	[_finishedTaskIndex addIndex:DLFinishedUploadViewFile];
 	[_sourceFilePaths setObject:aPath forKey:DLViewTrackKey];
 }
 
+- (NSString *)eventFilePath {
+	return [_sourceFilePaths objectForKey:DLEventTrackKey];
+}
+
+- (void)setEventFilePath:(NSString *)aPath {
+	if ( _sourceFilePaths == nil ) {
+		_sourceFilePaths = [[NSMutableDictionary alloc] initWithCapacity:6];
+	}
+	[_finishedTaskIndex addIndex:DLFinishedUploadEventFile];
+	[_sourceFilePaths setObject:aPath forKey:DLEventTrackKey];
+}
 
 @end
