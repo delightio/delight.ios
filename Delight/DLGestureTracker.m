@@ -393,7 +393,7 @@
             // If there's a transform property set, apply it
             if (!CGAffineTransformEqualToTransform(transform, CGAffineTransformIdentity)) {
                 location = CGPointApplyAffineTransform(location, transform);
-                previousLocation = CGPointApplyAffineTransform(location, transform);
+                previousLocation = CGPointApplyAffineTransform(previousLocation, transform);
                 if (touchIsInPrivateView) {
                     privateViewFrame = CGRectApplyAffineTransform(privateViewFrame, transform);
                 }
