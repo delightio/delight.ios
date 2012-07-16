@@ -16,7 +16,7 @@
 - (void)drawLabelCenteredAt:(CGPoint)point inWindow:(UIWindow *)window inContext:(CGContextRef)context 
                        text:(NSString *)text textColor:(UIColor *)textColor backgroundColor:(UIColor *)backgroundColor 
                    fontSize:(CGFloat)fontSize transform:(CGAffineTransform)transform;
-- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset;
+- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform;
 - (void)hideKeyboardWindow:(UIWindow *)window inContext:(CGContextRef)context;
 - (void)writeImageToPNG:(UIImage *)image;
 @end
@@ -199,12 +199,12 @@
     }
 }
 
-- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+- (void)blackOutPrivateViewsInPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform
 {
     // Black out private views directly in the pixel buffer
     for (NSDictionary *frameDict in lockedPrivateViewFrames) {
         CGRect frame = [[frameDict objectForKey:@"frame"] CGRectValue];
-        [self blackOutPrivateFrame:frame inPixelBuffer:pixelBuffer transform:transform transformOffset:transformOffset];
+        [self blackOutPrivateFrame:frame inPixelBuffer:pixelBuffer transform:transform];
     }
 }
 
@@ -289,12 +289,10 @@
     [labelSuperview release];    
 }
 
-- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform transformOffset:(CGPoint)transformOffset
+- (void)blackOutPrivateFrame:(CGRect)frame inPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform
 {
     CGFloat scale = [[UIScreen mainScreen] scale];
     CGRect frameInBuffer = CGRectApplyAffineTransform(frame, transform);
-    frameInBuffer.origin.x += transformOffset.x;
-    frameInBuffer.origin.y += transformOffset.y;
     frameInBuffer.origin.x *= scale;
     frameInBuffer.origin.y *= scale;
     frameInBuffer.size.width *= scale;

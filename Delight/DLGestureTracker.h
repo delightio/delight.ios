@@ -37,7 +37,6 @@
 - (void)startRecordingGesturesWithStartUptime:(NSTimeInterval)aStartTime;
 - (void)stopRecordingGestures;
 - (CGRect)touchBounds;
-- (CGPoint)transformOffset;
 - (UIImage *)drawPendingTouchMarksOnImage:(UIImage *)image;
 
 @end
