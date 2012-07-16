@@ -136,7 +136,7 @@
 	[pool release];
 }
 
-- (void)archiveEventInfoForSession:(DLRecordingContext *)aSession {
+- (void)archiveEventsForSession:(DLRecordingContext *)aSession {
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	NSString * errStr = nil;
 	NSArray * allEvents = aSession.events;
@@ -193,12 +193,9 @@
 			// save file touches file from session
 			[self archiveTouchesForSession:aSession];
             [self archiveOrientationChangesForSession:aSession];
-            if ([aSession shouldPostTrackForName:DLViewTrackKey]) {
-                [self archiveViewInfoForSession:aSession];
-            }
-            if ([aSession shouldPostTrackForName:DLEventTrackKey]) {
-                [self archiveEventsForSession:aSession];
-            }
+            [self archiveViewInfoForSession:aSession];
+            [self archiveEventsForSession:aSession];
+            
 			// create tasks to upload
 			[self uploadSession:aSession];
 			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];
