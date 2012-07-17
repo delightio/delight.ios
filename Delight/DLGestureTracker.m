@@ -147,17 +147,12 @@
 #else
         CGFloat rotation = M_PI_2;
 #endif
-        transform = CGAffineTransformMakeRotation(rotation);
+        CGRect transformedBounds = CGRectApplyAffineTransform(self.touchView.bounds, CGAffineTransformMakeRotation(rotation));
+        transform = CGAffineTransformMakeTranslation(-transformedBounds.origin.x, -transformedBounds.origin.y);
+        transform = CGAffineTransformRotate(transform, rotation);
     } else {
         transform = CGAffineTransformIdentity;
     }
-}
-
-- (CGPoint)transformOffset
-{
-    CGRect transformedBounds = CGRectApplyAffineTransform(self.touchView.bounds, transform);
-    CGPoint transformOffset = CGPointMake(-transformedBounds.origin.x, -transformedBounds.origin.y);
-    return transformOffset;
 }
 
 #pragma mark - Private methods
@@ -392,22 +387,19 @@
         for (UITouch *touch in [event allTouches]) {
 			CGRect privateViewFrame;
 			CGPoint location = [touch locationInView:touchView];
+            CGPoint previousLocation = [touch previousLocationInView:touchView];
             BOOL touchIsInPrivateView = [delegate gestureTracker:self locationIsPrivate:location inView:touchView privateViewFrame:&privateViewFrame];
 
-            // If there's a transform property set, apply it. Add an offset to keep the origin at (0, 0).
+            // If there's a transform property set, apply it
             if (!CGAffineTransformEqualToTransform(transform, CGAffineTransformIdentity)) {
-                CGPoint transformOffset = [self transformOffset];
                 location = CGPointApplyAffineTransform(location, transform);
-                location.x += transformOffset.x;
-                location.y += transformOffset.y;
+                previousLocation = CGPointApplyAffineTransform(previousLocation, transform);
                 if (touchIsInPrivateView) {
                     privateViewFrame = CGRectApplyAffineTransform(privateViewFrame, transform);
-                    privateViewFrame.origin.x += transformOffset.x;
-                    privateViewFrame.origin.y += transformOffset.y;
                 }
             }
             
-            DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:[touch previousLocationInView:touchView] phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView privateViewFrame:privateViewFrame];
+            DLTouch *ourTouch = [[DLTouch alloc] initWithSequence:eventSequenceLog location:location previousLocation:previousLocation phase:touch.phase tapCount:touch.tapCount timeInSession:touch.timestamp - startTime inPrivateView:touchIsInPrivateView privateViewFrame:privateViewFrame];
             [touches addObject:ourTouch];
             [ourTouch release];            
         }

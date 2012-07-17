@@ -628,8 +628,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     if (![videoEncoder isKindOfClass:[DLUIKitVideoEncoder class]]) {
         // Black out private views before encoding
         CGAffineTransform transform = CGAffineTransformScale(self.gestureTracker.transform, scale, scale);
-        CGPoint offset = CGPointApplyAffineTransform([self.gestureTracker transformOffset], CGAffineTransformMakeScale(scale, scale));
-        [self.screenshotController blackOutPrivateViewsInPixelBuffer:pixelBuffer transform:transform transformOffset:offset];
+        [self.screenshotController blackOutPrivateViewsInPixelBuffer:pixelBuffer transform:transform];
     }
 }
 
