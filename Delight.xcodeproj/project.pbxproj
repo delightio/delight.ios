@@ -76,6 +76,7 @@
 		838187011563156400608514 /* UITextField+DLPrivateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 838186FF1563156400608514 /* UITextField+DLPrivateView.m */; };
 		8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */; };
 		8382935F1558A04F007C6CDA /* CALayer+DLThreadSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */; };
+		8382C6D515B7424400291B32 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8382C6CE15B73B5200291B32 /* CoreImage.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8385CA7F154768530057FC37 /* DLTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA7D154768530057FC37 /* DLTouch.h */; };
 		8385CA80154768530057FC37 /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
 		8385CA831547688E0057FC37 /* DLOrientationChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA811547688D0057FC37 /* DLOrientationChange.h */; };
@@ -136,6 +137,7 @@
 		83827A541538BD82002EA080 /* DLGesture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGesture.m; sourceTree = "<group>"; };
 		8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+DLThreadSafe.h"; sourceTree = "<group>"; };
 		8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+DLThreadSafe.m"; sourceTree = "<group>"; };
+		8382C6CE15B73B5200291B32 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		8385CA7D154768530057FC37 /* DLTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTouch.h; sourceTree = "<group>"; };
 		8385CA7E154768530057FC37 /* DLTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTouch.m; sourceTree = "<group>"; };
 		8385CA811547688D0057FC37 /* DLOrientationChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLOrientationChange.h; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				83559CDA15ABB60B0062E66A /* CoreVideo.framework in Frameworks */,
 				83559CDB15ABB60B0062E66A /* QuartzCore.framework in Frameworks */,
 				83559CDC15ABB60B0062E66A /* Foundation.framework in Frameworks */,
+				8382C6D515B7424400291B32 /* CoreImage.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +295,7 @@
 		83B8968414EAEC68006D93C2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8382C6CE15B73B5200291B32 /* CoreImage.framework */,
 				A980945E1542B221002B2BCE /* SystemConfiguration.framework */,
 				A9A9A3D715371A3E00B6E4AB /* UIKit.framework */,
 				83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */,
