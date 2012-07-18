@@ -131,6 +131,7 @@
 
 - (void)prepareSessionUpload:(DLRecordingContext *)aSession {
 	if ( aSession == nil ) return;
+	_containsIncompleteSessions = YES;
 	if ( ![aSession allRequiredTracksExist] ) {
 		// discard this session. don't upload it.
 		[aSession discardAllTracks];
@@ -148,8 +149,10 @@
 		}];
 		[self.queue addOperationWithBlock:^{
 			// save file touches file from session
-			[self archiveTouchesForSession:aSession];
-            [self archiveOrientationChangesForSession:aSession];
+			if ( aSession.shouldRecordVideo ) {
+				[self archiveTouchesForSession:aSession];
+				[self archiveOrientationChangesForSession:aSession];
+			}
 			// create tasks to upload
 			[self uploadSession:aSession];
 			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];
@@ -215,6 +218,7 @@
 		// if there's no more items, remove the archive file
 		if ( [_unfinishedContexts count] == 0 ) {
 			[[NSFileManager defaultManager] removeItemAtPath:[self unfinishedRecordingContextsArchiveFilePath] error:nil];
+			_containsIncompleteSessions = NO;
 		}
 	}
 }
