@@ -413,13 +413,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)tryCreateNewSession {
     self.userStopped = NO;
     
-#ifdef DL_OFFLINE_RECORDING
-    [self startRecording];
-#else
     if (!self.videoEncoder.recording) {
         [self.taskController requestSessionIDWithAppToken:self.appToken];
     }
-#endif
     
     [self.metrics reset];
 }
@@ -461,9 +457,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)handleDidEnterBackground:(NSNotification *)notification
 {
-#ifdef DL_OFFLINE_RECORDING
-    [self stopRecording];
-#else
 	if (self.recordingContext.shouldRecordVideo) {
 		[self stopRecording];
 	}
@@ -474,7 +467,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		delaySessionUploadForCamera = NO;
 		[self.taskController prepareSessionUpload:self.recordingContext];
 	}
-#endif
     
     appInBackground = YES;
 }
