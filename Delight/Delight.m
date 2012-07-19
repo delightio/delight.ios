@@ -535,7 +535,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)captureManager:(DLCamCaptureManager *)captureManager didFailWithError:(NSError *)error
 {
-    DLDebugLog(@"Camera recording failed: %@", error);
+    DLLog(@"[Delight] Camera recording failed: %@", error);
 }
 
 #pragma mark - DLGestureTrackerDelegate
