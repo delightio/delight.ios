@@ -130,7 +130,7 @@
 		836ABF261548D47400926A71 /* DLCamCaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamCaptureManager.m; sourceTree = "<group>"; };
 		836ABF271548D47400926A71 /* DLCamRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamRecorder.h; sourceTree = "<group>"; };
 		836ABF281548D47400926A71 /* DLCamRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamRecorder.m; sourceTree = "<group>"; };
-		8380098515A22A6F002E9133 /* Delight_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delight_Private.h; sourceTree = "<group>"; };
+		8380098515A22A6F002E9133 /* Delight_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delight_Internal.h; sourceTree = "<group>"; };
 		838186FE1563156400608514 /* UITextField+DLPrivateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+DLPrivateView.h"; sourceTree = "<group>"; };
 		838186FF1563156400608514 /* UITextField+DLPrivateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+DLPrivateView.m"; sourceTree = "<group>"; };
 		83827A531538BD81002EA080 /* DLGesture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGesture.h; sourceTree = "<group>"; };
@@ -317,7 +317,7 @@
 				83995A90158AC17B00A41326 /* Encoder */,
 				8385CA7B154768360057FC37 /* Gestures */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
-				8380098515A22A6F002E9133 /* Delight_Private.h */,
+				8380098515A22A6F002E9133 /* Delight_Internal.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
 				832D1DAC1589626D004F2BD6 /* DLConstants.h */,
 				83149B2615337E5C00003862 /* DLScreenshotController.h */,

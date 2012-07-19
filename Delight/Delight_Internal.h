@@ -1,5 +1,5 @@
 //
-//  Delight_Private.h
+//  Delight_Internal.h
 //  Delight
 //
 //  Created by Chris Haugli on 7/2/12.

@@ -6,8 +6,7 @@
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "Delight.h"
-#import "Delight_Private.h"
+#import "Delight_Internal.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "DLUIKitVideoEncoder.h"
