@@ -13,11 +13,7 @@
 #import "DLGestureTracker.h"
 #import "DLCamCaptureManager.h"
 
-typedef enum {
-    DLAnnotationNone,
-    DLAnnotationFrontVideoAndAudio,
-    DLAnnotationAudioOnly
-} DLAnnotation;
+#define DLAnnotationAudioOnly 99
 
 @interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 
@@ -38,8 +34,6 @@ typedef enum {
 @property (nonatomic, assign) NSThread *screenshotThread;
 
 + (Delight *)sharedInstance;
-+ (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-
 - (void)startRecording;
 - (void)stopRecording;
 - (void)takeScreenshot;
