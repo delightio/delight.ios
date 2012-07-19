@@ -90,6 +90,23 @@
 + (NSSet *)privateViews;
 
 /**---------------------------------------------------------------------------------------
+ * @name Controlling Uploads
+ * ---------------------------------------------------------------------------------------
+ */
+
+/** Sets whether the current recording should be automatically uploaded when the app gets sent to the background. By default, the recording will be uploaded. If this property is set to NO, the recording will not be uploaded.
+  
+ @param uploadsAutomatically YES if the current recording will be uploaded when the app gets sent to the background; otherwise, NO.
+ */
++ (void)setUploadsAutomatically:(BOOL)uploadsAutomatically;
+
+/** Returns a Boolean value indicating whether the current recording will be uploaded when the app gets sent to the background.
+ 
+ @return YES if the current recording will be uploaded when the app gets sent to the background; otherwise, NO.
+ */
++ (BOOL)uploadsAutomatically;
+
+/**---------------------------------------------------------------------------------------
  * @name Debugging
  * ---------------------------------------------------------------------------------------
  */

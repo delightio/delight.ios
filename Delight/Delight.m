@@ -67,6 +67,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize annotation = _annotation;
 @synthesize scaleFactor = _scaleFactor;
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
+@synthesize uploadsAutomatically = _uploadsAutomatically;
 @synthesize userStopped = _userStopped;
 @synthesize userProperties = _userProperties;
 @synthesize screenshotThread = _screenshotThread;
@@ -147,6 +148,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return [self sharedInstance].screenshotController.privateViews;
 }
 
++ (void)setUploadsAutomatically:(BOOL)uploadsAutomatically
+{
+    [self sharedInstance].uploadsAutomatically = uploadsAutomatically;
+}
+
++ (BOOL)uploadsAutomatically
+{
+    return [self sharedInstance].uploadsAutomatically;
+}
+
 + (void)setPropertyValue:(id)value forKey:(NSString *)key
 {
     if (![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSNumber class]]) {
@@ -179,10 +190,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         screenshotQueue.maxConcurrentOperationCount = 1;
         
         self.userProperties = [NSMutableDictionary dictionary];
-        self.metrics = [[[DLMetrics alloc] init] autorelease];
-        
-        [self setScaleFactor:kDLDefaultScaleFactor];
-        [self setAutoCaptureEnabled:YES];
+        self.metrics = [[[DLMetrics alloc] init] autorelease];        
+        self.scaleFactor = kDLDefaultScaleFactor;
+        self.autoCaptureEnabled = YES;
+        self.uploadsAutomatically = YES;
+
         maximumFrameRate = kDLDefaultMaximumFrameRate;
         maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
         
@@ -458,7 +470,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     self.recordingContext.endTime = [NSDate date];
 	self.recordingContext.userProperties = self.userProperties;
     self.recordingContext.metrics = self.metrics;
-	if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
+	if (self.uploadsAutomatically && (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop))) {
 		delaySessionUploadForCamera = NO;
 		[self.taskController prepareSessionUpload:self.recordingContext];
 	}
@@ -487,7 +499,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             self.recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
 			self.recordingContext.userProperties = self.userProperties;
             self.recordingContext.metrics = self.metrics;
-			if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
+			if (self.uploadsAutomatically && (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop))) {
 				delaySessionUploadForCamera = NO;
 				[self.taskController prepareSessionUpload:self.recordingContext];
 			}
@@ -524,7 +536,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
 {
 	cameraDidStop = YES;
-	if ( !delaySessionUploadForCamera ) {
+	if (self.uploadsAutomatically && !delaySessionUploadForCamera) {
 		[self.taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:self.recordingContext waitUntilDone:NO];
 	}
     DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
