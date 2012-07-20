@@ -462,9 +462,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     self.recordingContext.endTime = [NSDate date];
 	self.recordingContext.userProperties = self.userProperties;
     self.recordingContext.metrics = self.metrics;
-	if (self.uploadsAutomatically && (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop))) {
-		delaySessionUploadForCamera = NO;
-		[self.taskController prepareSessionUpload:self.recordingContext];
+	if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
+        if (self.uploadsAutomatically) {
+            delaySessionUploadForCamera = NO;
+            [self.taskController prepareSessionUpload:self.recordingContext];
+        } else {
+            [self.recordingContext discardAllTracks];
+        }
 	}
     
     appInBackground = YES;
@@ -490,9 +494,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             self.recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
 			self.recordingContext.userProperties = self.userProperties;
             self.recordingContext.metrics = self.metrics;
-			if (self.uploadsAutomatically && (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop))) {
-				delaySessionUploadForCamera = NO;
-				[self.taskController prepareSessionUpload:self.recordingContext];
+			if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
+                if (self.uploadsAutomatically) {
+                    delaySessionUploadForCamera = NO;
+                    [self.taskController prepareSessionUpload:self.recordingContext];
+                } else {
+                    [self.recordingContext discardAllTracks];
+                }
 			}
             [self tryCreateNewSession];
         }
@@ -527,8 +535,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
 {
 	cameraDidStop = YES;
-	if (self.uploadsAutomatically && !delaySessionUploadForCamera) {
-		[self.taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:self.recordingContext waitUntilDone:NO];
+	if (!delaySessionUploadForCamera) {
+        if (self.uploadsAutomatically) {
+            [self.taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:self.recordingContext waitUntilDone:NO];
+        } else {
+            [self.recordingContext discardAllTracks];
+        }
 	}
     DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
 }

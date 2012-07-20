@@ -117,7 +117,7 @@
 	if ( _sourceFilePaths == nil ) return;
 	NSFileManager * fm = [NSFileManager defaultManager];
 	for (NSString * fPath in _sourceFilePaths) {
-		[fm removeItemAtPath:fPath error:nil];
+		[fm removeItemAtPath:[_sourceFilePaths objectForKey:fPath] error:nil];
 	}
 	self.sourceFilePaths = nil;
 }
