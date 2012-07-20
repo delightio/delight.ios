@@ -46,6 +46,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSTimeInterval lastScreenshotTime;
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
+    BOOL alertViewVisible;
     NSOperationQueue *screenshotQueue;
     
     // Configuration
@@ -445,6 +446,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             alertView.tag = kDLAlertViewTagStartUsabilityTest;        
             [alertView show];
             [alertView release];
+            alertViewVisible = YES;
         }
 	} else {
 		// there's no need to record the session. Clean up video encoder?
@@ -456,27 +458,29 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)handleDidEnterBackground:(NSNotification *)notification
 {
-	if (self.recordingContext.shouldRecordVideo) {
-		[self stopRecording];
-	}
-    self.recordingContext.endTime = [NSDate date];
-	self.recordingContext.userProperties = self.userProperties;
-    self.recordingContext.metrics = self.metrics;
-	if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
-        if (self.uploadsAutomatically) {
-            delaySessionUploadForCamera = NO;
-            [self.taskController prepareSessionUpload:self.recordingContext];
-        } else {
-            [self.recordingContext discardAllTracks];
+    if (!alertViewVisible) {
+        if (self.recordingContext.shouldRecordVideo) {
+            [self stopRecording];
         }
-	}
+        self.recordingContext.endTime = [NSDate date];
+        self.recordingContext.userProperties = self.userProperties;
+        self.recordingContext.metrics = self.metrics;
+        if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
+            if (self.uploadsAutomatically) {
+                delaySessionUploadForCamera = NO;
+                [self.taskController prepareSessionUpload:self.recordingContext];
+            } else {
+                [self.recordingContext discardAllTracks];
+            }
+        }
+    }
     
     appInBackground = YES;
 }
 
 - (void)handleWillEnterForeground:(NSNotification *)notification
 {
-    if (!self.userStopped) {
+    if (!self.userStopped && !alertViewVisible) {
         [self tryCreateNewSession];
     }
 }
@@ -585,6 +589,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         default:
             break;
     }
+    
+    alertViewVisible = NO;
 }
 
 #pragma mark - DLVideoEncoderDelegate
