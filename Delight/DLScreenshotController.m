@@ -139,9 +139,10 @@
 - (void)unregisterPrivateView:(UIView *)view
 {
     if ([privateViews containsObject:view]) {
+        NSString *className = [[view class] description];
         objc_setAssociatedObject(view, "DLDescription", nil, OBJC_ASSOCIATION_RETAIN);
         [privateViews removeObject:view];
-        DLLog(@"[Delight] Unregistered private view: %@", [view class]);
+        DLLog(@"[Delight] Unregistered private view: %@", className);
     }
 }
 
