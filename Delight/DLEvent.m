@@ -12,18 +12,20 @@
 
 @synthesize name = _name;
 @synthesize properties = _properties;
+@synthesize time = _time;
 
-+ (id)eventWithName:(NSString *)name properties:(NSDictionary *)properties
++ (id)eventWithName:(NSString *)name properties:(NSDictionary *)properties at:(NSTimeInterval)time
 {
-    return [[[DLEvent alloc] initWithName:name properties:properties] autorelease];
+    return [[[DLEvent alloc] initWithName:name properties:properties at:time] autorelease];
 }
 
-- (id)initWithName:(NSString *)name properties:(NSDictionary *)properties
+- (id)initWithName:(NSString *)name properties:(NSDictionary *)properties at:(NSTimeInterval)time
 {
     self = [super init];
     if (self) {
         self.name = name;
         self.properties = properties;
+        self.time = time;
     }
     return self;
 }
@@ -40,6 +42,7 @@
 {
 	NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                        _name, @"name",
+                                       [NSNumber numberWithDouble:_time], @"time",
                                        _properties, @"properties", nil];    
     return dictionary;
 }

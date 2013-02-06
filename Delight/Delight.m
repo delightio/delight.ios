@@ -177,7 +177,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)trackEvent:(NSString *)eventName info:(NSDictionary *)eventInfo
 {
-    DLEvent *event = [DLEvent eventWithName:eventName properties:eventInfo];
+    Delight *delight = [Delight sharedInstance];
+    NSTimeInterval time = [delight.videoEncoder currentFrameTimeInterval];
+    DLEvent *event = [DLEvent eventWithName:eventName properties:eventInfo at:time];
     [[Delight sharedInstance].analytics addEvent:event];
 }
 

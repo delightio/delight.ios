@@ -12,9 +12,10 @@
 
 @property (nonatomic, retain) NSString *name;
 @property (nonatomic, retain) NSDictionary *properties;
+@property (nonatomic) NSTimeInterval time;
 
-+ (id)eventWithName:(NSString *)name properties:(NSDictionary *)properties;
-- (id)initWithName:(NSString *)name properties:(NSDictionary *)properties;
++ (id)eventWithName:(NSString *)name properties:(NSDictionary *)properties at:(NSTimeInterval)time;
+- (id)initWithName:(NSString *)name properties:(NSDictionary *)properties at:(NSTimeInterval)time;
 - (NSDictionary *)dictionaryRepresentation;
 
 @end
