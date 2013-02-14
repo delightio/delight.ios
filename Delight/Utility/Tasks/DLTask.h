@@ -24,6 +24,7 @@ extern NSString * const DLEventTrackKey;
 @class DLTaskController;
 
 extern NSString * const DL_BASE_URL;
+extern NSString * const DL_BASE_SCHEME;
 extern NSString * const DL_APP_LOCALE;
 
 @interface DLTask : NSOperation

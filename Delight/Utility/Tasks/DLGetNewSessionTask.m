@@ -35,7 +35,7 @@ NSString * const DLMaximumRecordingDurationElementName = @"maximum_duration";
 }
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"https://%@/%@s.xml", DL_BASE_URL, self.taskController.sessionObjectName];
+	NSString * urlStr = [NSString stringWithFormat:@"%@://%@/%@s.xml", DL_BASE_SCHEME, DL_BASE_URL, self.taskController.sessionObjectName];
 	// check build and version number
 	NSDictionary * dict = [[NSBundle mainBundle] infoDictionary];
 	NSString * buildVer = [dict objectForKey:(NSString *)kCFBundleVersionKey];

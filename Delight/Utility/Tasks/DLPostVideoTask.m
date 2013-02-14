@@ -19,7 +19,7 @@
 }
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"https://%@/%@s.xml", DL_BASE_URL, _trackName];
+	NSString * urlStr = [NSString stringWithFormat:@"%@://%@/%@s.xml", DL_BASE_SCHEME, DL_BASE_URL, _trackName];
 	// get the URL for the specified track
 	NSString * paramStr = [NSString stringWithFormat:@"%@[app_session_id]=%@", _trackName, self.recordingContext.sessionID];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
