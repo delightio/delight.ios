@@ -7,7 +7,7 @@
 //
 
 #import "UIViewController+DLViewInfo.h"
-#import "Delight_Private.h"
+#import "Delight_Internal.h"
 
 DL_MAKE_CATEGORIES_LOADABLE(UIViewController_DLViewInfo);
 

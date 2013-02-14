@@ -2,6 +2,19 @@ Delight Release Notes
 =====================
 ___
 
+2.3.1
+=====
+---
+
+* Fixed crash in unregisterPrivateView when the view had a refcount of 1.
+
+2.3
+===
+---
+
+* Added annotation mode - now possible to record the front camera in addition to the screen.
+* Added uploadsAutomatically property, which can be used to turn on/off uploading of recordings.
+
 2.2.2
 =====
 ---

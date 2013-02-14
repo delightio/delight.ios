@@ -92,6 +92,7 @@
 		8385118E15AF9C8D00CE2C0B /* DLAnalytics.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385118B15AF9C8D00CE2C0B /* DLAnalytics.h */; };
 		8385118F15AF9C8D00CE2C0B /* DLAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385118C15AF9C8D00CE2C0B /* DLAnalytics.m */; };
 		8385119015AF9C8D00CE2C0B /* DLAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385118C15AF9C8D00CE2C0B /* DLAnalytics.m */; };
+		8382C6D515B7424400291B32 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8382C6CE15B73B5200291B32 /* CoreImage.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8385CA7F154768530057FC37 /* DLTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA7D154768530057FC37 /* DLTouch.h */; };
 		8385CA80154768530057FC37 /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
 		8385CA831547688E0057FC37 /* DLOrientationChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA811547688D0057FC37 /* DLOrientationChange.h */; };
@@ -150,6 +151,7 @@
 		837D9CDC15ACBE6100704989 /* UIViewController+DLViewInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+DLViewInfo.h"; sourceTree = "<group>"; };
 		837D9CDD15ACBE6100704989 /* UIViewController+DLViewInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+DLViewInfo.m"; sourceTree = "<group>"; };
 		8380098515A22A6F002E9133 /* Delight_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delight_Private.h; sourceTree = "<group>"; };
+		8380098515A22A6F002E9133 /* Delight_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delight_Internal.h; sourceTree = "<group>"; };
 		838186FE1563156400608514 /* UITextField+DLPrivateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+DLPrivateView.h"; sourceTree = "<group>"; };
 		838186FF1563156400608514 /* UITextField+DLPrivateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+DLPrivateView.m"; sourceTree = "<group>"; };
 		83827A531538BD81002EA080 /* DLGesture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLGesture.h; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 		83847A8915B0FE33007AB04B /* DLEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLEvent.m; sourceTree = "<group>"; };
 		8385118B15AF9C8D00CE2C0B /* DLAnalytics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLAnalytics.h; sourceTree = "<group>"; };
 		8385118C15AF9C8D00CE2C0B /* DLAnalytics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLAnalytics.m; sourceTree = "<group>"; };
+		8382C6CE15B73B5200291B32 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		8385CA7D154768530057FC37 /* DLTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTouch.h; sourceTree = "<group>"; };
 		8385CA7E154768530057FC37 /* DLTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTouch.m; sourceTree = "<group>"; };
 		8385CA811547688D0057FC37 /* DLOrientationChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLOrientationChange.h; sourceTree = "<group>"; };
@@ -220,6 +223,7 @@
 				83559CDA15ABB60B0062E66A /* CoreVideo.framework in Frameworks */,
 				83559CDB15ABB60B0062E66A /* QuartzCore.framework in Frameworks */,
 				83559CDC15ABB60B0062E66A /* Foundation.framework in Frameworks */,
+				8382C6D515B7424400291B32 /* CoreImage.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,6 +335,7 @@
 		83B8968414EAEC68006D93C2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8382C6CE15B73B5200291B32 /* CoreImage.framework */,
 				A980945E1542B221002B2BCE /* SystemConfiguration.framework */,
 				A9A9A3D715371A3E00B6E4AB /* UIKit.framework */,
 				83B896AA14EAEFBF006D93C2 /* AVFoundation.framework */,
@@ -353,7 +358,7 @@
 				83995A90158AC17B00A41326 /* Encoder */,
 				8385CA7B154768360057FC37 /* Gestures */,
 				83B8969314EAECD6006D93C2 /* Delight.h */,
-				8380098515A22A6F002E9133 /* Delight_Private.h */,
+				8380098515A22A6F002E9133 /* Delight_Internal.h */,
 				83B8969414EAECD6006D93C2 /* Delight.m */,
 				832D1DAC1589626D004F2BD6 /* DLConstants.h */,
 				83149B2615337E5C00003862 /* DLScreenshotController.h */,

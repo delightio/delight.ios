@@ -155,14 +155,24 @@
 @implementation DLCamCaptureManager (InternalUtilityMethods)
 
 - (BOOL)setupSession
-{    
+{   
+#if TARGET_IPHONE_SIMULATOR
+    if (audioOnly) {
+        DLLog(@"[Delight] Microphone not available in simulator. Recording will not be uploaded.");
+    } else {
+        DLLog(@"[Delight] Camera not available in simulator. Recording will not be uploaded.");
+    }
+    return NO;
+#endif
+    
     AVCaptureDevice *cameraDevice = [self frontFacingCamera];
     AVCaptureDevice *audioDevice = [self audioDevice];
     
-    if (audioDevice && !cameraDevice && !audioOnly) {
-        DLLog(@"[Delight] No front-facing camera available. Only audio will be captured.");
-    } if (!cameraDevice && !audioDevice) {
-        DLLog(@"[Delight] No front-facing camera or microphone available.");
+    if (!cameraDevice && !audioOnly) {
+        DLLog(@"[Delight] No front-facing camera available. Recording will not be uploaded.");
+        return NO;
+    } else if (!audioDevice && audioOnly) {
+        DLLog(@"[Delight] No microphone available. Recording will not be uploaded.");
         return NO;
     }
     

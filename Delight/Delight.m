@@ -6,8 +6,7 @@
 //  Copyright (c) 2012 Pipely Inc. All rights reserved.
 //
 
-#import "Delight.h"
-#import "Delight_Private.h"
+#import "Delight_Internal.h"
 #import <QuartzCore/QuartzCore.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "DLUIKitVideoEncoder.h"
@@ -48,6 +47,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSTimeInterval lastScreenshotTime;
     NSTimeInterval resignActiveTime;
     BOOL appInBackground;
+    BOOL alertViewVisible;
     NSOperationQueue *screenshotQueue;
     
     // Configuration
@@ -69,6 +69,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize annotation = _annotation;
 @synthesize scaleFactor = _scaleFactor;
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
+@synthesize uploadsAutomatically = _uploadsAutomatically;
 @synthesize userStopped = _userStopped;
 @synthesize userProperties = _userProperties;
 @synthesize screenshotThread = _screenshotThread;
@@ -149,6 +150,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return [self sharedInstance].screenshotController.privateViews;
 }
 
++ (void)setUploadsAutomatically:(BOOL)uploadsAutomatically
+{
+    [self sharedInstance].uploadsAutomatically = uploadsAutomatically;
+}
+
++ (BOOL)uploadsAutomatically
+{
+    return [self sharedInstance].uploadsAutomatically;
+}
+
 + (void)setPropertyValue:(id)value forKey:(NSString *)key
 {
     if (![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSNumber class]]) {
@@ -206,10 +217,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         screenshotQueue.maxConcurrentOperationCount = 1;
         
         self.userProperties = [NSMutableDictionary dictionary];
-        self.metrics = [[[DLMetrics alloc] init] autorelease];
-        
-        [self setScaleFactor:kDLDefaultScaleFactor];
-        [self setAutoCaptureEnabled:YES];
+        self.metrics = [[[DLMetrics alloc] init] autorelease];        
+        self.scaleFactor = kDLDefaultScaleFactor;
+        self.autoCaptureEnabled = YES;
+        self.uploadsAutomatically = YES;
+
         maximumFrameRate = kDLDefaultMaximumFrameRate;
         maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
         
@@ -437,13 +449,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)tryCreateNewSession {
     self.userStopped = NO;
     
-#ifdef DL_OFFLINE_RECORDING
-    [self startRecording];
-#else
     if (!self.videoEncoder.recording) {
         [self.taskController requestSessionIDWithAppToken:self.appToken];
     }
-#endif
     
     [self.metrics reset];
 }
@@ -474,6 +482,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             alertView.tag = kDLAlertViewTagStartUsabilityTest;        
             [alertView show];
             [alertView release];
+            alertViewVisible = YES;
         }
 	} else {
 		// there's no need to record the session. Clean up video encoder?
@@ -485,27 +494,29 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)handleDidEnterBackground:(NSNotification *)notification
 {
-#ifdef DL_OFFLINE_RECORDING
-    [self stopRecording];
-#else
-	if (self.recordingContext.shouldRecordVideo) {
-		[self stopRecording];
-	}
-    self.recordingContext.endTime = [NSDate date];
-	self.recordingContext.userProperties = self.userProperties;
-    self.recordingContext.metrics = self.metrics;
-	if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
-		delaySessionUploadForCamera = NO;
-		[self.taskController prepareSessionUpload:self.recordingContext];
-	}
-#endif
+    if (!alertViewVisible) {
+        if (self.recordingContext.shouldRecordVideo) {
+            [self stopRecording];
+        }
+        self.recordingContext.endTime = [NSDate date];
+        self.recordingContext.userProperties = self.userProperties;
+        self.recordingContext.metrics = self.metrics;
+        if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
+            if (self.uploadsAutomatically) {
+                delaySessionUploadForCamera = NO;
+                [self.taskController prepareSessionUpload:self.recordingContext];
+            } else {
+                [self.recordingContext discardAllTracks];
+            }
+        }
+    }
     
     appInBackground = YES;
 }
 
 - (void)handleWillEnterForeground:(NSNotification *)notification
 {
-    if (!self.userStopped) {
+    if (!self.userStopped && !alertViewVisible) {
         [self tryCreateNewSession];
     }
 }
@@ -523,9 +534,13 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             self.recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
 			self.recordingContext.userProperties = self.userProperties;
             self.recordingContext.metrics = self.metrics;
-			if ( !delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop) ) {
-				delaySessionUploadForCamera = NO;
-				[self.taskController prepareSessionUpload:self.recordingContext];
+			if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
+                if (self.uploadsAutomatically) {
+                    delaySessionUploadForCamera = NO;
+                    [self.taskController prepareSessionUpload:self.recordingContext];
+                } else {
+                    [self.recordingContext discardAllTracks];
+                }
 			}
             [self tryCreateNewSession];
         }
@@ -560,15 +575,19 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)captureManagerRecordingFinished:(DLCamCaptureManager *)captureManager
 {
 	cameraDidStop = YES;
-	if ( !delaySessionUploadForCamera ) {
-		[self.taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:self.recordingContext waitUntilDone:NO];
+	if (!delaySessionUploadForCamera) {
+        if (self.uploadsAutomatically) {
+            [self.taskController performSelectorOnMainThread:@selector(prepareSessionUpload:) withObject:self.recordingContext waitUntilDone:NO];
+        } else {
+            [self.recordingContext discardAllTracks];
+        }
 	}
     DLDebugLog(@"Completed camera recording, file is stored at: %@", captureManager.outputPath);
 }
 
 - (void)captureManager:(DLCamCaptureManager *)captureManager didFailWithError:(NSError *)error
 {
-    DLDebugLog(@"Camera recording failed: %@", error);
+    DLLog(@"[Delight] Camera recording failed: %@", error);
 }
 
 #pragma mark - DLGestureTrackerDelegate
@@ -606,6 +625,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         default:
             break;
     }
+    
+    alertViewVisible = NO;
 }
 
 #pragma mark - DLVideoEncoderDelegate

@@ -10,11 +10,16 @@
 #import "IOMobileFramebuffer/IOMobileFramebuffer.h"
 #include <dlfcn.h>
 
+// Definitions for private methods
 #if TARGET_IPHONE_SIMULATOR
 CGImageRef UIGetScreenImage(void);
 #endif
 
 void CARenderServerRenderDisplay(int, NSString *, IOSurfaceRef, int, int);
+
+@interface CIImage ()
++ (CIImage *)imageWithIOSurface:(IOSurfaceRef)surface;
+@end
 
 // Dynamically-loaded functions
 static IOSurfaceRef (*DLIOSurfaceCreate)(CFDictionaryRef);
@@ -46,13 +51,25 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
         DLIOServiceGetMatchingService = dlsym(ioKitHandle, "IOServiceGetMatchingService");
         DLIOServiceMatching = dlsym(ioKitHandle, "IOServiceMatching");
         dlclose(ioKitHandle);
-
+        
         void *ioMobileFramebufferHandle = dlopen("/System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/IOMobileFramebuffer", RTLD_LAZY);
         DLIOMobileFramebufferOpen = dlsym(ioMobileFramebufferHandle, "IOMobileFramebufferOpen");
         DLIOMobileFramebufferGetLayerDefaultSurface = dlsym(ioMobileFramebufferHandle, "IOMobileFramebufferGetLayerDefaultSurface");
         dlclose(ioMobileFramebufferHandle);
+        
+        Class CIContextClass = NSClassFromString(@"CIContext");
+        imageContext = [[CIContextClass contextWithOptions:nil] retain];
+        colorSpace = CGColorSpaceCreateDeviceRGB();
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [imageContext release];
+    CGColorSpaceRelease(colorSpace);
+    
+    [super dealloc];
 }
 
 - (void)startNewRecording
@@ -88,7 +105,7 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     
     uint32_t width = (uint32_t) defaultSurfaceSize.width;
     uint32_t height = (uint32_t) defaultSurfaceSize.height;
-
+    
     // Create a BGRA surface that we will render the display to
     int pitch = width * 4;
     int allocSize = width * height * 4;
@@ -140,42 +157,44 @@ static IOMobileFramebufferReturn (*DLIOMobileFramebufferGetLayerDefaultSurface)(
     CARenderServerRenderDisplay(0, @"LCD", bgraSurface, 0, 0);
     void *frameBuffer = DLIOSurfaceGetBaseAddress(bgraSurface);
     
-    if (videoScale == 1.0) {
-        // We can encode the surface data directly
-        CVPixelBufferRef pixelBuffer = NULL;
-        CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, avAdaptor.pixelBufferPool, &pixelBuffer);
-        
-        if (!self.recording) {
-            return;
-        } else if ((pixelBuffer == NULL) || (status != kCVReturnSuccess)) {
-            DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
-            return;
-        }
-        
-        CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-        void *pixelBufferData = (void *) CVPixelBufferGetBaseAddress(pixelBuffer);
-        
-        [lock lock];
-        if (self.recording) {
-            memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
-            
-            if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
-                [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:videoScale];
-            }
-            
-            if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
-                DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
-            }
-        }
-        [lock unlock];
-        
-        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
-        CVPixelBufferRelease(pixelBuffer);
-    } else {
-        // Need to scale down before encoding
-        UIImage *image = [self resizedImageForPixelData:frameBuffer width:DLIOSurfaceGetWidth(bgraSurface) height:DLIOSurfaceGetHeight(bgraSurface)];
-        [self encodeImage:image atPresentationTime:time byteShift:0 scale:videoScale];
+    CVPixelBufferRef pixelBuffer = NULL;
+    CVReturn status = CVPixelBufferPoolCreatePixelBuffer(NULL, avAdaptor.pixelBufferPool, &pixelBuffer);
+    
+    if (!self.recording) {
+        return;
+    } else if ((pixelBuffer == NULL) || (status != kCVReturnSuccess)) {
+        DLLog(@"[Delight] Error creating pixel buffer: status=%d, pixelBufferPool=%p", status, avAdaptor.pixelBufferPool);
+        return;
     }
+    
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    
+    [lock lock];
+    if (self.recording) {
+        if (videoScale == 1.0) {
+            // Copy the surface buffer directly to the video buffer
+            void *pixelBufferData = (void *) CVPixelBufferGetBaseAddress(pixelBuffer);
+            memcpy(pixelBufferData, frameBuffer, DLIOSurfaceGetAllocSize(bgraSurface));
+        } else {
+            // Need to scale the pixel buffer down
+            Class CIImageClass = NSClassFromString(@"CIImage");
+            CIImage *beginImage = [CIImageClass imageWithIOSurface:bgraSurface];
+            CIImage *outputImage = [beginImage imageByApplyingTransform:CGAffineTransformMakeScale(videoScale, videoScale)];
+            [imageContext render:outputImage toCVPixelBuffer:pixelBuffer bounds:CGRectMake(0, 0, self.videoSize.width, self.videoSize.height) colorSpace:colorSpace];
+        }
+        
+        if ([self.delegate respondsToSelector:@selector(videoEncoder:willEncodePixelBuffer:scale:)]) {
+            [self.delegate videoEncoder:self willEncodePixelBuffer:pixelBuffer scale:videoScale];
+        }
+        
+        if (![avAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:time]) {
+            DLLog(@"[Delight] Unable to write buffer to video: %@", videoWriter.error);
+        }
+    }
+    [lock unlock];
+    
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+    CVPixelBufferRelease(pixelBuffer);
 #endif
 }
 

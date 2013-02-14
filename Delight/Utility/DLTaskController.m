@@ -89,7 +89,7 @@
 	// set touch bounds
 	[rootDict setObject:NSStringFromCGRect(aSession.touchBounds) forKey:@"touchBounds"];
 	[rootDict setObject:@"0.2" forKey:@"formatVersion"];
-	
+
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * touchesPath = [self touchesFilePathForSession:aSession];
 	[theData writeToFile:touchesPath atomically:NO];
@@ -108,7 +108,7 @@
 		[dictOrientationChanges addObject:[theOrientationChange dictionaryRepresentation]];
 	}
 	[rootDict setObject:dictOrientationChanges forKey:@"orientationChanges"];
-	
+
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * orientationPath = [self orientationFilePathForSession:aSession];
 	[theData writeToFile:orientationPath atomically:NO];
@@ -127,7 +127,7 @@
 		[dictViewInfo addObject:[theViewInfo dictionaryRepresentation]];
 	}
 	[rootDict setObject:dictViewInfo forKey:@"viewInfos"];
-	
+
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * viewPath = [self viewFilePathForSession:aSession];
 	[theData writeToFile:viewPath atomically:NO];
@@ -146,7 +146,7 @@
 		[dictEvent addObject:[theEvent dictionaryRepresentation]];
 	}
 	[rootDict setObject:dictEvent forKey:@"events"];
-	
+
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * eventPath = [self eventFilePathForSession:aSession];
 	[theData writeToFile:eventPath atomically:NO];
@@ -157,14 +157,14 @@
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
-	
+
 	if ( !firstReachabilityNotificationReceived || [_wifiReachability currentReachabilityStatus] == NotReachable ) {
 		// signal the flag to make a connection
 		pendingRequestSessionForFirstReachabilityNotification = YES;
 		self.appToken = aToken;
 		return;
 	}
-	
+
 	// begin connection
 	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] initWithAppToken:aToken];
 	theTask.taskController = self;
@@ -174,6 +174,7 @@
 
 - (void)prepareSessionUpload:(DLRecordingContext *)aSession {
 	if ( aSession == nil ) return;
+	_containsIncompleteSessions = YES;
 	if ( ![aSession allRequiredTracksExist] ) {
 		// discard this session. don't upload it.
 		[aSession discardAllTracks];
@@ -183,7 +184,7 @@
 	BOOL backgroundSupported = NO;
 	UIDevice* device = [UIDevice currentDevice];
 	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
-	
+
 	if ( backgroundSupported ) {
 		bgTaskIdentifier = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			[self saveUnfinishedRecordingContext:aSession];
@@ -191,11 +192,13 @@
 		}];
 		[self.queue addOperationWithBlock:^{
 			// save file touches file from session
-			[self archiveTouchesForSession:aSession];
-            [self archiveOrientationChangesForSession:aSession];
-            [self archiveViewInfoForSession:aSession];
-            [self archiveEventsForSession:aSession];
-            
+			if ( aSession.shouldRecordVideo ) {
+				[self archiveTouchesForSession:aSession];
+				[self archiveOrientationChangesForSession:aSession];
+			}
+      [self archiveViewInfoForSession:aSession];
+      [self archiveEventsForSession:aSession];
+
 			// create tasks to upload
 			[self uploadSession:aSession];
 			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];
@@ -218,7 +221,7 @@
 	UIDevice* device = [UIDevice currentDevice];
 	BOOL backgroundSupported = NO;
 	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
-	
+
 	if ( !backgroundSupported ) {
 		// upload next time when the app is launched
 		return;
@@ -275,6 +278,7 @@
 		// if there's no more items, remove the archive file
 		if ( [_unfinishedContexts count] == 0 ) {
 			[[NSFileManager defaultManager] removeItemAtPath:[self unfinishedRecordingContextsArchiveFilePath] error:nil];
+			_containsIncompleteSessions = NO;
 		}
 	}
 }
@@ -346,7 +350,7 @@
 }
 
 - (void)renewUploadURLForSession:(DLRecordingContext *)ctx wtihTrack:(NSString *)trcName {
-	
+
 }
 
 #pragma mark Task Management
@@ -415,11 +419,11 @@
 		case ReachableViaWiFi:
 			statusStr = @"wifi";
 			break;
-			
+
 		case ReachableViaWWAN:
 			statusStr = @"wwan";
 			break;
-			
+
 		default:
 			statusStr = @"no_network";
 			break;

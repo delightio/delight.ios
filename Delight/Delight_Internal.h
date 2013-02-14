@@ -1,5 +1,5 @@
 //
-//  Delight_Private.h
+//  Delight_Internal.h
 //  Delight
 //
 //  Created by Chris Haugli on 7/2/12.
@@ -14,11 +14,7 @@
 #import "DLCamCaptureManager.h"
 #import "DLAnalytics.h"
 
-typedef enum {
-    DLAnnotationNone,
-    DLAnnotationFrontVideoAndAudio,
-    DLAnnotationAudioOnly
-} DLAnnotation;
+#define DLAnnotationAudioOnly 99
 
 @interface Delight () <DLRecordingSessionDelegate, DLGestureTrackerDelegate, DLVideoEncoderDelegate, DLCamCaptureManagerDelegate, UIAlertViewDelegate>
 
@@ -34,13 +30,12 @@ typedef enum {
 @property (nonatomic, assign) DLAnnotation annotation;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL autoCaptureEnabled;
+@property (nonatomic, assign) BOOL uploadsAutomatically;
 @property (nonatomic, assign) BOOL userStopped;
 @property (nonatomic, retain) NSMutableDictionary *userProperties;
 @property (nonatomic, assign) NSThread *screenshotThread;
 
 + (Delight *)sharedInstance;
-+ (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
-
 - (void)startRecording;
 - (void)stopRecording;
 - (void)takeScreenshot;

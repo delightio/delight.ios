@@ -12,6 +12,8 @@
 @interface DLMobileFrameBufferVideoEncoder : DLVideoEncoder {
     IOSurfaceRef bgraSurface;
     CGFloat videoScale;
+    CIContext *imageContext;
+    CGColorSpaceRef colorSpace;
 }
 
 - (void)encode;
