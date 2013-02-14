@@ -46,6 +46,7 @@
 @synthesize wifiConnected = _wifiConnected;
 @synthesize networkStatusString;
 @synthesize sessionObjectName = _sessionObjectName;
+@synthesize callbackContext = _callbackContext;
 
 - (id)init {
 	self = [super init];
@@ -66,6 +67,7 @@
 	[_baseDirectory release];
 	[_appToken release];
     [_sessionObjectName release];
+    [_callbackContext release];
 	[super dealloc];
 }
 

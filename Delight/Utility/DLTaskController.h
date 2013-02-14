@@ -36,6 +36,7 @@
 @property (nonatomic) BOOL wifiConnected;
 @property (nonatomic, readonly) NSString * networkStatusString;
 @property (nonatomic, retain) NSString *sessionObjectName;
+@property (nonatomic, retain) NSDictionary *callbackContext;
 
 - (void)requestSessionIDWithAppToken:(NSString *)aToken;
 - (void)prepareSessionUpload:(DLRecordingContext *)aSession;

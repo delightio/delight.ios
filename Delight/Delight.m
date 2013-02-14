@@ -86,22 +86,51 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 + (void)startWithAppToken:(NSString *)appToken
 {
-    [self startWithAppToken:appToken annotation:DLAnnotationNone];
+    [self _setAppSessionType:@"app_session"];
+    [self _startWithAppToken:appToken annotation:DLAnnotationNone];
 }
 
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
 {
+    [self _setAppSessionType:@"usability_app_session"];
+    [self _startWithAppToken:appToken annotation:annotation];
+}
+
++ (void)startWithPartnerAppToken:(NSString *)appToken
+                     callbackURL:(NSString *)callbackURL
+                  callbackPayload:(NSDictionary *)callbackPayload
+{
+    NSDictionary *callbackContext = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     callbackURL, @"callbackURL",
+                                     callbackPayload, @"callbackPayload", nil];
+    [self _setAppSessionType:@"partner_app_session"
+             callbackContext:callbackContext];
+    [self _startWithAppToken:appToken annotation:DLAnnotationNone];
+}
+
++ (void)_startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
+{
 	Delight *delight = [self sharedInstance];
-	if (annotation == DLAnnotationFrontVideoAndAudio) {
-		delight.taskController.sessionObjectName = @"usability_app_session";
-	} else {
-		delight.taskController.sessionObjectName = @"app_session";
-	}
-	
     [delight setAnnotation:annotation];
     [delight setAppToken:appToken];
 	[delight tryCreateNewSession];
 }
+
++ (void)_setAppSessionType:(NSString *)sessionType
+{
+    Delight *delight = [self sharedInstance];
+    delight.taskController.sessionObjectName = sessionType;
+}
+
++ (void)_setAppSessionType:(NSString *)sessionType
+           callbackContext:(NSDictionary *) callbackContext
+{
+    Delight *delight = [self sharedInstance];
+    delight.taskController.callbackContext = callbackContext;
+    
+    [self _setAppSessionType:sessionType];
+}
+
 
 + (void)stop
 {

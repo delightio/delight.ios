@@ -34,9 +34,12 @@ NSString * const DLMaximumRecordingDurationElementName = @"maximum_duration";
 	[super dealloc];
 }
 
-- (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"%@://%@/%@s.xml", DL_BASE_SCHEME, DL_BASE_URL, self.taskController.sessionObjectName];
-	// check build and version number
+- (BOOL)isPartnerAppSession {
+    return [self.taskController.sessionObjectName isEqualToString:@"partner_app_session"];
+}
+
+- (NSDictionary *) parameters {
+    // check build and version number
 	NSDictionary * dict = [[NSBundle mainBundle] infoDictionary];
 	NSString * buildVer = [dict objectForKey:(NSString *)kCFBundleVersionKey];
 	if ( buildVer == nil ) buildVer = @"";
@@ -48,17 +51,42 @@ NSString * const DLMaximumRecordingDurationElementName = @"maximum_duration";
 	// get the exact hardward name
 	struct utsname systemInfo;
 	uname(&systemInfo);
-	
-	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
-	NSString * paramStr = [self parameterStringForProperties:[NSDictionary dictionaryWithObjectsAndKeys:dotVer, @"app_version", 
-                                                                            buildVer, @"app_build",
-                                                                            [[NSLocale currentLocale] localeIdentifier], @"app_locale",
-                                                                            self.taskController.networkStatusString, @"app_connectivity",
-                                                                            DELIGHT_VERSION, @"delight_version",
-                                                                            machineName, @"device_hw_version", 
-                                                                            theDevice.systemVersion, @"device_os_version",
-                                                                            nil]];
 
+	NSString * machineName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   dotVer, @"app_version",
+                                   buildVer, @"app_build",
+                                   [[NSLocale currentLocale] localeIdentifier], @"app_locale",
+                                   self.taskController.networkStatusString, @"app_connectivity",
+                                   DELIGHT_VERSION, @"delight_version",
+                                   machineName, @"device_hw_version",
+                                   theDevice.systemVersion, @"device_os_version",
+                                   nil];
+    
+    if ([self isPartnerAppSession]) {
+        NSDictionary * context = self.taskController.callbackContext;
+        [params setObject:[context objectForKey:@"callbackURL"] forKey:@"callback_url"];
+//        [params setObject:[context objectForKey:@"callbackPayload"] forKey:@"callback_payload"];
+    }
+    return params;
+}
+
+- (NSURLRequest *)URLRequest {
+    NSMutableString * payloadStr = [NSMutableString string];
+    if ([self isPartnerAppSession]) {
+        NSDictionary * payload = [self.taskController.callbackContext objectForKey:@"callbackPayload"];
+        for (NSString * key in [payload allKeys]) {
+            id value = [payload objectForKey:key];
+            if ([value isKindOfClass:[NSString class]]) {
+                value = [self stringByAddingPercentEscapes:value];
+            }
+            [payloadStr appendFormat:@"&%@[callback_payload][%@]=%@", self.taskController.sessionObjectName, [self stringByAddingPercentEscapes:key], value];
+        }
+    }
+    NSString * systemParamStr = [self parameterStringForProperties:[self parameters]];
+    NSString * paramStr = [NSString stringWithFormat:@"%@%@", systemParamStr, payloadStr];
+
+	NSString * urlStr = [NSString stringWithFormat:@"%@://%@/%@s.xml", DL_BASE_SCHEME, DL_BASE_URL, self.taskController.sessionObjectName];
 	NSMutableURLRequest * request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlStr] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:DL_REQUEST_TIMEOUT];
 //	[request setHTTPBody:[[self stringByAddingPercentEscapes:paramStr] dataUsingEncoding:NSUTF8StringEncoding]];
 	[request setHTTPBody:[paramStr dataUsingEncoding:NSUTF8StringEncoding]];
