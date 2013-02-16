@@ -70,7 +70,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize scaleFactor = _scaleFactor;
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
 @synthesize uploadsAutomatically = _uploadsAutomatically;
-@synthesize userStopped = _userStopped;
 @synthesize userProperties = _userProperties;
 @synthesize screenshotThread = _screenshotThread;
 
@@ -129,14 +128,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     delight.taskController.callbackContext = callbackContext;
     
     [self _setAppSessionType:sessionType];
-}
-
-
-+ (void)stop
-{
-    [[self sharedInstance] stopRecording];
-    [self sharedInstance].metrics.stopReason = DLMetricsStopReasonManual;
-    [self sharedInstance].userStopped = YES;
 }
 
 + (BOOL)debugLogEnabled
@@ -476,8 +467,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 #pragma mark - Session
 
 - (void)tryCreateNewSession {
-    self.userStopped = NO;
-    
     if (!self.videoEncoder.recording) {
         [self.taskController requestSessionIDWithAppToken:self.appToken];
     }
@@ -545,7 +534,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)handleWillEnterForeground:(NSNotification *)notification
 {
-    if (!self.userStopped && !alertViewVisible) {
+    if (!alertViewVisible) {
         [self tryCreateNewSession];
     }
 }
@@ -553,7 +542,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)handleDidBecomeActive:(NSNotification *)notification
 {
     // In iOS 4, locking the screen does not trigger didEnterBackground: notification. Check if we've been inactive for a long time.
-    if (resignActiveTime > 0 && !appInBackground && !self.userStopped && [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
+    if (resignActiveTime > 0 && !appInBackground &&
+        [[[UIDevice currentDevice] systemVersion] floatValue] < 5.0) {
         NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
         if (inactiveTime > kDLMaximumSessionInactiveTime) {
             // We've been inactive for a long time, stop the previous recording and create a new session

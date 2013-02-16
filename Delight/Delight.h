@@ -48,10 +48,6 @@ typedef enum {
                      callbackURL:(NSString *)callbackURL
                  callbackPayload:(NSDictionary *)callbackPayload;
 
-/** Stops the current recording and all future recordings.
- */
-+ (void)stop;
-
 /**---------------------------------------------------------------------------------------
  * @name Adding Metadata
  * ---------------------------------------------------------------------------------------
