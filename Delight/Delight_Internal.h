@@ -30,7 +30,6 @@
 @property (nonatomic, assign) DLAnnotation annotation;
 @property (nonatomic, assign) CGFloat scaleFactor;
 @property (nonatomic, assign) BOOL autoCaptureEnabled;
-@property (nonatomic, assign) BOOL uploadsAutomatically;
 @property (nonatomic, retain) NSMutableDictionary *userProperties;
 @property (nonatomic, assign) NSThread *screenshotThread;
 
