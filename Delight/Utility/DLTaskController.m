@@ -198,8 +198,8 @@
 				[self archiveTouchesForSession:aSession];
 				[self archiveOrientationChangesForSession:aSession];
 			}
-      [self archiveViewInfoForSession:aSession];
-      [self archiveEventsForSession:aSession];
+            [self archiveViewInfoForSession:aSession];
+            [self archiveEventsForSession:aSession];
 
 			// create tasks to upload
 			[self uploadSession:aSession];
