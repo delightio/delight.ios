@@ -38,7 +38,7 @@ typedef enum {
  */
 + (void)startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation;
 
-/** Delight partner only: Starts capturing the screen and recording gestures, with no annotation.
+/** Delight partner ONLY: Starts capturing the screen and recording gestures, with no annotation.
  
  @param partnerAppToken The application token from your [control panel](http://delight.io/apps). Contact partners@delight.io if you are interested in licensing Delight's technology.
  @param callbackURL URL which Delight server will post to after the recording is uploaded and finished processing.
@@ -47,6 +47,14 @@ typedef enum {
 + (void)startWithPartnerAppToken:(NSString *)partnerAppToken
                      callbackURL:(NSString *)callbackURL
                  callbackPayload:(NSDictionary *)callbackPayload;
+
+/** Stop the recording and discard all recorded tracks. You will have to explicitly call startWith* again to start another recording session.
+ */
++ (void)stopAndDiscard;
+
+/** Stop the recording and upload intermediately. You will have to explicitly call startWith* again to start another recording session.
+ */
++ (void)stopAndUpload;
 
 /**---------------------------------------------------------------------------------------
  * @name Adding Metadata

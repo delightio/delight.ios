@@ -114,6 +114,21 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[delight tryCreateNewSession];
 }
 
++ (void)stopAndDiscard
+{
+    Delight * delight = [self sharedInstance];
+    [delight stopRecording];
+    [delight.recordingContext discardAllTracks];
+    DLDebugLog(@"[Delight] recording is stopped and discarded");
+}
+
++ (void)stopAndUpload
+{
+    Delight * delight = [self sharedInstance];
+    [delight stopAndUpload];
+    DLDebugLog(@"[Delight] recording is stopped and queued for uploading.");
+}
+
 + (void)_setAppSessionType:(NSString *)sessionType
 {
     Delight *delight = [self sharedInstance];
@@ -388,6 +403,26 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     self.gestureTracker.scaleFactor = aScaleFactor;
 }
 
+- (void)stopAndUpload:(NSDate *)endTime
+{
+    if (self.recordingContext.shouldRecordVideo) {
+        [self stopRecording];
+    }
+    self.recordingContext.endTime = endTime;
+    self.recordingContext.userProperties = self.userProperties;
+    self.recordingContext.metrics = self.metrics;
+    if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
+        delaySessionUploadForCamera = NO;
+        [self.taskController prepareSessionUpload:self.recordingContext];
+    }
+}
+
+- (void)stopAndUpload
+{
+    [self stopAndUpload:[NSDate date]];
+}
+
+
 - (void)setAutoCaptureEnabled:(BOOL)isAutoCaptureEnabled
 {
     if (_autoCaptureEnabled != isAutoCaptureEnabled) {
@@ -501,16 +536,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 - (void)handleDidEnterBackground:(NSNotification *)notification
 {
     if (!alertViewVisible) {
-        if (self.recordingContext.shouldRecordVideo) {
-            [self stopRecording];
-        }
-        self.recordingContext.endTime = [NSDate date];
-        self.recordingContext.userProperties = self.userProperties;
-        self.recordingContext.metrics = self.metrics;
-        if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
-            delaySessionUploadForCamera = NO;
-            [self.taskController prepareSessionUpload:self.recordingContext];
-        }
+        [self stopAndUpload];
     }
     
     appInBackground = YES;
@@ -531,16 +557,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         NSTimeInterval inactiveTime = [[NSDate date] timeIntervalSince1970] - resignActiveTime;
         if (inactiveTime > kDLMaximumSessionInactiveTime) {
             // We've been inactive for a long time, stop the previous recording and create a new session
-            if (self.recordingContext.shouldRecordVideo) {
-                [self stopRecording];
-            }
-            self.recordingContext.endTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
-			self.recordingContext.userProperties = self.userProperties;
-            self.recordingContext.metrics = self.metrics;
-			if (!delaySessionUploadForCamera || (delaySessionUploadForCamera && cameraDidStop)) {
-                delaySessionUploadForCamera = NO;
-                [self.taskController prepareSessionUpload:self.recordingContext];
-			}
+            NSDate * previousEndTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
+            [self stopAndUpload:previousEndTime];
             [self tryCreateNewSession];
         }
     }
