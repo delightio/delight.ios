@@ -71,6 +71,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize autoCaptureEnabled = _autoCaptureEnabled;
 @synthesize userProperties = _userProperties;
 @synthesize screenshotThread = _screenshotThread;
+@synthesize autoStart = _autoStart;
 
 #pragma mark - Class methods
 
@@ -101,8 +102,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     NSDictionary *callbackContext = [NSDictionary dictionaryWithObjectsAndKeys:
                                      callbackURL, @"callbackURL",
                                      callbackPayload, @"callbackPayload", nil];
-    [self _setAppSessionType:@"partner_app_session"
-             callbackContext:callbackContext];
+    [self _setPartnerAppSessionTypeWithCallbackContext:callbackContext];
     [self _startWithAppToken:appToken annotation:DLAnnotationNone];
 }
 
@@ -134,16 +134,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 + (void)_setAppSessionType:(NSString *)sessionType
 {
     Delight *delight = [self sharedInstance];
+    delight.autoStart = YES; // Non partner app sessions always allow auto start
     delight.taskController.sessionObjectName = sessionType;
 }
 
-+ (void)_setAppSessionType:(NSString *)sessionType
-           callbackContext:(NSDictionary *) callbackContext
++ (void)_setPartnerAppSessionTypeWithCallbackContext:(NSDictionary *) callbackContext
 {
     Delight *delight = [self sharedInstance];
     delight.taskController.callbackContext = callbackContext;
-    
-    [self _setAppSessionType:sessionType];
+    delight.autoStart = NO; // Partner app sessions require explicit start.
+    delight.taskController.sessionObjectName = @"partner_app_session";
 }
 
 + (BOOL)debugLogEnabled
@@ -246,6 +246,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         self.metrics = [[[DLMetrics alloc] init] autorelease];        
         self.scaleFactor = kDLDefaultScaleFactor;
         self.autoCaptureEnabled = YES;
+        self.autoStart = YES;
 
         maximumFrameRate = kDLDefaultMaximumFrameRate;
         maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
@@ -546,7 +547,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 - (void)handleWillEnterForeground:(NSNotification *)notification
 {
-    if (!alertViewVisible) {
+    if (!alertViewVisible && self.autoStart) {
         [self tryCreateNewSession];
     }
 }
@@ -561,7 +562,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             // We've been inactive for a long time, stop the previous recording and create a new session
             NSDate * previousEndTime = [NSDate dateWithTimeIntervalSince1970:resignActiveTime];
             [self stopAndUpload:previousEndTime];
-            [self tryCreateNewSession];
+
+            if (self.autoStart) {
+                [self tryCreateNewSession];
+            }
         }
     }
     
