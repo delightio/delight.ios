@@ -119,14 +119,16 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     Delight * delight = [self sharedInstance];
     [delight stopRecording];
     [delight.recordingContext discardAllTracks];
-    DLDebugLog(@"[Delight] recording is stopped and discarded");
+    DLDebugLog(@"[Delight] recording for session %@ is stopped and discarded.",
+               delight.recordingContext.sessionID);
 }
 
 + (void)stopAndUpload
 {
     Delight * delight = [self sharedInstance];
     [delight stopAndUpload];
-    DLDebugLog(@"[Delight] recording is stopped and queued for uploading.");
+    DLDebugLog(@"[Delight] recording for session %@ is stopped and queued for uploading.",
+               delight.recordingContext.sessionID);
 }
 
 + (void)_setAppSessionType:(NSString *)sessionType
