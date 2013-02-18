@@ -83,8 +83,13 @@
     // Clear the status bar since we don't draw over it
     CGContextClearRect(context, [[UIApplication sharedApplication] statusBarFrame]);
     
+    // https://github.com/delightio/delight.ios/issues/12
+    // Chris suggested us to retain the windows before we go into the loop.
+    NSArray * retainedWindows = [NSArray arrayWithArray:
+                                 [[UIApplication sharedApplication] windows]];
+
     // Iterate over every window from back to front
-    for (UIWindow *window in [[UIApplication sharedApplication] windows]) {
+    for (UIWindow *window in retainedWindows) {
         if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen]) {
             CGContextSaveGState(context);
             
@@ -123,7 +128,7 @@
     if (writesToPNG) {
         [self writeImageToPNG:image];
     }
-    
+
     return image;
 }
 
