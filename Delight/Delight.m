@@ -72,6 +72,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize userProperties = _userProperties;
 @synthesize screenshotThread = _screenshotThread;
 @synthesize autoStart = _autoStart;
+@synthesize isReadyToRecord = _isReadyToRecord;
 
 #pragma mark - Class methods
 
@@ -95,15 +96,30 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self _startWithAppToken:appToken annotation:annotation];
 }
 
-+ (void)startWithPartnerAppToken:(NSString *)appToken
-                     callbackURL:(NSString *)callbackURL
-                  callbackPayload:(NSDictionary *)callbackPayload
++ (void)initWithPartnerAppToken:(NSString *)appToken
+                    callbackURL:(NSString *)callbackURL
+                callbackPayload:(NSDictionary *)callbackPayload
 {
     NSDictionary *callbackContext = [NSDictionary dictionaryWithObjectsAndKeys:
                                      callbackURL, @"callbackURL",
                                      callbackPayload, @"callbackPayload", nil];
     [self _setPartnerAppSessionTypeWithCallbackContext:callbackContext];
     [self _startWithAppToken:appToken annotation:DLAnnotationNone];
+}
+
++ (BOOL)isReadyToRecord {
+    Delight * delight = [Delight sharedInstance];
+    return ([delight isReadyToRecord]);
+}
+
++ (void)start
+{
+    if ([Delight isReadyToRecord]) {
+        Delight * delight = [Delight sharedInstance];
+        [delight startRecording];
+    } else {
+        DLDebugLog(@"Delight is not ready to record yet. Please try again later.");
+    }
 }
 
 + (void)_startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
@@ -127,6 +143,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     Delight * delight = [self sharedInstance];
     [delight stopAndUpload];
+    delight.isReadyToRecord = NO;
     DLDebugLog(@"[Delight] recording for session %@ is stopped and queued for uploading.",
                delight.recordingContext.sessionID);
 }
@@ -135,6 +152,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     Delight *delight = [self sharedInstance];
     delight.autoStart = YES; // Non partner app sessions always allow auto start
+    delight.isReadyToRecord = YES;
     delight.taskController.sessionObjectName = sessionType;
 }
 
@@ -142,8 +160,11 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 {
     Delight *delight = [self sharedInstance];
     delight.taskController.callbackContext = callbackContext;
-    delight.autoStart = NO; // Partner app sessions require explicit start.
     delight.taskController.sessionObjectName = @"partner_app_session";
+
+    // Partner app sessions require explicit init and start.
+    delight.autoStart = NO;
+    delight.isReadyToRecord = NO;
 }
 
 + (BOOL)debugLogEnabled
@@ -247,6 +268,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         self.scaleFactor = kDLDefaultScaleFactor;
         self.autoCaptureEnabled = YES;
         self.autoStart = YES;
+        self.isReadyToRecord = NO;
 
         maximumFrameRate = kDLDefaultMaximumFrameRate;
         maximumRecordingDuration = kDLDefaultMaximumRecordingDuration;
@@ -314,6 +336,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	__DL_ENABLE_DEBUG_LOG = aflag;
 }
 
+- (BOOL)isPartnerAppSession {
+    return [self.taskController.sessionObjectName isEqualToString:@"partner_app_session"];
+}
+
 - (void)startRecording
 {    
     if (!self.videoEncoder.recording) {
@@ -376,7 +402,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
-- (void)stopRecording 
+- (void)stopRecording
 {    
     if (self.cameraManager.recording) {
         [self.cameraManager stopRecording];
@@ -391,6 +417,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         self.recordingContext.viewInfos = self.analytics.viewInfos;
         self.recordingContext.events = self.analytics.events;
         self.analytics = nil;       // Stop tracking analytics data
+    }
+
+    if ([self isPartnerAppSession]) {
+        self.isReadyToRecord = NO;
     }
 }
 
@@ -505,8 +535,12 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     
 	if (self.recordingContext.shouldRecordVideo) {
         if (self.annotation == DLAnnotationNone) {
-            // Start recording immediately
-            [self startRecording];
+            self.isReadyToRecord = YES;
+            
+            // Start recording immediately if not partner app session
+            if (![self isPartnerAppSession]) {
+                [self startRecording];
+            }
         } else {
             // Show warning that user will be recorded
             UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil

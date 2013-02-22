@@ -33,6 +33,7 @@
 @property (nonatomic, retain) NSMutableDictionary *userProperties;
 @property (nonatomic, assign) NSThread *screenshotThread;
 @property (nonatomic, assign) BOOL autoStart;
+@property (nonatomic, assign) BOOL isReadyToRecord;
 
 + (Delight *)sharedInstance;
 - (void)startRecording;
