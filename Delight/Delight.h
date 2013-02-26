@@ -59,8 +59,8 @@ typedef enum {
 
 /** Check with our server if the current session should be recorded. However, Delight won't record until star: is called.
  
- @param callbackURL URL which Delight server will post to after the recording is uploaded and finished processing.
- @param callbackPayload A list of key value pair to be posted back. Please note that we only support single value data type such as strings and numerics.
+ @param url URL which Delight server will post to after the recording is uploaded and finished processing.
+ @param payload A list of key value pair to be posted back. Please note that we only support single value data type such as strings and numerics.
  */
 + (void)prepareWithCallbackURL:(NSString *)url andPayload:(NSDictionary *)payload;
 
