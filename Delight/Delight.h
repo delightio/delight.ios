@@ -46,16 +46,19 @@ typedef enum {
  */
 + (void)stopAndUpload;
 
-/** Delight partner ONLY: Starts capturing the screen and recording gestures, with no annotation. Please note Partner App Session will not be automatically started again after being uploaded either by `startWithPartnerAppToken:` or when application goes into background.
+/** Delight partner ONLY: Starts capturing the screen and recording gestures, with no annotation. Please note Partner App Session will not be automatically started again after being uploaded either by `stopAndUpload:` or when application goes into background.
+ 
+    Sequence for creating partner session:
+    1. [Delight initWithPartnerAppToken:]
+    2. [Delight prepareWithCallbackURL:]
+    3. when isReadyToRecord is true, [Delight start]
  
  @param partnerAppToken The application token from your [control panel](http://delight.io/apps). Contact partners@delight.io if you are interested in licensing Delight's technology.
  @param callbackURL URL which Delight server will post to after the recording is uploaded and finished processing.
  @param callbackPayload A list of key value pair to be posted back. Please note that we only support single value data type such as strings and numerics.
  */
-+ (void)initWithPartnerAppToken:(NSString *)partnerAppToken
-                    callbackURL:(NSString *)callbackURL
-                callbackPayload:(NSDictionary *)callbackPayload;
-
++ (void)initWithPartnerAppToken:(NSString *)partnerAppToken;
++ (void)prepareWithCallbackURL:(NSString *)url andPayload:(NSDictionary *)payload;
 + (BOOL)isReadyToRecord;
 + (void)start;
 

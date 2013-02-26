@@ -171,6 +171,7 @@
 	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] initWithAppToken:aToken];
 	theTask.taskController = self;
 	_task = theTask;
+    self.appToken = aToken;
 	[self.queue addOperation:theTask];
 }
 
@@ -197,10 +198,9 @@
 			if ( aSession.shouldRecordVideo ) {
 				[self archiveTouchesForSession:aSession];
 				[self archiveOrientationChangesForSession:aSession];
-			}
-            [self archiveViewInfoForSession:aSession];
-            [self archiveEventsForSession:aSession];
-
+                [self archiveViewInfoForSession:aSession];
+                [self archiveEventsForSession:aSession];
+            }
 			// create tasks to upload
 			[self uploadSession:aSession];
 			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];

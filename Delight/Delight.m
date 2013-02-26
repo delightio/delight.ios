@@ -96,30 +96,46 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [self _startWithAppToken:appToken annotation:annotation];
 }
 
-+ (void)initWithPartnerAppToken:(NSString *)appToken
-                    callbackURL:(NSString *)callbackURL
-                callbackPayload:(NSDictionary *)callbackPayload
++ (void) initWithPartnerAppToken:(NSString *)partnerAppToken
 {
+    Delight *delight = [self sharedInstance];
+    delight.appToken = partnerAppToken;
+    delight.taskController.sessionObjectName = @"partner_app_session";
+    
+    // Partner app sessions require explicit init and start.
+    delight.autoStart = NO;
+    delight.isReadyToRecord = NO;
+    
+    NSLog(@"initWithPartnerAppToken");
+}
+
+
++ (void)prepareWithCallbackURL:(NSString *)url
+                  andPayload:(NSDictionary *)payload
+{
+    NSLog(@"prepareWithCallback");
     NSDictionary *callbackContext = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     callbackURL, @"callbackURL",
-                                     callbackPayload, @"callbackPayload", nil];
-    [self _setPartnerAppSessionTypeWithCallbackContext:callbackContext];
-    [self _startWithAppToken:appToken annotation:DLAnnotationNone];
+                                        url, @"callbackURL",
+                                        payload, @"callbackPayload", nil];
+    
+    Delight * delight = [Delight sharedInstance];
+    delight.taskController.callbackContext = callbackContext;
+    [delight tryCreateNewSession];
+}
+
++ (void)start
+{
+    if ([self isReadyToRecord]) {
+        Delight * delight = [Delight sharedInstance];
+        [delight startRecording];
+    } else {
+        DLDebugLog(@"Delight is not ready for recording yet.");
+    }
 }
 
 + (BOOL)isReadyToRecord {
     Delight * delight = [Delight sharedInstance];
     return ([delight isReadyToRecord]);
-}
-
-+ (void)start
-{
-    if ([Delight isReadyToRecord]) {
-        Delight * delight = [Delight sharedInstance];
-        [delight startRecording];
-    } else {
-        DLDebugLog(@"Delight is not ready to record yet. Please try again later.");
-    }
 }
 
 + (void)_startWithAppToken:(NSString *)appToken annotation:(DLAnnotation)annotation
@@ -154,17 +170,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     delight.autoStart = YES; // Non partner app sessions always allow auto start
     delight.isReadyToRecord = YES;
     delight.taskController.sessionObjectName = sessionType;
-}
-
-+ (void)_setPartnerAppSessionTypeWithCallbackContext:(NSDictionary *) callbackContext
-{
-    Delight *delight = [self sharedInstance];
-    delight.taskController.callbackContext = callbackContext;
-    delight.taskController.sessionObjectName = @"partner_app_session";
-
-    // Partner app sessions require explicit init and start.
-    delight.autoStart = NO;
-    delight.isReadyToRecord = NO;
 }
 
 + (BOOL)debugLogEnabled
