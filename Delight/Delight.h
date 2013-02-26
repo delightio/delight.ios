@@ -54,13 +54,23 @@ typedef enum {
     3. when isReadyToRecord is true, [Delight start]
  
  @param partnerAppToken The application token from your [control panel](http://delight.io/apps). Contact partners@delight.io if you are interested in licensing Delight's technology.
+ */
++ (void)initWithPartnerAppToken:(NSString *)partnerAppToken;
+
+/** Check with our server if the current session should be recorded. However, Delight won't record until star: is called.
+ 
  @param callbackURL URL which Delight server will post to after the recording is uploaded and finished processing.
  @param callbackPayload A list of key value pair to be posted back. Please note that we only support single value data type such as strings and numerics.
  */
-+ (void)initWithPartnerAppToken:(NSString *)partnerAppToken;
 + (void)prepareWithCallbackURL:(NSString *)url andPayload:(NSDictionary *)payload;
-+ (BOOL)isReadyToRecord;
+
+/** Start actual recording.
+ */
 + (void)start;
+
+/** True when Delight is ready to record.
+ */
++ (BOOL)isReadyToRecord;
 
 /**---------------------------------------------------------------------------------------
  * @name Adding Metadata
