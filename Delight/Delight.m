@@ -217,6 +217,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         Swizzle(NSClassFromString(@"WebLayer"), @selector(drawInContext:), @selector(DLthreadSafeDrawInContext:));
         //        Swizzle(NSClassFromString(@"WebTiledLayer"), @selector(drawInContext:), @selector(DLthreadSafeDrawInContext2:));
         
+        // Method swizzling to rewrite MKMapView layer rendering code to avoid crash
+        Swizzle(NSClassFromString(@"CAEAGLLayer"), @selector(renderInContext:), @selector(DLthreadSafeRenderInContext:));
+        
 #ifndef PRIVATE_FRAMEWORK
         // Method swizzling to hide private views
         Swizzle([CALayer class], @selector(renderInContext:), @selector(DLrenderInContext:));
@@ -296,7 +299,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         self.videoEncoder.outputPath = [NSString stringWithFormat:@"%@/%@.mp4", cachePath, (self.recordingContext ? self.recordingContext.sessionID : @"output")];
         [self.videoEncoder startNewRecording];
         
-        if (self.annotation != DLAnnotationNone) {    
+        if (self.annotation != DLAnnotationNone) {
             if (!self.cameraManager) {
                 self.cameraManager = [[[DLCamCaptureManager alloc] init] autorelease];
                 self.cameraManager.audioOnly = (self.annotation == DLAnnotationAudioOnly);
