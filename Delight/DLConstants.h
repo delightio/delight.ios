@@ -8,8 +8,8 @@
 
 // Don't change the version here, it is auto-generated via a build script.
 // Change it in Delight-Info.plist instead.
-#define DELIGHT_VERSION_PRIVATE @"2.3.2.Private"
-#define DELIGHT_VERSION_PUBLIC @"2.3.2"
+#define DELIGHT_VERSION_PRIVATE @"2.3.3.Private"
+#define DELIGHT_VERSION_PUBLIC @"2.3.3"
 
 #ifdef PRIVATE_FRAMEWORK
     #define DELIGHT_VERSION DELIGHT_VERSION_PRIVATE
