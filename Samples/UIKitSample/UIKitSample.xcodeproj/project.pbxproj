@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		246EEDBA16DF9E66000C1F33 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 246EEDB916DF9E66000C1F33 /* MapKit.framework */; };
 		837C3A3A153F870600463CB3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A39153F870600463CB3 /* UIKit.framework */; };
 		837C3A3C153F870600463CB3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A3B153F870600463CB3 /* Foundation.framework */; };
 		837C3A3E153F870600463CB3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837C3A3D153F870600463CB3 /* CoreGraphics.framework */; };
@@ -49,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		246EEDB916DF9E66000C1F33 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		837C3A35153F870600463CB3 /* UIKitSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIKitSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		837C3A39153F870600463CB3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		837C3A3B153F870600463CB3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -87,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				246EEDBA16DF9E66000C1F33 /* MapKit.framework in Frameworks */,
 				8382932A155863A5007C6CDA /* Delight.framework in Frameworks */,
 				838897091545FABE00FCE2D5 /* SystemConfiguration.framework in Frameworks */,
 				8381FFF51540972A0051F33A /* CoreMedia.framework in Frameworks */,
@@ -105,6 +108,7 @@
 		837C3A2A153F870600463CB3 = {
 			isa = PBXGroup;
 			children = (
+				246EEDB916DF9E66000C1F33 /* MapKit.framework */,
 				837C3A3F153F870600463CB3 /* UIKitSample */,
 				837C3A38153F870600463CB3 /* Frameworks */,
 				837C3A36153F870600463CB3 /* Products */,
