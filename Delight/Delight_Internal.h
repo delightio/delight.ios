@@ -34,6 +34,8 @@
 @property (nonatomic, assign) NSThread *screenshotThread;
 @property (nonatomic, assign) BOOL autoStart;
 @property (nonatomic, assign) BOOL isReadyToRecord;
+@property (copy) void(^onReadyBlock)(void);
+@property (copy) void(^onErrorBlock)(NSString *);
 
 + (Delight *)sharedInstance;
 - (void)startRecording;

@@ -73,6 +73,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize screenshotThread = _screenshotThread;
 @synthesize autoStart = _autoStart;
 @synthesize isReadyToRecord = _isReadyToRecord;
+@synthesize onReadyBlock = _onReadyBlock;
+@synthesize onErrorBlock = _onErrorBlock;
 
 #pragma mark - Class methods
 
@@ -111,7 +113,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 
 
 + (void)prepareWithCallbackURL:(NSString *)url
-                  andPayload:(NSDictionary *)payload
+                    andPayload:(NSDictionary *)payload
+                       onReady:(void (^)(void))onReadyBlock
+                       onError:(void (^)(NSString *))onErrorBlock
 {
     NSLog(@"prepareWithCallback");
     NSDictionary *callbackContext = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -119,6 +123,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
                                         payload, @"callbackPayload", nil];
     
     Delight * delight = [Delight sharedInstance];
+    // TODO: the blocks should probably go under the task controller instead.
+    delight.onReadyBlock = onReadyBlock;
+    delight.onErrorBlock = onErrorBlock;
     delight.taskController.callbackContext = callbackContext;
     [delight tryCreateNewSession];
 }
@@ -329,6 +336,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     [_userProperties release];
     [_analytics release];
 	[screenshotQueue release];
+    [_onReadyBlock release];
+    [_onErrorBlock release];
     
     [super dealloc];
 }
@@ -543,7 +552,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
             self.isReadyToRecord = YES;
             
             // Start recording immediately if not partner app session
-            if (![self isPartnerAppSession]) {
+            if ([self isPartnerAppSession]) {
+                self.onReadyBlock();
+            } else {
                 [self startRecording];
             }
         } else {
@@ -570,6 +581,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	} else {
 		// there's no need to record the session. Clean up video encoder?
 		self.recordingContext.startTime = [NSDate date];
+        
+        NSString * errorString = [NSString stringWithFormat:@"Session is not scheduled to be recorded."];
+        self.onErrorBlock(errorString);
 	}
 }
 

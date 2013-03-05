@@ -61,8 +61,14 @@ typedef enum {
  
  @param url URL which Delight server will post to after the recording is uploaded and finished processing.
  @param payload A list of key value pair to be posted back. Please note that we only support single value data type such as strings and numerics.
+ @param onReadyBlock Block to be called when the recording is ready to be started.
+ @param onErrorBlock Block to be called if there are other errors preparing the recording. Note that currently it is only called when the recording is not scheduled.
+
  */
-+ (void)prepareWithCallbackURL:(NSString *)url andPayload:(NSDictionary *)payload;
++ (void)prepareWithCallbackURL:(NSString *)url
+                    andPayload:(NSDictionary *)payload
+                       onReady:(void(^)(void))onReadyBlock
+                       onError:(void(^)(NSString *))onErrorBlock;
 
 /** Start actual recording.
  */
