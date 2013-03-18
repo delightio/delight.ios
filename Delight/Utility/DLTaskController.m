@@ -12,6 +12,7 @@
 #import "DLReachability.h"
 #import "DLTouch.h"
 #import "DLOrientationChange.h"
+#import "DLViewInfo.h"
 #import <UIKit/UIKit.h>
 
 @interface DLTaskController (PrivateMethods)
@@ -24,8 +25,12 @@
 - (void)uploadSession:(DLRecordingContext *)aSession;
 - (void)archiveTouchesForSession:(DLRecordingContext *)aSession;
 - (void)archiveOrientationChangesForSession:(DLRecordingContext *)aSession;
+- (void)archiveViewInfoForSession:(DLRecordingContext *)aSession;
+- (void)archiveEventsForSession:(DLRecordingContext *)aSession;
 - (NSString *)touchesFilePathForSession:(DLRecordingContext *)ctx;
 - (NSString *)orientationFilePathForSession:(DLRecordingContext *)ctx;
+- (NSString *)viewFilePathForSession:(DLRecordingContext *)ctx;
+- (NSString *)eventFilePathForSession:(DLRecordingContext *)ctx;
 
 @end
 
@@ -84,7 +89,7 @@
 	// set touch bounds
 	[rootDict setObject:NSStringFromCGRect(aSession.touchBounds) forKey:@"touchBounds"];
 	[rootDict setObject:@"0.2" forKey:@"formatVersion"];
-	
+
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * touchesPath = [self touchesFilePathForSession:aSession];
 	[theData writeToFile:touchesPath atomically:NO];
@@ -103,7 +108,7 @@
 		[dictOrientationChanges addObject:[theOrientationChange dictionaryRepresentation]];
 	}
 	[rootDict setObject:dictOrientationChanges forKey:@"orientationChanges"];
-	
+
 	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
 	NSString * orientationPath = [self orientationFilePathForSession:aSession];
 	[theData writeToFile:orientationPath atomically:NO];
@@ -112,16 +117,54 @@
 	[pool release];
 }
 
+- (void)archiveViewInfoForSession:(DLRecordingContext *)aSession {
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	NSString * errStr = nil;
+	NSArray * allViewInfo = aSession.viewInfos;
+	NSMutableDictionary * rootDict = [NSMutableDictionary dictionaryWithCapacity:3];
+	NSMutableArray * dictViewInfo = [NSMutableArray arrayWithCapacity:[allViewInfo count]];
+	for (DLViewInfo * theViewInfo in allViewInfo) {
+		[dictViewInfo addObject:[theViewInfo dictionaryRepresentation]];
+	}
+	[rootDict setObject:dictViewInfo forKey:@"viewInfos"];
+
+	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
+	NSString * viewPath = [self viewFilePathForSession:aSession];
+	[theData writeToFile:viewPath atomically:NO];
+	// set file path
+	[aSession.sourceFilePaths setObject:viewPath forKey:DLViewTrackKey];
+	[pool release];
+}
+
+- (void)archiveEventsForSession:(DLRecordingContext *)aSession {
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	NSString * errStr = nil;
+	NSArray * allEvents = aSession.events;
+	NSMutableDictionary * rootDict = [NSMutableDictionary dictionaryWithCapacity:3];
+	NSMutableArray * dictEvent = [NSMutableArray arrayWithCapacity:[allEvents count]];
+	for (DLViewInfo * theEvent in allEvents) {
+		[dictEvent addObject:[theEvent dictionaryRepresentation]];
+	}
+	[rootDict setObject:dictEvent forKey:@"events"];
+
+	NSData * theData = [NSPropertyListSerialization dataFromPropertyList:rootDict format:NSPropertyListXMLFormat_v1_0 errorDescription:&errStr];
+	NSString * eventPath = [self eventFilePathForSession:aSession];
+	[theData writeToFile:eventPath atomically:NO];
+	// set file path
+	[aSession.sourceFilePaths setObject:eventPath forKey:DLEventTrackKey];
+	[pool release];
+}
+
 - (void)requestSessionIDWithAppToken:(NSString *)aToken {
 	if ( _task ) return;
-	
+
 	if ( !firstReachabilityNotificationReceived || [_wifiReachability currentReachabilityStatus] == NotReachable ) {
 		// signal the flag to make a connection
 		pendingRequestSessionForFirstReachabilityNotification = YES;
 		self.appToken = aToken;
 		return;
 	}
-	
+
 	// begin connection
 	DLGetNewSessionTask * theTask = [[DLGetNewSessionTask alloc] initWithAppToken:aToken];
 	theTask.taskController = self;
@@ -141,7 +184,7 @@
 	BOOL backgroundSupported = NO;
 	UIDevice* device = [UIDevice currentDevice];
 	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
-	
+
 	if ( backgroundSupported ) {
 		bgTaskIdentifier = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
 			[self saveUnfinishedRecordingContext:aSession];
@@ -153,6 +196,9 @@
 				[self archiveTouchesForSession:aSession];
 				[self archiveOrientationChangesForSession:aSession];
 			}
+      [self archiveViewInfoForSession:aSession];
+      [self archiveEventsForSession:aSession];
+
 			// create tasks to upload
 			[self uploadSession:aSession];
 			[[UIApplication sharedApplication] endBackgroundTask:bgTaskIdentifier];
@@ -160,7 +206,13 @@
 	} else {
 		// if the system does not support background processing, we have to save the touches in main thread.
 		[self archiveTouchesForSession:aSession];
-        [self archiveOrientationChangesForSession:aSession];        
+        [self archiveOrientationChangesForSession:aSession];
+        if ([aSession shouldPostTrackForName:DLViewTrackKey]) {
+            [self archiveViewInfoForSession:aSession];
+        }
+        if ([aSession shouldPostTrackForName:DLEventTrackKey]) {
+            [self archiveEventsForSession:aSession];
+        }
 	}
 }
 
@@ -169,7 +221,7 @@
 	UIDevice* device = [UIDevice currentDevice];
 	BOOL backgroundSupported = NO;
 	if ([device respondsToSelector:@selector(isMultitaskingSupported)]) backgroundSupported = device.multitaskingSupported;
-	
+
 	if ( !backgroundSupported ) {
 		// upload next time when the app is launched
 		return;
@@ -209,6 +261,14 @@
 
 - (NSString *)orientationFilePathForSession:(DLRecordingContext *)ctx {
     return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"orientation-%@.plist", ctx.sessionID]];
+}
+
+- (NSString *)viewFilePathForSession:(DLRecordingContext *)ctx {
+    return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"view-%@.plist", ctx.sessionID]];
+}
+
+- (NSString *)eventFilePathForSession:(DLRecordingContext *)ctx {
+    return [self.baseDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"events-%@.plist", ctx.sessionID]];
 }
 
 - (void)removeRecordingContext:(DLRecordingContext *)ctx {
@@ -290,7 +350,7 @@
 }
 
 - (void)renewUploadURLForSession:(DLRecordingContext *)ctx wtihTrack:(NSString *)trcName {
-	
+
 }
 
 #pragma mark Task Management
@@ -359,11 +419,11 @@
 		case ReachableViaWiFi:
 			statusStr = @"wifi";
 			break;
-			
+
 		case ReachableViaWWAN:
 			statusStr = @"wwan";
 			break;
-			
+
 		default:
 			statusStr = @"no_network";
 			break;

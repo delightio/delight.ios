@@ -9,11 +9,8 @@
 #import "DLTask.h"
 #import "DLTaskController.h"
 
-#ifdef DL_USE_STAGING_SERVER
-NSString * const DL_BASE_URL = @"delightweb-staging.herokuapp.com";
-#else
 NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
-#endif
+NSString * const DL_BASE_SCHEME = @"https";
 NSString * const DL_APP_LOCALE = @"";
 NSString * const DLTrackURLKey = @"url";
 NSString * const DLTrackExpiryDateKey = @"expiry_date";
@@ -21,6 +18,8 @@ NSString * const DLScreenTrackKey = @"screen_track";
 NSString * const DLTouchTrackKey = @"touch_track";
 NSString * const DLFrontTrackKey = @"front_track";
 NSString * const DLOrientationTrackKey = @"orientation_track";
+NSString * const DLViewTrackKey = @"view_track";
+NSString * const DLEventTrackKey = @"event_track";
 
 @implementation DLTask
 @synthesize recordingContext = _recordingContext;

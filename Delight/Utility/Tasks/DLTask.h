@@ -18,10 +18,13 @@ extern NSString * const DLScreenTrackKey;
 extern NSString * const DLTouchTrackKey;
 extern NSString * const DLFrontTrackKey;
 extern NSString * const DLOrientationTrackKey;
+extern NSString * const DLViewTrackKey;
+extern NSString * const DLEventTrackKey;
 
 @class DLTaskController;
 
 extern NSString * const DL_BASE_URL;
+extern NSString * const DL_BASE_SCHEME;
 extern NSString * const DL_APP_LOCALE;
 
 @interface DLTask : NSOperation

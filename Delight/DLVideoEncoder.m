@@ -25,6 +25,7 @@
 @synthesize maximumKeyFrameInterval;
 @synthesize outputFileSize;
 @synthesize pixelFormatType;
+@synthesize recordingStartTime;
 @synthesize delegate;
 
 - (id)init
@@ -191,6 +192,11 @@
     CMTime time = CMTimeMake((int)millisElapsed, 1000);
     
     return time;
+}
+
+- (NSTimeInterval)currentFrameTimeInterval
+{
+    return (recording ? [[NSProcessInfo processInfo] systemUptime] - recordingStartTime : 0.0f);
 }
 
 - (UIImage *)resizedImageForPixelData:(void *)pixelData width:(int)backingWidth height:(int)backingHeight

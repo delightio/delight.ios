@@ -16,10 +16,14 @@ typedef enum {
 	DLFinishedUploadFrontCameraFile,
 	DLFinishedUploadTouchesFile,
 	DLFinishedUploadOrientationFile,
+    DLFinishedUploadViewFile,
+    DLFinishedUploadEventFile,
 	DLFinishedPostVideo,
 	DLFinishedPostTouches,
 	DLFinishedPostOrientation,
 	DLFinishedPostFrontCamera,
+    DLFinishedPostView,
+    DLFinishedPostEvents
 } DLFinishedTaskIdentifier;
 
 /*!
@@ -34,6 +38,8 @@ typedef enum {
 @property (nonatomic, retain) NSArray * touches;
 @property (nonatomic, assign) CGRect touchBounds;
 @property (nonatomic, retain) NSArray * orientationChanges;
+@property (nonatomic, retain) NSArray * viewInfos;
+@property (nonatomic, retain) NSArray * events;
 @property (nonatomic) BOOL shouldRecordVideo;
 @property (nonatomic) BOOL wifiUploadOnly;
 @property (nonatomic) float scaleFactor;
@@ -49,6 +55,7 @@ typedef enum {
 @property (nonatomic, retain) NSString * cameraFilePath;
 @property (nonatomic, retain) NSString * touchFilePath;
 @property (nonatomic, retain) NSString * orientationFilePath;
+@property (nonatomic, retain) NSString * eventFilePath;
 @property (nonatomic, retain) NSString * usabilityTestDescription;
 @property (nonatomic, retain) NSMutableDictionary * userProperties;
 @property (nonatomic, retain) NSMutableIndexSet * finishedTaskIndex;

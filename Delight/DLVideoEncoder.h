@@ -17,9 +17,7 @@
 @interface DLVideoEncoder : NSObject {
     AVAssetWriter *videoWriter;
     AVAssetWriterInput *videoWriterInput;
-    AVAssetWriterInputPixelBufferAdaptor *avAdaptor;
-    
-    NSTimeInterval recordingStartTime;  // System uptime at recording start    
+    AVAssetWriterInputPixelBufferAdaptor *avAdaptor;    
     NSLock *lock;
 }
 
@@ -31,6 +29,7 @@
 @property (nonatomic, assign) NSUInteger maximumKeyFrameInterval;
 @property (nonatomic, readonly) long outputFileSize;
 @property (nonatomic, readonly) int pixelFormatType;
+@property (nonatomic, assign) NSTimeInterval recordingStartTime;  // System uptime at recording start    
 @property (nonatomic, assign) id<DLVideoEncoderDelegate> delegate;
 
 - (void)startNewRecording;
@@ -41,6 +40,7 @@
 - (void)encodeImage:(UIImage *)frameImage atPresentationTime:(CMTime)time byteShift:(NSInteger)byteShift scale:(CGFloat)scale;
 - (NSURL *)tempFileURL;
 - (CMTime)currentFrameTime;
+- (NSTimeInterval)currentFrameTimeInterval;
 - (UIImage *)resizedImageForPixelData:(void *)pixelData width:(int)backingWidth height:(int)backingHeight;
 
 @end

@@ -70,12 +70,28 @@
 		836ABF2C1548D47400926A71 /* DLCamCaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF261548D47400926A71 /* DLCamCaptureManager.m */; };
 		836ABF2D1548D47400926A71 /* DLCamRecorder.h in Headers */ = {isa = PBXBuildFile; fileRef = 836ABF271548D47400926A71 /* DLCamRecorder.h */; };
 		836ABF2E1548D47400926A71 /* DLCamRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 836ABF281548D47400926A71 /* DLCamRecorder.m */; };
+		837D9CD815ACB74500704989 /* DLViewInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 837D9CD615ACB74500704989 /* DLViewInfo.h */; };
+		837D9CD915ACB74500704989 /* DLViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 837D9CD715ACB74500704989 /* DLViewInfo.m */; };
+		837D9CDE15ACBE6100704989 /* UIViewController+DLViewInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 837D9CDC15ACBE6100704989 /* UIViewController+DLViewInfo.h */; };
+		837D9CDF15ACBE6100704989 /* UIViewController+DLViewInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 837D9CDC15ACBE6100704989 /* UIViewController+DLViewInfo.h */; };
+		837D9CE015ACBE6100704989 /* UIViewController+DLViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 837D9CDD15ACBE6100704989 /* UIViewController+DLViewInfo.m */; };
+		837D9CE115ACBE6100704989 /* UIViewController+DLViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 837D9CDD15ACBE6100704989 /* UIViewController+DLViewInfo.m */; };
+		837D9CE215ACBE6400704989 /* DLViewInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 837D9CD615ACB74500704989 /* DLViewInfo.h */; };
+		837D9CE315ACBE6400704989 /* DLViewInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 837D9CD715ACB74500704989 /* DLViewInfo.m */; };
 		837E8A4D15658ACE00FB16E9 /* DLGesture.m in Sources */ = {isa = PBXBuildFile; fileRef = 83827A541538BD82002EA080 /* DLGesture.m */; };
 		837E8A4F15658AD100FB16E9 /* DLGestureTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391626E1537C21000549347 /* DLGestureTracker.m */; };
 		838187001563156400608514 /* UITextField+DLPrivateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 838186FE1563156400608514 /* UITextField+DLPrivateView.h */; };
 		838187011563156400608514 /* UITextField+DLPrivateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 838186FF1563156400608514 /* UITextField+DLPrivateView.m */; };
 		8382935E1558A04F007C6CDA /* CALayer+DLThreadSafe.h in Headers */ = {isa = PBXBuildFile; fileRef = 8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */; };
 		8382935F1558A04F007C6CDA /* CALayer+DLThreadSafe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */; };
+		83847A8A15B0FE33007AB04B /* DLEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 83847A8815B0FE33007AB04B /* DLEvent.h */; };
+		83847A8B15B0FE33007AB04B /* DLEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 83847A8815B0FE33007AB04B /* DLEvent.h */; };
+		83847A8C15B0FE33007AB04B /* DLEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 83847A8915B0FE33007AB04B /* DLEvent.m */; };
+		83847A8D15B0FE33007AB04B /* DLEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 83847A8915B0FE33007AB04B /* DLEvent.m */; };
+		8385118D15AF9C8D00CE2C0B /* DLAnalytics.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385118B15AF9C8D00CE2C0B /* DLAnalytics.h */; };
+		8385118E15AF9C8D00CE2C0B /* DLAnalytics.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385118B15AF9C8D00CE2C0B /* DLAnalytics.h */; };
+		8385118F15AF9C8D00CE2C0B /* DLAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385118C15AF9C8D00CE2C0B /* DLAnalytics.m */; };
+		8385119015AF9C8D00CE2C0B /* DLAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385118C15AF9C8D00CE2C0B /* DLAnalytics.m */; };
 		8382C6D515B7424400291B32 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8382C6CE15B73B5200291B32 /* CoreImage.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		8385CA7F154768530057FC37 /* DLTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = 8385CA7D154768530057FC37 /* DLTouch.h */; };
 		8385CA80154768530057FC37 /* DLTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = 8385CA7E154768530057FC37 /* DLTouch.m */; };
@@ -130,6 +146,11 @@
 		836ABF261548D47400926A71 /* DLCamCaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamCaptureManager.m; sourceTree = "<group>"; };
 		836ABF271548D47400926A71 /* DLCamRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLCamRecorder.h; sourceTree = "<group>"; };
 		836ABF281548D47400926A71 /* DLCamRecorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLCamRecorder.m; sourceTree = "<group>"; };
+		837D9CD615ACB74500704989 /* DLViewInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLViewInfo.h; sourceTree = "<group>"; };
+		837D9CD715ACB74500704989 /* DLViewInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLViewInfo.m; sourceTree = "<group>"; };
+		837D9CDC15ACBE6100704989 /* UIViewController+DLViewInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+DLViewInfo.h"; sourceTree = "<group>"; };
+		837D9CDD15ACBE6100704989 /* UIViewController+DLViewInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+DLViewInfo.m"; sourceTree = "<group>"; };
+		8380098515A22A6F002E9133 /* Delight_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delight_Private.h; sourceTree = "<group>"; };
 		8380098515A22A6F002E9133 /* Delight_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Delight_Internal.h; sourceTree = "<group>"; };
 		838186FE1563156400608514 /* UITextField+DLPrivateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextField+DLPrivateView.h"; sourceTree = "<group>"; };
 		838186FF1563156400608514 /* UITextField+DLPrivateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextField+DLPrivateView.m"; sourceTree = "<group>"; };
@@ -137,6 +158,10 @@
 		83827A541538BD82002EA080 /* DLGesture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLGesture.m; sourceTree = "<group>"; };
 		8382935C1558A04F007C6CDA /* CALayer+DLThreadSafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CALayer+DLThreadSafe.h"; sourceTree = "<group>"; };
 		8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CALayer+DLThreadSafe.m"; sourceTree = "<group>"; };
+		83847A8815B0FE33007AB04B /* DLEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLEvent.h; sourceTree = "<group>"; };
+		83847A8915B0FE33007AB04B /* DLEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLEvent.m; sourceTree = "<group>"; };
+		8385118B15AF9C8D00CE2C0B /* DLAnalytics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLAnalytics.h; sourceTree = "<group>"; };
+		8385118C15AF9C8D00CE2C0B /* DLAnalytics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLAnalytics.m; sourceTree = "<group>"; };
 		8382C6CE15B73B5200291B32 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		8385CA7D154768530057FC37 /* DLTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLTouch.h; sourceTree = "<group>"; };
 		8385CA7E154768530057FC37 /* DLTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DLTouch.m; sourceTree = "<group>"; };
@@ -231,6 +256,19 @@
 			path = Camera;
 			sourceTree = "<group>";
 		};
+		837D9CDB15ACB74C00704989 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				8385118B15AF9C8D00CE2C0B /* DLAnalytics.h */,
+				8385118C15AF9C8D00CE2C0B /* DLAnalytics.m */,
+				837D9CD615ACB74500704989 /* DLViewInfo.h */,
+				837D9CD715ACB74500704989 /* DLViewInfo.m */,
+				83847A8815B0FE33007AB04B /* DLEvent.h */,
+				83847A8915B0FE33007AB04B /* DLEvent.m */,
+			);
+			name = Analytics;
+			sourceTree = "<group>";
+		};
 		838293611558A054007C6CDA /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -240,6 +278,8 @@
 				8382935D1558A04F007C6CDA /* CALayer+DLThreadSafe.m */,
 				838186FE1563156400608514 /* UITextField+DLPrivateView.h */,
 				838186FF1563156400608514 /* UITextField+DLPrivateView.m */,
+				837D9CDC15ACBE6100704989 /* UIViewController+DLViewInfo.h */,
+				837D9CDD15ACBE6100704989 /* UIViewController+DLViewInfo.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -311,6 +351,7 @@
 		83B8968714EAEC68006D93C2 /* Delight */ = {
 			isa = PBXGroup;
 			children = (
+				837D9CDB15ACB74C00704989 /* Analytics */,
 				836ABF241548D47400926A71 /* Camera */,
 				838293611558A054007C6CDA /* Categories */,
 				A9A9A3CC1536EA3600B6E4AB /* Utility */,
@@ -401,6 +442,10 @@
 				83559CF115ABB60B0062E66A /* DLConstants.h in Headers */,
 				83559CF315ABB60B0062E66A /* DLUIKitVideoEncoder.h in Headers */,
 				83559CF715ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.h in Headers */,
+				837D9CDF15ACBE6100704989 /* UIViewController+DLViewInfo.h in Headers */,
+				837D9CE215ACBE6400704989 /* DLViewInfo.h in Headers */,
+				8385118E15AF9C8D00CE2C0B /* DLAnalytics.h in Headers */,
+				83847A8B15B0FE33007AB04B /* DLEvent.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,6 +474,10 @@
 				833B500D15670E690085552F /* DLMetrics.h in Headers */,
 				832D1DAE1589626D004F2BD6 /* DLConstants.h in Headers */,
 				83995A8E158AC08200A41326 /* DLUIKitVideoEncoder.h in Headers */,
+				837D9CD815ACB74500704989 /* DLViewInfo.h in Headers */,
+				837D9CDE15ACBE6100704989 /* UIViewController+DLViewInfo.h in Headers */,
+				8385118D15AF9C8D00CE2C0B /* DLAnalytics.h in Headers */,
+				83847A8A15B0FE33007AB04B /* DLEvent.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -661,6 +710,10 @@
 				83559CCE15ABB60B0062E66A /* DLMetrics.m in Sources */,
 				83559CD015ABB60B0062E66A /* DLUIKitVideoEncoder.m in Sources */,
 				83559CD115ABB60B0062E66A /* DLMobileFrameBufferVideoEncoder.m in Sources */,
+				837D9CE115ACBE6100704989 /* UIViewController+DLViewInfo.m in Sources */,
+				837D9CE315ACBE6400704989 /* DLViewInfo.m in Sources */,
+				8385119015AF9C8D00CE2C0B /* DLAnalytics.m in Sources */,
+				83847A8D15B0FE33007AB04B /* DLEvent.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,6 +743,10 @@
 				837E8A4F15658AD100FB16E9 /* DLGestureTracker.m in Sources */,
 				833B500E15670E690085552F /* DLMetrics.m in Sources */,
 				83995A8F158AC08200A41326 /* DLUIKitVideoEncoder.m in Sources */,
+				837D9CD915ACB74500704989 /* DLViewInfo.m in Sources */,
+				837D9CE015ACBE6100704989 /* UIViewController+DLViewInfo.m in Sources */,
+				8385118F15AF9C8D00CE2C0B /* DLAnalytics.m in Sources */,
+				83847A8C15B0FE33007AB04B /* DLEvent.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

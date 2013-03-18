@@ -12,6 +12,7 @@
 #import "DLVideoEncoder.h"
 #import "DLGestureTracker.h"
 #import "DLCamCaptureManager.h"
+#import "DLAnalytics.h"
 
 #define DLAnnotationAudioOnly 99
 
@@ -24,6 +25,7 @@
 @property (nonatomic, retain) DLGestureTracker *gestureTracker;
 @property (nonatomic, retain) DLCamCaptureManager *cameraManager;
 @property (nonatomic, retain) DLMetrics *metrics;
+@property (nonatomic, retain) DLAnalytics *analytics;
 @property (nonatomic, retain) NSString *appToken;
 @property (nonatomic, assign) DLAnnotation annotation;
 @property (nonatomic, assign) CGFloat scaleFactor;

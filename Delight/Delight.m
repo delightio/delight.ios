@@ -13,6 +13,7 @@
 #import "DLMetrics.h"
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
+#import "UIViewController+DLViewInfo.h"
 #import </usr/include/objc/objc-class.h>
 
 #if PRIVATE_FRAMEWORK
@@ -63,6 +64,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 @synthesize gestureTracker = _gestureTracker;
 @synthesize cameraManager = _cameraManager;
 @synthesize metrics = _metrics;
+@synthesize analytics = _analytics;
 @synthesize appToken = _appToken;
 @synthesize annotation = _annotation;
 @synthesize scaleFactor = _scaleFactor;
@@ -167,6 +169,31 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     }
 }
 
++ (void)markCurrentView:(NSString *)viewName
+{
+    Delight *delight = [Delight sharedInstance];
+    NSTimeInterval startTime = [delight.videoEncoder currentFrameTimeInterval];
+    DLViewInfo *lastViewInfo = [delight.analytics lastViewInfoForType:DLViewInfoTypeUser];
+    DLViewInfo *sectionChange = [DLViewInfo viewInfoWithName:viewName type:DLViewInfoTypeUser startTime:startTime];
+
+    [delight.analytics addViewInfo:sectionChange];
+    
+    // Set the end time for the last user-marked view
+    if (lastViewInfo) {
+        lastViewInfo.endTime = startTime;
+    }
+    
+    DLLog(@"[Delight] Marked view: %@", viewName);
+}
+
++ (void)trackEvent:(NSString *)eventName info:(NSDictionary *)eventInfo
+{
+    Delight *delight = [Delight sharedInstance];
+    NSTimeInterval time = [delight.videoEncoder currentFrameTimeInterval];
+    DLEvent *event = [DLEvent eventWithName:eventName properties:eventInfo at:time];
+    [[Delight sharedInstance].analytics addEvent:event];
+}
+
 #pragma mark -
 
 - (id)init
@@ -230,6 +257,10 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         Swizzle([UITextField class], @selector(setSecureTextEntry:), @selector(DLsetSecureTextEntry:));
         Swizzle([UITextField class], @selector(becomeFirstResponder), @selector(DLbecomeFirstResponder));
         Swizzle([UITextField class], @selector(resignFirstResponder), @selector(DLresignFirstResponder));
+        
+        // Method swizzling to automatically mark UIViewController changes in the view track
+        Swizzle([UIViewController class], @selector(viewDidAppear:), @selector(DLviewDidAppear:));
+        Swizzle([UIViewController class], @selector(viewWillDisappear:), @selector(DLviewWillDisappear:));
     }
     return self;
 }
@@ -246,6 +277,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 	[_taskController release];
     [_metrics release];
     [_userProperties release];
+    [_analytics release];
 	[screenshotQueue release];
     
     [super dealloc];
@@ -313,7 +345,8 @@ static void Swizzle(Class c, SEL orig, SEL new) {
         
         self.recordingContext.startTime = [NSDate date];
         self.recordingContext.screenFilePath = self.videoEncoder.outputPath;
-        
+        self.analytics = [[[DLAnalytics alloc] init] autorelease];
+
         if (self.autoCaptureEnabled) {
             [self scheduleScreenshot];
         }
@@ -332,6 +365,9 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 		self.recordingContext.touches = self.gestureTracker.touches;
         self.recordingContext.touchBounds = [self.gestureTracker touchBounds];
         self.recordingContext.orientationChanges = self.gestureTracker.orientationChanges;
+        self.recordingContext.viewInfos = self.analytics.viewInfos;
+        self.recordingContext.events = self.analytics.events;
+        self.analytics = nil;       // Stop tracking analytics data
     }
 }
 
@@ -599,7 +635,7 @@ static void Swizzle(Class c, SEL orig, SEL new) {
 #pragma mark - DLVideoEncoderDelegate
 
 - (void)videoEncoder:(DLVideoEncoder *)videoEncoder didBeginRecordingAtTime:(NSTimeInterval)startTime
-{
+{    
     if (videoEncoder.videoSize.width > videoEncoder.videoSize.height && self.gestureTracker.touchView.bounds.size.height > self.gestureTracker.touchView.bounds.size.width) {
         // Landscape video, portrait screen. Our surface is rotated.
         [self.gestureTracker setShouldRotateTouches:YES];

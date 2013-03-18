@@ -14,7 +14,7 @@
 @synthesize sessionDidEnd = _sessionDidEnd;
 
 - (NSURLRequest *)URLRequest {
-	NSString * urlStr = [NSString stringWithFormat:@"https://%@/%@s/%@.xml", DL_BASE_URL, self.taskController.sessionObjectName, self.recordingContext.sessionID];
+	NSString * urlStr = [NSString stringWithFormat:@"%@://%@/%@s/%@.xml", DL_BASE_SCHEME, DL_BASE_URL, self.taskController.sessionObjectName, self.recordingContext.sessionID];
     
     NSMutableString * propertyParams = [NSMutableString string];
     for (NSString * key in [self.recordingContext.userProperties allKeys]) {
