@@ -160,15 +160,6 @@ static void Swizzle(Class c, SEL orig, SEL new) {
     return [self sharedInstance].uploadsAutomatically;
 }
 
-+ (void)setPropertyValue:(id)value forKey:(NSString *)key
-{
-    if (![value isKindOfClass:[NSString class]] && ![value isKindOfClass:[NSNumber class]]) {
-        DLLog(@"[Delight] Ignoring property for key %@ - value must be an NSString or an NSNumber.", key);
-    } else {
-        [[self sharedInstance].userProperties setObject:value forKey:key];
-    }
-}
-
 + (void)markCurrentView:(NSString *)viewName
 {
     Delight *delight = [Delight sharedInstance];
