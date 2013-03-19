@@ -29,6 +29,11 @@
     return self;
 }
 
+- (NSDictionary *)dictionary
+{
+    return [NSDictionary dictionaryWithObjectsAndKeys:self.name, @"name", self.email,@"email", nil];
+}
+
 - (void)dealloc
 {
     [name release];

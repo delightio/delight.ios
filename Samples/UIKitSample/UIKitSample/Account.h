@@ -15,5 +15,6 @@
 
 + (id)accountWithName:(NSString *)name email:(NSString *)email password:(NSString *)password;
 - (id)initWithName:(NSString *)name email:(NSString *)email password:(NSString *)password;
+- (NSDictionary *)dictionary;
 
 @end

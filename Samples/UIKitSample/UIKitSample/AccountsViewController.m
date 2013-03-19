@@ -108,7 +108,7 @@
     [self.navigationController pushViewController:viewAccountViewController animated:YES];
     [viewAccountViewController release];
     
-    [Delight setPropertyValue:selectedAccount.name forKey:@"last_account_viewed"];
+    [Delight trackEvent:@"last_account_viewed" info:[selectedAccount dictionary]];
 }
 
 #pragma mark - AddAccountViewControllerDelegate
@@ -121,7 +121,7 @@
                           atScrollPosition:UITableViewScrollPositionBottom
                                   animated:YES];
     
-    [Delight setPropertyValue:[NSNumber numberWithUnsignedInteger:[accounts count]] forKey:@"account_count"];
+    [Delight trackEvent:@"account_added" info:[account dictionary]];
 }
 
 #pragma mark - ViewAccountViewControllerDelegate
@@ -131,7 +131,7 @@
     [accounts removeObject:account];
     [self.tableView reloadData];
     
-    [Delight setPropertyValue:[NSNumber numberWithUnsignedInteger:[accounts count]] forKey:@"account_count"];
+    [Delight trackEvent:@"account_deleted" info:[account dictionary]];
 }
 
 @end
