@@ -57,7 +57,7 @@ typedef enum {
  */
 + (void)initWithPartnerAppToken:(NSString *)partnerAppToken;
 
-/** Check with our server if the current session should be recorded. However, Delight won't record until star: is called.
+/** Check with our server if the current session should be recorded. However, Delight won't record until start: is called.
  
  @param url URL which Delight server will post to after the recording is uploaded and finished processing.
  @param payload A list of key value pair to be posted back. Please note that we only support single value data type such as strings and numerics.
