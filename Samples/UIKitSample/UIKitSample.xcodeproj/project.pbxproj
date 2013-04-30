@@ -108,7 +108,6 @@
 		837C3A2A153F870600463CB3 = {
 			isa = PBXGroup;
 			children = (
-				246EEDB916DF9E66000C1F33 /* MapKit.framework */,
 				837C3A3F153F870600463CB3 /* UIKitSample */,
 				837C3A38153F870600463CB3 /* Frameworks */,
 				837C3A36153F870600463CB3 /* Products */,
@@ -135,6 +134,7 @@
 				837C3A39153F870600463CB3 /* UIKit.framework */,
 				837C3A3B153F870600463CB3 /* Foundation.framework */,
 				837C3A3D153F870600463CB3 /* CoreGraphics.framework */,
+				246EEDB916DF9E66000C1F33 /* MapKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
