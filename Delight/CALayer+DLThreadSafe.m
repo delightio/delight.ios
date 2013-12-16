@@ -8,7 +8,7 @@
 
 #import "CALayer+DLThreadSafe.h"
 #import "Delight_Internal.h"
-#import </usr/include/objc/objc-runtime.h>
+#import <objc/runtime.h>
 
 DL_MAKE_CATEGORIES_LOADABLE(CALayer_DLThreadSafe);
 

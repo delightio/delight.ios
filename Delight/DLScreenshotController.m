@@ -8,7 +8,7 @@
 
 #import "DLScreenshotController.h"
 #import <QuartzCore/QuartzCore.h>
-#import </usr/include/objc/objc-runtime.h>
+#import <objc/runtime.h>
 
 @interface DLScreenshotController ()
 - (UIWindow *)keyboardWindow;

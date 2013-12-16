@@ -7,7 +7,7 @@
 //
 
 #import "UIWindow+DLInterceptEvents.h"
-#import </usr/include/objc/objc-runtime.h>
+#import <objc/runtime.h>
 
 DL_MAKE_CATEGORIES_LOADABLE(UIWindow_DLInterceptEvents);
 

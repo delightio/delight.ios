@@ -8,7 +8,7 @@
 
 #import "UITextField+DLPrivateView.h"
 #import "Delight.h"
-#import </usr/include/objc/objc-runtime.h>
+#import <objc/runtime.h>
 
 DL_MAKE_CATEGORIES_LOADABLE(UITextField_DLPrivateView);
 

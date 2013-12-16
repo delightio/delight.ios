@@ -14,7 +14,7 @@
 #import "UIWindow+DLInterceptEvents.h"
 #import "UITextField+DLPrivateView.h"
 #import "UIViewController+DLViewInfo.h"
-#import </usr/include/objc/objc-class.h>
+#import <objc/runtime.h>
 
 #if PRIVATE_FRAMEWORK
 #import "DLMobileFrameBufferVideoEncoder.h"
