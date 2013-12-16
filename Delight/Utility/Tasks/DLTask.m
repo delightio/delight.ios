@@ -9,8 +9,8 @@
 #import "DLTask.h"
 #import "DLTaskController.h"
 
-NSString * const DL_BASE_URL = @"delightweb.herokuapp.com";
-NSString * const DL_BASE_SCHEME = @"https";
+NSString * const DL_BASE_URL = @"0.0.0.0:5000";
+NSString * const DL_BASE_SCHEME = @"http";
 NSString * const DL_APP_LOCALE = @"";
 NSString * const DLTrackURLKey = @"url";
 NSString * const DLTrackExpiryDateKey = @"expiry_date";
